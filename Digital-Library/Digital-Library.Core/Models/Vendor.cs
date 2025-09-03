@@ -15,6 +15,8 @@ namespace Digital_Library.Core.Models
 		[Required]
 		public string LibraryName { get; set; }
 		[Required]
+		public string LibraryLogoUrl { get; set; }
+		[Required]
 		public string City { get; set; }
 		[Required]
 		public string State { get; set; }
@@ -27,6 +29,7 @@ namespace Digital_Library.Core.Models
 		public ICollection<VendorIdentityImagesUrl>? vendorIdentityImagesUrls { get; set; }
 		public User? User { get; set; }
 		[ForeignKey(nameof(User))]
+		[Required]
 		public string UserId { get; set; }
 
 

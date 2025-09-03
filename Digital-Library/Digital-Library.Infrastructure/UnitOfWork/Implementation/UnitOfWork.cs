@@ -10,18 +10,18 @@ namespace Digital_Library.Infrastructure.UnitOfWork.Implementation
 	{
 		public EBookContext _context { get; }
 
-        public IBaseRepository<User> Users { get; }
-        public IBaseRepository<Book> Books { get; }
-        public IBaseRepository<Borrowing> Borrowings { get; }
-        public IBaseRepository<Cart> Carts { get; }
-        public IBaseRepository<CartDetail> CartDetails { get; }
-        public IBaseRepository<Category> Categories { get; }
-        public IBaseRepository<Order> Orders { get; }
-        public IBaseRepository<OrderDetail> OrderDetails { get; }
-        public IBaseRepository<Transaction> Transactions { get; }
-        public IBaseRepository<Vendor> Vendors { get; }
+		public IBaseRepository<User> Users { get; }
+		public IBaseRepository<Book> Books { get; }
+		public IBaseRepository<Borrowing> Borrowings { get; }
+		public IBaseRepository<Cart> Carts { get; }
+		public IBaseRepository<CartDetail> CartDetails { get; }
+		public IBaseRepository<Category> Categories { get; }
+		public IBaseRepository<Order> Orders { get; }
+		public IBaseRepository<OrderDetail> OrderDetails { get; }
+		public IBaseRepository<Transaction> Transactions { get; }
+		public IBaseRepository<Vendor> Vendors { get; }
 
-        public UnitOfWork(EBookContext context)
+		public UnitOfWork(EBookContext context)
 		{
 			_context = context;
 			Users = new BaseRepository<User>(_context);

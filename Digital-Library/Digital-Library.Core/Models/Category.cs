@@ -6,7 +6,7 @@ public class Category
 	[Key]
 	public string Id { get; set; } = Guid.NewGuid().ToString();
 	[Required]
-	public string CategroyName { get; set; }
+	public string CategoryName { get; set; }
 	[Required]
 	public string Description { get; set; }
 	[Required]

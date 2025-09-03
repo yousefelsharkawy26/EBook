@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Digital_Library.Service.Implementation;
+using Digital_Library.Service.Interface;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Digital_Library.Service
 {
@@ -6,6 +8,7 @@ namespace Digital_Library.Service
 	{
 		public static IServiceCollection Add_Module_Service_Dependencies(this IServiceCollection services)
 		{
+			services.AddTransient<IFileService, FileService>();
 			return services;
 		}
 	}

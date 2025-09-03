@@ -2,6 +2,7 @@ using Digital_Library.Core.Models;
 using Digital_Library.Infrastructure;
 using Digital_Library.Infrastructure.Context;
 using Digital_Library.Service;
+using Digital_Library.Service.Seed;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -49,6 +50,11 @@ namespace Digital_Library
 							name: "default",
 							pattern: "{controller=Home}/{action=Index}/{id?}")
 							.WithStaticAssets();
+			using (var scope = app.Services.CreateScope())
+			{
+				var services =  scope.ServiceProvider;
+				RoleSeeder.SeedRolesAsync(services).Wait();
+			}
 
 			app.Run();
 		}
