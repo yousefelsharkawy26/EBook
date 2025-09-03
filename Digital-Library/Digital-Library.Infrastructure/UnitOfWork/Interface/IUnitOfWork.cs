@@ -11,7 +11,7 @@ public interface IUnitOfWork : IDisposable
 	IBaseRepository<CartDetail> CartDetails {  get; }
 	IBaseRepository<Category> Categories {  get; }
 	IBaseRepository<Order> Orders {  get; }
-	IBaseRepository<OrderDetails> OrderDetails {  get; }
+	IBaseRepository<OrderDetail> OrderDetails {  get; }
 	IBaseRepository<Transaction> Transactions {  get; }
 	IBaseRepository<Vendor> Vendors {  get; }
 

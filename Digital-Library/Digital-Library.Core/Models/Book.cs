@@ -30,7 +30,7 @@ public class Book
 	[Required]
 	public string CategoryID { get; set; }
 
-	public ICollection<Borrowing>? Borrowing { get; set; }
+	public ICollection<Borrowing>? Borrowings { get; set; }
 	public ICollection<CartDetail>? CartDetails { get; set; }
 	public ICollection<OrderDetail>? OrderDetails { get; set; }
 

@@ -33,21 +33,22 @@ namespace Digital_Library.Service.Implementation;
 
         public async Task<Vendor> UpdateVendorAsync(int id, Vendor vendor)
         {
-            var existingVendor = await _context.Vendors.FindAsync(id);
-            if (existingVendor == null) return null;
+            //var existingVendor = await _context.Vendors.FindAsync(id);
+            //if (existingVendor == null) return null;
 
-            existingVendor.LibraryName = vendor.LibraryName;
-            existingVendor.Address = vendor.Address;
-            existingVendor.City = vendor.City;
-            existingVendor.State = vendor.State;
-            existingVendor.ZipCode = vendor.ZipCode;
-            existingVendor.ContactNumber = vendor.ContactNumber;
-            existingVendor.IdentityImagesUrl = vendor.IdentityImagesUrl;
-            existingVendor.WalletBalance = vendor.WalletBalance;
+            //existingVendor.LibraryName = vendor.LibraryName;
+            //existingVendor.Address = vendor.Address;
+            //existingVendor.City = vendor.City;
+            //existingVendor.State = vendor.State;
+            //existingVendor.ZipCode = vendor.ZipCode;
+            //existingVendor.ContactNumber = vendor.ContactNumber;
+            //existingVendor.IdentityImagesUrl = vendor.IdentityImagesUrl;
+            //existingVendor.WalletBalance = vendor.WalletBalance;
 
-            await _context.SaveChangesAsync();
-            return existingVendor;
-        }
+            //await _context.SaveChangesAsync();
+            //return existingVendor;
+            return null;
+	}
 
         public async Task<bool> DeleteVendorAsync(int id)
         {
