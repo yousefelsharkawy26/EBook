@@ -12,9 +12,4 @@
     <ProjectReference Include="..\Digital-Library.Infrastructure\Digital-Library.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Implementation\" />
-    <Folder Include="Interface\" />
-  </ItemGroup>
-
 </Project>
