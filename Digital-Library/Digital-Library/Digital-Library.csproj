@@ -25,4 +25,12 @@
     <ProjectReference Include="..\Digital-Library.Service\Digital-Library.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\BooksImage\" />
+    <Folder Include="wwwroot\BooksPdf\" />
+    <Folder Include="wwwroot\UserProfileImage\" />
+    <Folder Include="wwwroot\VendorIdentification\" />
+    <Folder Include="wwwroot\VendorLibraryLogo\" />
+  </ItemGroup>
+
 </Project>
