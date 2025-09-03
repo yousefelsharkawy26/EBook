@@ -1,15 +1,20 @@
-﻿namespace Digital_Library.Core.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Digital_Library.Core.Models;
 
 public class Borrowing
 {
-    public Guid Id { get; set; }
+	[Key]
+	public string Id { get; set; } = Guid.NewGuid().ToString();
+	public DateTime BorrowDate { get; set; }=	DateTime.Now;
+	[Required]
+	public DateTime DueDate { get; set; }
+	public Book? Book { get; set; }
+	[ForeignKey(nameof(Book))]
+	public string BookId { get; set; }
 
-    public DateTime BorrowDate { get; set; }
-
-    public DateTime DueDate{ get; set; }
-
-    public Book Book { get; set; }
-
-
-    public Guid BookId { get; set; }
+	public User? User { get; set; }
+	[ForeignKey(nameof(User))]
+	public string UserId { get; set; }
 }

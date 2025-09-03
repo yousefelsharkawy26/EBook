@@ -1,15 +1,10 @@
 ﻿using Digital_Library.Core.Models;
 using Digital_Library.Infrastructure.Context;
 using Digital_Library.Service.Interface;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
-namespace Digital_Library.Service.Implementation
-{
+namespace Digital_Library.Service.Implementation;
+
     public class VendorService : IVendorService
     {
         private readonly EBookContext _context;
@@ -64,4 +59,4 @@ namespace Digital_Library.Service.Implementation
             return true;
         }
     }
-}
+
