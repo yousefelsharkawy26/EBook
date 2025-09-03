@@ -12,5 +12,6 @@ namespace Digital_Library.Core.Models
         public Guid CartDetailId { get; set; }
         public int Quantity { get; set; }
         public FormatType FormatType { get; set; }
+        int c = 6;
     }
 }
