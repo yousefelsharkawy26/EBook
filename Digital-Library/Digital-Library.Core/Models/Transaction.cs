@@ -10,28 +10,22 @@ using System.Threading.Tasks;
 
 namespace Digital_Library.Core.Models
 {
-    public class Transaction
-    {
-        [Key]
-        public Guid PaymentId { get; set; }
-
-        public Status TransactionStatus { get; set; }
-
-        public int Amount { get; set; }
-
-        public PaymentMethod PaymentMethod { get; set; }
-
-        public DateTime TransactionDate { get; set; }
-
-        public string ReferenceCode { get; set; }
-
-
-        public Guid OrderId { get; set; }
-
-        [ForeignKey(nameof(Order.OrderId))]
-        public Order Order { get; set; }
+	public class Transaction
+	{
+		[Key]
+		public string Id { get; set; } = Guid.NewGuid().ToString();
+		public Status TransactionStatus { get; set; }
+		[Required]
+		public decimal Amount { get; set; }
+		public PaymentMethod PaymentMethod { get; set; }
+		public DateTime TransactionDate { get; set; }=	DateTime.Now;
+		public string ReferenceCode { get; set; }
+		[ForeignKey(nameof(Order))]
+		[Required]
+		public string OrderId { get; set; }
+		public Order? Order { get; set; }
 
 
 
-    }
+	}
 }
