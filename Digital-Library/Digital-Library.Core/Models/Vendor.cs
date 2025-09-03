@@ -15,6 +15,8 @@ namespace Digital_Library.Core.Models
 		[Required]
 		public string LibraryName { get; set; }
 		[Required]
+		public string LibraryLogoUrl { get; set; }
+		[Required]
 		public string City { get; set; }
 		[Required]
 		public string State { get; set; }
