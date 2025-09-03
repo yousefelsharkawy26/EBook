@@ -25,7 +25,7 @@ namespace Digital_Library.Core.Models
 		public DateTime TransactionDate { get; set; }=	DateTime.Now;
 
 		public string ReferenceCode { get; set; }
-		[ForeignKey(nameof(Order)]
+		[ForeignKey(nameof(Order))]
 		public string OrderId { get; set; }
 		public Order? Order { get; set; }
 
