@@ -14,14 +14,17 @@ namespace Digital_Library.Core.Models
 		[Key]
 		public string Id { get; set; }=Guid.NewGuid().ToString();
 		public FormatType FormatType { get; set; }
+		[Required]
 		public decimal Price { get; set; }
 		[Required]
 		public int Quantity { get; set; }
 		public Order? Order { get; set; }
 		[ForeignKey(nameof(Order))]
+		[Required]
 		public string OrderId { get; set; }
 		public Book? Book { get; set; }
 		[ForeignKey(nameof(Book))]
+		[Required]
 		public string BookId { get; set; }
 	}
 }

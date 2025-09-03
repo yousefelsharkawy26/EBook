@@ -13,8 +13,9 @@ namespace Digital_Library.Core.Models
 		[Key]
 		public string Id { get; set; }=	Guid.NewGuid().ToString();
 		[Required]
-		public string Url { get; set; }
+		public string ImageUrl { get; set; }
 		[ForeignKey(nameof(Vendor))]
+		[Required]
 		public string VendorId { get; set; }
 		public Vendor Vendor { get; set; }
 	}

@@ -14,18 +14,14 @@ namespace Digital_Library.Core.Models
 	{
 		[Key]
 		public string Id { get; set; } = Guid.NewGuid().ToString();
-
 		public Status TransactionStatus { get; set; }
-
-
+		[Required]
 		public decimal Amount { get; set; }
-
 		public PaymentMethod PaymentMethod { get; set; }
-
 		public DateTime TransactionDate { get; set; }=	DateTime.Now;
-
 		public string ReferenceCode { get; set; }
 		[ForeignKey(nameof(Order))]
+		[Required]
 		public string OrderId { get; set; }
 		public Order? Order { get; set; }
 

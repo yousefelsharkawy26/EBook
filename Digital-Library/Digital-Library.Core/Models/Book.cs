@@ -27,6 +27,7 @@ public class Book
 
 	public Category? Category { get; set; }
 	[ForeignKey(nameof(Category))]
+	[Required]
 	public string CategoryID { get; set; }
 
 	public ICollection<Borrowing>? Borrowing { get; set; }
@@ -35,6 +36,7 @@ public class Book
 
 	public Vendor? Vendor { get; set; }
 	[ForeignKey(nameof(Vendor))]
+	[Required]
 	public string VendorId { get; set; }
 
 

@@ -14,6 +14,7 @@ namespace Digital_Library.Core.Models
 		[Key]
 		public string Id { get; set; }=	Guid.NewGuid().ToString();
 		public DateTime OrderDate { get; set; }=	DateTime.Now;
+		[Required]
 		public decimal TotalAmount { get; set; }
 		public Status Status { get; set; }=Status.Pending;
 
@@ -25,6 +26,7 @@ namespace Digital_Library.Core.Models
 
 		public User? User { get; set; }
 		[ForeignKey(nameof(User))]
+		[Required]
 		public string UserId { get; set; }
 
 	}

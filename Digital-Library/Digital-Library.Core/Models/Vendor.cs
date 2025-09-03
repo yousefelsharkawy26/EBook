@@ -27,6 +27,7 @@ namespace Digital_Library.Core.Models
 		public ICollection<VendorIdentityImagesUrl>? vendorIdentityImagesUrls { get; set; }
 		public User? User { get; set; }
 		[ForeignKey(nameof(User))]
+		[Required]
 		public string UserId { get; set; }
 
 

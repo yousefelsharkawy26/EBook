@@ -19,11 +19,11 @@ namespace Digital_Library.Core.Models
 		public FormatType FormatType { get; set; }
 
 		[ForeignKey(nameof(Cart))]
+		[Required]
 		public string CartId { get; set; }
-
 		public Cart? Cart { get; set; }
-
 		[ForeignKey(nameof(Book))]
+		[Required]
 		public string BookId { get; set; }
 		public Book? Book { get; set; }
 
