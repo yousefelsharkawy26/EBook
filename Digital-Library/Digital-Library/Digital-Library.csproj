@@ -7,4 +7,10 @@
     <RootNamespace>Digital_Library</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Digital-Library.Core\Digital-Library.Core.csproj" />
+    <ProjectReference Include="..\Digital-Library.Infrastructure\Digital-Library.Infrastructure.csproj" />
+    <ProjectReference Include="..\Digital-Library.Service\Digital-Library.Service.csproj" />
+  </ItemGroup>
+
 </Project>
