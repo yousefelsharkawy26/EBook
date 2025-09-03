@@ -26,7 +26,8 @@ namespace Digital_Library
 			#region Dependency injections
 
 			builder.Services.Add_Module_Infrastructure_Dependencies()
-																				.Add_Module_Service_Dependencies();
+							.Add_Module_Service_Dependencies()
+                            .Add_Module_Configuration_Services(builder.Configuration);
 																				
 			#endregion
 
