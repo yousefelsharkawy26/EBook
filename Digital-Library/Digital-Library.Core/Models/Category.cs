@@ -1,12 +1,10 @@
-﻿namespace Digital_Library.Core.Model
+﻿namespace Digital_Library.Core.Models;
+public class Category
 {
-    public class Category
-    {
-        public Guid CategroyID { get; set; }
-        public string CategroyName { get; set; }
-        public string Description { get; set; }
-        public bool IsApproved { get; set; }
+    public Guid CategroyID { get; set; }
+    public string CategroyName { get; set; }
+    public string Description { get; set; }
+    public bool IsApproved { get; set; }
 
-        public ICollection<Book> Books { get; set; }
-    }
+    public ICollection<Book> Books { get; set; }
 }

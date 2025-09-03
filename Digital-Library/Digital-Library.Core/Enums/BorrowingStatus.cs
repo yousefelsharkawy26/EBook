@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Digital_Library.Core.Enum
+﻿namespace Digital_Library.Core.Enum
 {
-    internal enum BorrowingStatus
+    public enum Status
     {
         Pending,
         inProgress,

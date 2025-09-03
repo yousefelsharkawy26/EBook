@@ -7,4 +7,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Digital-Library.Core\Digital-Library.Core.csproj" />
+    <ProjectReference Include="..\Digital-Library.Infrastructure\Digital-Library.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
