@@ -17,7 +17,7 @@ namespace Digital_Library.Infrastructure.UnitOfWork.Implementation
         public IBaseRepository<CartDetail> CartDetails { get; }
         public IBaseRepository<Category> Categories { get; }
         public IBaseRepository<Order> Orders { get; }
-        public IBaseRepository<OrderDetails> OrderDetails { get; }
+        public IBaseRepository<OrderDetail> OrderDetails { get; }
         public IBaseRepository<Transaction> Transactions { get; }
         public IBaseRepository<Vendor> Vendors { get; }
 
@@ -30,7 +30,7 @@ namespace Digital_Library.Infrastructure.UnitOfWork.Implementation
 			Carts = new BaseRepository<Cart>(_context);
 			Categories = new BaseRepository<Category>(_context);
 			Orders = new BaseRepository<Order>(_context);
-			OrderDetails = new BaseRepository<OrderDetails>(_context);
+			OrderDetails = new BaseRepository<OrderDetail>(_context);
 			Transactions = new BaseRepository<Transaction>(_context);
 			Vendors = new BaseRepository<Vendor>(_context);
 		}
