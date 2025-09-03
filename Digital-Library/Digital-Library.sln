@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digital-Library.Service", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digital-Library.Infrastructure", "Digital-Library.Infrastructure\Digital-Library.Infrastructure.csproj", "{CE2B6ED5-6327-4372-AD7E-ADEEC3315B88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digital-Library", "Digital-Library\Digital-Library.csproj", "{7EAF1E08-9D96-59A7-23FE-8A754B359BB7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{CE2B6ED5-6327-4372-AD7E-ADEEC3315B88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE2B6ED5-6327-4372-AD7E-ADEEC3315B88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE2B6ED5-6327-4372-AD7E-ADEEC3315B88}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7EAF1E08-9D96-59A7-23FE-8A754B359BB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7EAF1E08-9D96-59A7-23FE-8A754B359BB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7EAF1E08-9D96-59A7-23FE-8A754B359BB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7EAF1E08-9D96-59A7-23FE-8A754B359BB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
