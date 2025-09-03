@@ -9,10 +9,10 @@ namespace Digital_Library.Service.Interface
 {
     public interface IUserService
     {
-        Task<User> ChangeName(Guid id , string name);
+        Task ChangeName(string id , string name);
 
-        Task<User> ChangeAddress(Guid id , string Address);
+        Task ChangeAddress(string id , string City , string State , string ZipCode);
 
-        Task<User> ChangePhoneNumber(Guid id, string PhoneNumber);
+        Task ChangePhoneNumber(string id, string PhoneNumber);
     }
 }

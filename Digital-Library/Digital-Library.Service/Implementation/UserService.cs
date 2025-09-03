@@ -1,34 +1,52 @@
 ﻿using Digital_Library.Core.Models;
+using Digital_Library.Infrastructure.Repositories.Interface;
+using Digital_Library.Infrastructure.UnitOfWork.Interface;
 using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Digital_Library.Service.Implementation
+namespace Digital_Library.Service.Implementation;
+public class UserService : IUserService
 {
-    public class UserService : IUserService
+    private readonly IUnitOfWork _unitOfWork;
+    public UserService(IUnitOfWork unitOfWork)
     {
-        private readonly UserManager<User> _userManager;
-        public UserService(UserManager<User> userManager)
+        _unitOfWork = unitOfWork;
+    }
+    public async Task ChangeAddress(string id, string City , string State , string ZipCode)
+    {
+        var vendor = await _unitOfWork.Vendors.GetByIdAsync(id);
+        if (vendor == null)
         {
-            _userManager = userManager;
-        }
-        public Task<User> ChangeAddress(Guid id, string Address)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<User> ChangeName(Guid id, string name)
-        {
-            throw new NotImplementedException();
+            throw new KeyNotFoundException($"User with this {id} not found");
         }
 
-        public Task<User> ChangePhoneNumber(Guid id, string PhoneNumber)
+        vendor.City = City;
+        vendor.State = State;
+        vendor.ZipCode = ZipCode;
+
+        await _unitOfWork.SaveChangesAsync();
+
+    }
+
+    public async Task ChangeName(string id, string name)
+    {
+        var user = await _unitOfWork.Users.GetByIdAsync(id);
+        if (user == null)
         {
-            throw new NotImplementedException();
+            throw new KeyNotFoundException($"User with this {id} not found");
         }
+
+        user.FullName = name;
+    }
+
+    public async Task ChangePhoneNumber(string id, string PhoneNumber)
+    {
+        var user = await _unitOfWork.Users.GetByIdAsync(id);
+        if (user == null)
+        {
+            throw new KeyNotFoundException($"User with this {id} not found");
+        }
+
+        user.PhoneNumber = PhoneNumber;
     }
 }
