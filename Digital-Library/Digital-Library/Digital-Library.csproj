@@ -17,17 +17,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-<<<<<<< HEAD
     <ProjectReference Include="..\Digital-Library.Core\Digital-Library.Core.csproj" />
     <ProjectReference Include="..\Digital-Library.Infrastructure\Digital-Library.Infrastructure.csproj" />
     <ProjectReference Include="..\Digital-Library.Service\Digital-Library.Service.csproj" />
-=======
-
     <ProjectReference Include="..\Digital-Library.Core\Digital-Library.Core.csproj" />
     <ProjectReference Include="..\Digital-Library.Infrastructure\Digital-Library.Infrastructure.csproj" />
     <ProjectReference Include="..\Digital-Library.Service\Digital-Library.Service.csproj" />
-
->>>>>>> ddc13ae1bf1004eac1ceae1e01311e72989fbd60
   </ItemGroup>
 
 </Project>
