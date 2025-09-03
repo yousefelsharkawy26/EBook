@@ -1,8 +1,5 @@
-﻿using Digital_Library.Core.Models;
-using Digital_Library.Infrastructure.Repositories.Interface;
-using Digital_Library.Infrastructure.UnitOfWork.Interface;
+﻿using Digital_Library.Infrastructure.UnitOfWork.Interface;
 using Digital_Library.Service.Interface;
-using Microsoft.AspNetCore.Identity;
 
 namespace Digital_Library.Service.Implementation;
 public class UserService : IUserService
@@ -12,7 +9,7 @@ public class UserService : IUserService
     {
         _unitOfWork = unitOfWork;
     }
-    public async Task ChangeAddress(string id, string City , string State , string ZipCode)
+    public async Task ChangeAddress(string id, string City, string State, string ZipCode)
     {
         var vendor = await _unitOfWork.Vendors.GetByIdAsync(id);
         if (vendor == null)
