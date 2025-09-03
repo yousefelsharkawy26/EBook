@@ -1,10 +1,16 @@
-﻿namespace Digital_Library.Core.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Digital_Library.Core.Models;
 public class Category
 {
-    public Guid CategroyID { get; set; }
-    public string CategroyName { get; set; }
-    public string Description { get; set; }
-    public bool IsApproved { get; set; }
+	[Key]
+	public string Id { get; set; } = Guid.NewGuid().ToString();
+	[Required]
+	public string CategroyName { get; set; }
+	[Required]
+	public string Description { get; set; }
+	[Required]
+	public bool IsApproved { get; set; }
 
-    public ICollection<Book> Books { get; set; }
+	public ICollection<Book>? Books { get; set; }
 }
