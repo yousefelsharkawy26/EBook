@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Digital_Library.Core.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Digital_Library.Infrastructure.Context
@@ -10,6 +11,8 @@ namespace Digital_Library.Infrastructure.Context
         {
             
         }
+        public DbSet<Vendor> Vendors { get; set; }
+
 
     }
 }
