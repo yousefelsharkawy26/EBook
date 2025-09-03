@@ -15,5 +15,7 @@ namespace Digital_Library.Core.Models
 
         public Status Status { get; set; }
 
+        public ICollection<Transaction> Transactions { get; set; }
+
     }
 }
