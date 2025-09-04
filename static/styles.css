@@ -1,0 +1,62 @@
+:root{
+  --brand-primary:#0d6efd;
+}
+
+.view{min-height:40vh}
+
+.preview-content{
+  display:grid;
+  gap:1rem;
+}
+.preview-content .preview-page{
+  border:1px solid rgba(0,0,0,.125);
+  border-radius:.5rem;
+  padding:1rem;
+  background:#fff;
+}
+
+.watermark{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) rotate(-20deg);
+  pointer-events:none;
+  opacity:.15;
+  font-weight:700;
+  font-size:2rem;
+  white-space:nowrap;
+}
+
+.reader-area{
+  height:calc(100vh - 120px);
+  overflow:auto;
+  background:var(--bs-body-bg);
+}
+
+.rating{color:#ffbf00}
+
+.card-cover{
+  aspect-ratio:3/4;
+  object-fit:cover;
+}
+
+/* Dark mode */
+body.dark{
+  --bs-body-bg:#121212;
+  --bs-body-color:#eaeaea;
+  background:#121212;
+}
+body.dark .card{background:#1e1e1e}
+body.dark .navbar{background:#0b5ed7!important}
+
+/* Small helper utilities */
+.cursor-pointer{cursor:pointer}
+.drm-disabled{
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+/* Tables */
+table img.table-cover{width:40px;height:56px;object-fit:cover;border-radius:.25rem}
+
+

@@ -28,10 +28,10 @@ namespace Digital_Library.Service
 
 		public static IServiceCollection Add_Module_Configuration_Services(this IServiceCollection services, IConfiguration configuration)
 		{
-            // 1. Configure the EmailSettings class with values from appsettings.json
-            services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
+  // 1. Configure the EmailSettings class with values from appsettings.json
+  services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
 
 			return services;
-        }
+  }
 	}
 }

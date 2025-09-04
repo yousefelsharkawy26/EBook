@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Digital Library System</title>
+    <meta name="description" content="Digital Library System UI Prototype">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="assets/icon-book.svg">
+  </head>
+  <body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm" aria-label="Main navigation">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="#" id="brandHome">
+          <img src="assets/icon-book.svg" width="24" height="24" alt="Library logo">
+          <span>Digital Library</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+          <form class="d-flex ms-lg-3 my-3 my-lg-0 flex-grow-1" role="search" onsubmit="return false;">
+            <input id="globalSearchInput" class="form-control me-2" type="search" placeholder="Search books, authors..." aria-label="Search">
+            <button id="globalSearchBtn" class="btn btn-light" type="button">Search</button>
+          </form>
+
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+            <li class="nav-item"><a class="nav-link active" data-nav="catalog" href="#">Browse</a></li>
+            <li class="nav-item"><a class="nav-link" data-nav="mylibrary" href="#">My Library</a></li>
+            <li class="nav-item vendor-only d-none"><a class="nav-link" data-nav="vendor" href="#">Vendor Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" data-nav="subscription" href="#">Subscription</a></li>
+            <li class="nav-item"><a class="nav-link" data-nav="institutional" href="#">Institutional</a></li>
+            <li class="nav-item dropdown ms-lg-2">
+              <a class="nav-link dropdown-toggle" href="#" id="authDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span id="authDisplay">Login / Register</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="authDropdown">
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a></li>
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#registerModal">Register</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger d-none" id="logoutBtn" href="#">Logout</a></li>
+              </ul>
+            </li>
+            <li class="nav-item ms-lg-2">
+              <button class="btn btn-light position-relative" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" aria-controls="cartOffcanvas" aria-label="Open cart">
+                <img src="assets/icon-cart.svg" width="20" height="20" alt="Cart icon">
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">0</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main content container -->
+    <main class="container py-4">
+      <!-- Catalog / Landing -->
+      <section id="view-catalog" class="view">
+        <div class="row g-3 align-items-center mb-3">
+          <div class="col-12 col-lg-3">
+            <h2 class="h4 mb-0">Catalog</h2>
+          </div>
+          <div class="col-12 col-lg-9">
+            <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
+              <select id="filterCategory" class="form-select w-auto" aria-label="Filter by category">
+                <option value="">All Categories</option>
+              </select>
+              <select id="filterAuthor" class="form-select w-auto" aria-label="Filter by author">
+                <option value="">All Authors</option>
+              </select>
+              <select id="filterFormat" class="form-select w-auto" aria-label="Filter by format">
+                <option value="">All Formats</option>
+                <option value="pdf">PDF</option>
+                <option value="physical">Physical</option>
+              </select>
+              <div class="d-flex align-items-center gap-2">
+                <label for="priceRange" class="form-label mb-0 small">Max Price</label>
+                <input type="range" class="form-range" id="priceRange" min="0" max="100" step="1" style="width:160px">
+                <span id="priceRangeValue" class="small fw-semibold">$100</span>
+              </div>
+              <select id="sortSelect" class="form-select w-auto" aria-label="Sort results">
+                <option value="popularity">Most Popular</option>
+                <option value="newest">Newest</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="catalogGrid" class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+          <!-- Cards injected by JS -->
+        </div>
+
+        <div class="d-flex justify-content-center mt-4">
+          <button id="loadMoreBtn" class="btn btn-outline-primary">Load more</button>
+        </div>
+      </section>
+
+      <!-- My Library -->
+      <section id="view-mylibrary" class="view d-none">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h2 class="h4 mb-0">My Library</h2>
+          <div>
+            <button id="libraryBorrowedTab" class="btn btn-outline-primary me-2">Borrowed</button>
+            <button id="libraryPurchasedTab" class="btn btn-outline-secondary">Purchased</button>
+          </div>
+        </div>
+        <div id="libraryEmpty" class="text-center text-muted py-5 d-none">No items yet. Borrow or purchase books to see them here.</div>
+        <div id="libraryList" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3"></div>
+      </section>
+
+      <!-- Vendor Dashboard -->
+      <section id="view-vendor" class="view d-none">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h2 class="h4 mb-0">Vendor Dashboard</h2>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary" id="vendorAddBranchBtn">Add Branch</button>
+            <button class="btn btn-primary" id="vendorAddBookBtn">Add Book</button>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-12 col-lg-3">
+            <div class="card h-100">
+              <div class="card-body">
+                <h6 class="text-muted">This Month</h6>
+                <div class="d-flex justify-content-between"><span>Revenue</span><span id="vendorRevenue" class="fw-bold">$0</span></div>
+                <div class="d-flex justify-content-between"><span>Sales</span><span id="vendorSales" class="fw-bold">0</span></div>
+                <div class="d-flex justify-content-between"><span>Borrowed</span><span id="vendorBorrowed" class="fw-bold">0</span></div>
+                <div class="d-grid mt-3">
+                  <button id="requestPayoutBtn" class="btn btn-outline-success">Request Payout</button>
+                </div>
+              </div>
+            </div>
+            <div class="card mt-3">
+              <div class="card-body">
+                <h6 class="mb-2">Branches</h6>
+                <ul id="branchList" class="list-group list-group-flush small"></ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-9">
+            <ul class="nav nav-pills mb-3" id="vendorTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="tab-books" data-bs-toggle="pill" data-bs-target="#pane-books" type="button" role="tab" aria-controls="pane-books" aria-selected="true">Manage Books</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-orders" data-bs-toggle="pill" data-bs-target="#pane-orders" type="button" role="tab" aria-controls="pane-orders" aria-selected="false">Orders</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-reports" data-bs-toggle="pill" data-bs-target="#pane-reports" type="button" role="tab" aria-controls="pane-reports" aria-selected="false">Reports</button>
+              </li>
+            </ul>
+
+            <div class="tab-content" id="vendorTabContent">
+              <div class="tab-pane fade show active" id="pane-books" role="tabpanel" aria-labelledby="tab-books">
+                <div class="table-responsive">
+                  <table class="table align-middle">
+                    <thead>
+                      <tr>
+                        <th>Cover</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Price (PDF)</th>
+                        <th>Price (Physical)</th>
+                        <th>Stock</th>
+                        <th>Borrow</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="vendorBooksTable"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="pane-orders" role="tabpanel" aria-labelledby="tab-orders">
+                <div class="table-responsive">
+                  <table class="table align-middle">
+                    <thead>
+                      <tr>
+                        <th>Order #</th>
+                        <th>Book</th>
+                        <th>Customer</th>
+                        <th>Qty</th>
+                        <th>Status</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="vendorOrdersTable"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="pane-reports" role="tabpanel" aria-labelledby="tab-reports">
+                <div class="row g-3">
+                  <div class="col-12 col-lg-6">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <h6>Sales by Day</h6>
+                        <canvas id="chartSales" height="160" aria-label="Sales chart" role="img"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-lg-6">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <h6>Most Popular Books</h6>
+                        <div id="popularList" class="small"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Subscription -->
+      <section id="view-subscription" class="view d-none">
+        <div class="row g-3 align-items-center mb-3">
+          <div class="col"><h2 class="h4 mb-0">Subscription</h2></div>
+        </div>
+        <div class="row g-3">
+          <div class="col-12 col-lg-8">
+            <div class="card">
+              <div class="card-body">
+                <h5>Monthly Plan</h5>
+                <p>Unlimited reading of included titles. Cancel anytime.</p>
+                <ul>
+                  <li>Access to 5,000+ eBooks</li>
+                  <li>Offline reading in browser cache</li>
+                  <li>Exclusive vendor discounts</li>
+                </ul>
+                <button id="subscribeBtn" class="btn btn-primary">Subscribe for $9.99/month</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-4">
+            <div class="alert alert-info">Coming soon: annual plans and family sharing.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Institutional -->
+      <section id="view-institutional" class="view d-none">
+        <h2 class="h4 mb-3">Institutional Plans</h2>
+        <div class="card">
+          <div class="card-body">
+            <form id="institutionForm" class="row g-3">
+              <div class="col-md-6">
+                <label for="instName" class="form-label">Institution Name</label>
+                <input type="text" class="form-control" id="instName" required>
+              </div>
+              <div class="col-md-6">
+                <label for="instEmail" class="form-label">Contact Email</label>
+                <input type="email" class="form-control" id="instEmail" required>
+              </div>
+              <div class="col-12">
+                <label for="instMessage" class="form-label">Requirements</label>
+                <textarea class="form-control" id="instMessage" rows="4" required></textarea>
+              </div>
+              <div class="col-12">
+                <button class="btn btn-primary" type="submit">Request Quote</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-top py-4 small bg-white">
+      <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <span class="text-muted">© <span id="yearNow"></span> Digital Library</span>
+        <div class="form-check form-switch mb-0">
+          <input class="form-check-input" type="checkbox" role="switch" id="darkModeSwitch" aria-label="Toggle dark mode">
+          <label class="form-check-label" for="darkModeSwitch">Dark mode</label>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Offcanvas Cart -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
+      <div class="offcanvas-header">
+        <h5 id="cartOffcanvasLabel">Cart</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body d-flex flex-column">
+        <div id="cartItems" class="flex-grow-1"></div>
+        <div id="cartEmpty" class="text-center text-muted py-4">Your cart is empty.</div>
+        <div class="border-top pt-3 mt-3 d-grid gap-2">
+          <div class="d-flex justify-content-between"><span>Total</span><span id="cartTotal" class="fw-bold">$0.00</span></div>
+          <button id="checkoutBtn" class="btn btn-primary" disabled data-bs-toggle="modal" data-bs-target="#checkoutModal">Checkout</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Book Detail Modal -->
+    <div class="modal fade" id="bookDetailModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="bookDetailTitle">Book Detail</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-12 col-md-4">
+                <img id="bookDetailCover" src="assets/cover-1.svg" class="img-fluid rounded" alt="Book cover">
+              </div>
+              <div class="col-12 col-md-8">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <span id="bookDetailAuthor" class="text-muted"></span>
+                  <span id="bookDetailRating" class="badge text-bg-warning"></span>
+                </div>
+                <p id="bookDetailDesc" class="small"></p>
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                  <button id="detailPreviewBtn" class="btn btn-outline-secondary">Preview</button>
+                  <button id="detailWishlistBtn" class="btn btn-outline-primary">Add to Wishlist</button>
+                  <button id="detailBorrowBtn" class="btn btn-outline-success">Borrow</button>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                  <button id="detailBuyPdfBtn" class="btn btn-primary">Buy PDF</button>
+                  <button id="detailBuyPhysicalBtn" class="btn btn-primary">Buy Physical</button>
+                </div>
+              </div>
+            </div>
+            <hr>
+            <div>
+              <h6 class="mb-2">Ratings & Reviews</h6>
+              <form id="reviewForm" class="row g-2 align-items-center mb-3">
+                <div class="col-auto">
+                  <label class="form-label mb-0 small" for="reviewRating">Rating</label>
+                  <select id="reviewRating" class="form-select">
+                    <option>5</option><option>4</option><option>3</option><option>2</option><option>1</option>
+                  </select>
+                </div>
+                <div class="col">
+                  <label class="visually-hidden" for="reviewText">Review</label>
+                  <input id="reviewText" class="form-control" placeholder="Share your thoughts" maxlength="180">
+                </div>
+                <div class="col-auto">
+                  <button class="btn btn-secondary" type="submit">Post</button>
+                </div>
+              </form>
+              <ul id="reviewList" class="list-group list-group-flush small"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Preview</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body position-relative">
+            <div class="watermark">Preview - Do not redistribute</div>
+            <div id="previewContent" class="preview-content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- E-Reader Modal -->
+    <div class="modal fade" id="readerModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="readerTitle">Reader</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-0 position-relative">
+            <div class="reader-toolbar d-flex align-items-center gap-2 p-2 border-bottom bg-body">
+              <button id="readerPrev" class="btn btn-outline-secondary btn-sm" aria-label="Previous page">Prev</button>
+              <span class="small">Page <span id="readerPage">1</span>/<span id="readerTotal">1</span></span>
+              <button id="readerNext" class="btn btn-outline-secondary btn-sm" aria-label="Next page">Next</button>
+              <div class="ms-auto d-flex align-items-center gap-3">
+                <span id="readerBorrowInfo" class="badge text-bg-info d-none"></span>
+                <button id="readerDownload" class="btn btn-primary btn-sm">Download</button>
+              </div>
+            </div>
+            <div class="reader-area position-relative" id="readerArea">
+              <div class="watermark small d-none" id="readerWatermark"></div>
+              <div id="readerPageContent" class="p-3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Login</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form id="loginForm">
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="loginEmail" class="form-label">Email</label>
+                <input type="email" class="form-control" id="loginEmail" required>
+              </div>
+              <div class="mb-3">
+                <label for="loginPassword" class="form-label">Password</label>
+                <input type="password" class="form-control" id="loginPassword" required>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="rememberMe">
+                <label class="form-check-label" for="rememberMe">Remember me</label>
+              </div>
+              <div id="loginFeedback" class="form-text text-danger d-none">Invalid credentials</div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Register</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form id="registerForm">
+            <div class="modal-body">
+              <div class="row g-2">
+                <div class="col-12">
+                  <label for="regName" class="form-label">Full Name</label>
+                  <input type="text" class="form-control" id="regName" required>
+                </div>
+                <div class="col-12">
+                  <label for="regEmail" class="form-label">Email</label>
+                  <input type="email" class="form-control" id="regEmail" required>
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="regPassword" class="form-label">Password</label>
+                  <input type="password" class="form-control" id="regPassword" minlength="6" required>
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="regType" class="form-label">User Type</label>
+                  <select id="regType" class="form-select" required>
+                    <option value="reader" selected>Reader</option>
+                    <option value="vendor">Vendor</option>
+                  </select>
+                </div>
+              </div>
+              <div id="registerFeedback" class="form-text text-danger d-none">Registration failed</div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary">Create account</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="modal fade" id="checkoutModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Checkout</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-12 col-lg-6">
+                <h6>Shipping Address (physical items)</h6>
+                <form id="shippingForm" class="row g-2">
+                  <div class="col-12">
+                    <label class="form-label" for="shipName">Full Name</label>
+                    <input id="shipName" class="form-control" required>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label" for="shipAddress">Address</label>
+                    <input id="shipAddress" class="form-control" required>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label" for="shipCity">City</label>
+                    <input id="shipCity" class="form-control" required>
+                  </div>
+                  <div class="col-3">
+                    <label class="form-label" for="shipZip">ZIP</label>
+                    <input id="shipZip" class="form-control" required>
+                  </div>
+                  <div class="col-3">
+                    <label class="form-label" for="shipCountry">Country</label>
+                    <input id="shipCountry" class="form-control" required>
+                  </div>
+                </form>
+              </div>
+              <div class="col-12 col-lg-6">
+                <h6>Payment</h6>
+                <div class="d-grid gap-2" id="paymentMethods">
+                  <button class="btn btn-outline-primary" data-method="visa">Visa</button>
+                  <button class="btn btn-outline-primary" data-method="mastercard">MasterCard</button>
+                  <button class="btn btn-outline-primary" data-method="paypal">PayPal</button>
+                  <button class="btn btn-outline-primary" data-method="fawry">Fawry</button>
+                </div>
+              </div>
+            </div>
+            <div class="alert alert-info mt-3 small">This is a demo. No real payment is processed.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Borrow Modal -->
+    <div class="modal fade" id="borrowModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Borrow Book</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form id="borrowForm">
+            <div class="modal-body">
+              <p class="small text-muted mb-2">Choose a duration:</p>
+              <div class="d-flex gap-2">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="borrowDuration" id="borrow7" value="7" checked>
+                  <label class="form-check-label" for="borrow7">7 days</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="borrowDuration" id="borrow14" value="14">
+                  <label class="form-check-label" for="borrow14">14 days</label>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-success">Confirm Borrow</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+  </html>
+
+

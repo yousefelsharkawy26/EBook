@@ -5,11 +5,6 @@ using Digital_Library.Infrastructure.Repositories.Interface;
 using Digital_Library.Infrastructure.UnitOfWork.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Digital_Library.Infrastructure
 {
@@ -39,7 +34,8 @@ namespace Digital_Library.Infrastructure
 				option.User.RequireUniqueEmail = false;
 				option.SignIn.RequireConfirmedEmail = false;
 
-			}).AddEntityFrameworkStores<EBookContext>().AddDefaultTokenProviders();
+			}).AddEntityFrameworkStores<EBookContext>()
+			  .AddDefaultTokenProviders();
 			#endregion
 			services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 			services.AddScoped<IUnitOfWork, UnitOfWork.Implementation.UnitOfWork>();

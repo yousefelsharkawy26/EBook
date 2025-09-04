@@ -5,6 +5,7 @@ using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Core.ViewModels.Responses;
 using Digital_Library.Infrastructure.UnitOfWork.Interface;
 using Digital_Library.Service.Interface;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
@@ -16,12 +17,14 @@ namespace Digital_Library.Service.Services
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IFileService _fileService;
 		private readonly ILogger<VendorService> _logger;
+		private readonly IEmailSender _emailSender;
 
-		public VendorService(IUnitOfWork unitOfWork, IFileService fileService, ILogger<VendorService> logger)
+		public VendorService(IUnitOfWork unitOfWork, IFileService fileService, ILogger<VendorService> logger, IEmailSender emailSender)
 		{
 			_unitOfWork = unitOfWork;
 			_fileService = fileService;
 			_logger = logger;
+			_emailSender = emailSender;
 		}
 
 		public async Task<Response> SubmitVendorRequestAsync(VendorRequest request, string userId)
@@ -150,7 +153,10 @@ namespace Digital_Library.Service.Services
 		{
 			try
 			{
-				var vendor = await _unitOfWork.Vendors.GetByIdAsync(vendorId);
+				var vendor = await _unitOfWork.Vendors.GetSingleAsync(
+								v => v.Id == vendorId,
+								v => v.User
+				);
 				if (vendor == null)
 					return Response.Fail("Vendor not found.");
 
@@ -158,7 +164,27 @@ namespace Digital_Library.Service.Services
 				vendor.RejectionReason = status == VendorStatus.Rejected ? reason : null;
 				vendor.ReviewedAt = DateTime.UtcNow;
 
-				_unitOfWork.Vendors.Update(vendor);
+				if (status == VendorStatus.Approved)
+				{
+					string htmlMessage = $"<p>Hello {vendor.User?.FullName},</p>" +
+																										$"<p>Your vendor request for '<strong>{vendor.LibraryName}</strong>' has been <strong>approved</strong>.</p>" +
+																										"<p>Thank you.</p>";
+
+					await _emailSender.SendEmailAsync(vendor.User!.Email, "Vendor Request Approved", htmlMessage);
+					_unitOfWork.Vendors.Update(vendor);
+				}
+				else if (status == VendorStatus.Rejected)
+				{
+					string htmlMessage = $"<p>Hello {vendor.User?.FullName},</p>" +
+																										$"<p>Your vendor request for '<strong>{vendor.LibraryName}</strong>' has been <strong>rejected</strong>.</p>" +
+																										$"<p>Reason: {reason ?? "Not specified"}</p>" +
+																										"<p>You can submit a new request if you wish.</p>";
+
+					await _emailSender.SendEmailAsync(vendor.User!.Email, "Vendor Request Rejected", htmlMessage);
+
+					_unitOfWork.Vendors.Delete(vendor);
+				}
+
 				await _unitOfWork.SaveChangesAsync();
 
 				_logger.LogInformation("Vendor {VendorId} status changed to {Status}", vendorId, status);
@@ -170,5 +196,6 @@ namespace Digital_Library.Service.Services
 				return Response.Fail("An error occurred while updating vendor status.");
 			}
 		}
+
 	}
 }
