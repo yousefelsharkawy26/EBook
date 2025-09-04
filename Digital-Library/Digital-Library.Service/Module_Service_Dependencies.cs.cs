@@ -17,8 +17,9 @@ namespace Digital_Library.Service
 			services.AddScoped<IBorrowService, BorrowService>();
 			services.AddScoped<ICartService,     CartService>();
 			services.AddScoped<IUserService,   UserService>();
-
-			return services;
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IVendorService, VendorService>();
+            return services;
 		}
 
 		public static IServiceCollection Add_Module_Configuration_Services(this IServiceCollection services, IConfiguration configuration)

@@ -27,7 +27,6 @@ namespace Digital_Library
 
 
 			//inject for using services in controller constructor
-            builder.Services.AddScoped<IVendorService, VendorService>();
             #region Dependency injections
 
             builder.Services.Add_Module_Infrastructure_Dependencies()
