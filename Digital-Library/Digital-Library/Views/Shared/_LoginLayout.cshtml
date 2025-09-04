@@ -4,40 +4,37 @@
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
 
-@if(SignInManager.IsSignedIn(User)) {
-<ul class="navbar-nav flex-row">
-    <li class="nav-item me-3 me-lg-1">
-        <a class="nav-link d-sm-flex align-items-sm-center" href="#">
-            <img src="https://mdbcdn.b-cdn.net/img/new/avatars/1.webp"
-                 class="rounded-circle"
-                 height="22"
-                 alt="Black and White Portrait of a Man"
-                 loading="lazy" />
-            <strong class="d-none d-sm-block ms-1">John</strong>
-        </a>
-    </li>
-    <li class="nav-item me-3 me-lg-1">
-        <a class="nav-link" href="#">
-            <span><i class="fas fa-shopping-bag fa-lg"></i></span>
-        </a>
-    </li>
 
-    <li class="nav-item dropdown me-3 me-lg-1">
-        <button class="nav-link dropdown-toggle hidden-arrow" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-chevron-circle-down fa-lg"></i>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end"
-            aria-labelledby="navbarDropdownMenuLink">
-            <li>
-                <a class="dropdown-item" href="#">Profile</a>
+
+<ul class="navbar-nav ms-auto" style="align-items: center;">
+    @if (SignInManager.IsSignedIn(User))
+    {
+    
+        @*Profile page*@
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index"
+                   title="Manage">Hello @User.Identity?.Name!</a>
             </li>
-            <li>
-                <a class="dropdown-item" href="#">Sign out</a>
+            <li class="nav-item">
+                <form class="d-inline" asp-controller="Auth" asp-action="Logout"
+                      asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+                </form>
             </li>
-        </ul>
-    </li>
+   
+
+
+    }
+    else
+    {
+    
+            <li class="nav-item m-2">
+                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Register">Register</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Login</a>
+            </li>
+
+    
+    }
 </ul>
-}
-else {
-    <a asp-controller="Auth" asp-action="Login" class="btn btn-primary px-3">Login</a>
-}

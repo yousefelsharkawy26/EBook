@@ -1,6 +1,7 @@
 ﻿using Digital_Library.Core.ViewModels;
 using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Threading.Tasks;
 
 namespace Digital_Library.Controllers;
@@ -39,5 +40,36 @@ public class AuthController : Controller
         }
 
         return View();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Register()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Register(RegisterViewModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                await _authService.SignUpAsync(model.UserName, model.Email, model.Password);
+                return RedirectToAction("Index", "Home", null);
+            }
+            catch
+            {
+                return View();
+            }
+        }
+        return View();
+
+    }
+
+    public async Task<IActionResult> Logout()
+    {
+        await _authService.SignOutAsync();
+        return RedirectToAction("Index", "Home", null);
     }
 }

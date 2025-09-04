@@ -1,0 +1,41 @@
+﻿@model Digital_Library.Core.ViewModels.RegisterViewModel
+<link rel="stylesheet" href="~/css/register.css" />
+
+<div class="register-wrapper">
+    <div class="register-card">
+        <h3>Registration Form</h3>
+        @using (Html.BeginForm("Register", "Auth", FormMethod.Post))
+        {
+            <div class="form-group mb-3">
+                @Html.LabelFor(m => m.UserName)
+                @Html.TextBoxFor(m => m.UserName, new { @class = "form-control-custom", placeholder = "Enter Username" })
+                @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group mb-3">
+                @Html.LabelFor(m => m.Email)
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control-custom", placeholder = "Enter Email" })
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group mb-3">
+                @Html.LabelFor(m => m.Password)
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control-custom", placeholder = "Enter Password" })
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group mb-3">
+                @Html.LabelFor(m => m.ConfirmPassword, "Confirm Password")
+                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control-custom", placeholder = "Re-enter Password" })
+                @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+            </div>
+
+            <button type="submit" class="btn-register">Register</button>
+
+            <p class="text-center mt-2">
+                Alaredy have an account?
+                <a asp-controller="Auth" asp-action="Login" class="text-link fw-bold">Sign In</a>
+            </p>
+        }
+    </div>
+</div>

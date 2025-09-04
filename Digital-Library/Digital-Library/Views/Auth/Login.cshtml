@@ -1,71 +1,59 @@
 ﻿@model LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "_Layout"; // Assuming you have a _Layout.cshtml that includes your header/footer
+}
+<link href="~/css/login.css" rel="stylesheet" />
 
-<section class="mt-4">
-    <div class="container-fluid h-custom">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col-md-9 col-lg-6 col-xl-5">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
-                     class="img-fluid" alt="Sample image">
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <h2 class="text-center">Login</h2>
+        <p class="subtitle text-center">Please enter your email and password!</p>
+
+        <!-- Validation Summary -->
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <form asp-action="Login" method="post">
+            <!-- Email -->
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label visually-hidden">Email</label>
+                <input asp-for="Email" class="form-control form-control-custom" placeholder="Enter your email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-            <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-                <form method="post">
-                    <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
-                        <p class="lead fw-normal mb-0 me-3">Sign in with</p>
-                        <a asp-action="third-party-fb" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-floating mx-1">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
 
-                        <a asp-action="third-party-x" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-floating mx-1">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-
-                        <a asp-action="third-party-li" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-floating mx-1">
-                            <i class="fab fa-linkedin-in"></i>
-                        </a>
-                    </div>
-
-                    <div class="divider d-flex align-items-center my-4">
-                        <p class="text-center fw-bold mx-3 mb-0">Or</p>
-                    </div>
-
-                    <!-- Email input -->
-                    <div data-mdb-input-init class="form-outline mb-4">
-                        <input asp-for="Email" class="form-control form-control-lg"
-                               placeholder="Enter a valid email address" />
-                        <label class="form-label" asp-for="Email">Email address</label>
-                    </div>
-
-                    <!-- Password input -->
-                    <div data-mdb-input-init class="form-outline mb-3">
-                        <input asp-for="Password" class="form-control form-control-lg"
-                               placeholder="Enter password" />
-                        <label class="form-label" asp-for="Password">Password</label>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center">
-                        <!-- Checkbox -->
-                        <div class="form-check mb-0">
-                            <input class="form-check-input me-2" asp-for="RememberMe" />
-                            <label class="form-check-label" asp-for="RememberMe">
-                                Remember me
-                            </label>
-                        </div>
-                        <a asp-action="ForgetPassword" class="text-body">Forgot password?</a>
-                    </div>
-
-                    <div class="text-center text-lg-start mt-4 pt-2">
-                        <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
-                                style="padding-left: 2.5rem; padding-right: 2.5rem;">
-                            Login
-                        </button>
-                        <p class="small fw-bold mt-2 pt-1 mb-0">
-                            Don't have an account? <a asp-action="Register"
-                                                      class="link-danger">Register</a>
-                        </p>
-                    </div>
-
-                </form>
+            <!-- Password -->
+            <div class="mb-4">
+                <label asp-for="Password" class="form-label visually-hidden">Password</label>
+                <input asp-for="Password" type="password" class="form-control form-control-custom" placeholder="Enter your password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
             </div>
-        </div>
+
+            <!-- Remember Me + Forgot Password -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                    <input asp-for="RememberMe" class="form-check-input" id="rememberMeCheck" />
+                    <label class="form-check-label" for="rememberMeCheck">Remember me</label>
+                </div>
+                <a asp-page="/Auth/ForgotPassword" class="text-link">Forgot password?</a>
+            </div>
+
+            <!-- Login Button -->
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-login">Login</button>
+            </div>
+
+            <!-- Register -->
+            <p class="text-center mb-0">
+                Don’t have an account?
+                <a asp-controller="Auth" asp-action="Register" class="text-link fw-bold">Sign Up</a>
+            </p>
+        </form>
     </div>
-</section>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
