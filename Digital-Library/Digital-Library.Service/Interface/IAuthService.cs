@@ -4,7 +4,6 @@ namespace Digital_Library.Service.Interface
 {
 	public interface IAuthService
 	{
-
 		Task<Response> SignInAsync(string email, string password);
 		Task<Response> SignOutAsync();
 		Task<Response> SignUpAsync(string name, string email, string password);
