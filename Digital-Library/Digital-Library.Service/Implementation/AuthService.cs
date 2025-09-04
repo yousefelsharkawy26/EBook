@@ -45,14 +45,32 @@ public class AuthService : IAuthService
 	public async Task<Response> SignInAsync(string email, string password)
 	{
 		var user = await _userManager.FindByEmailAsync(email);
-		if (user == null) return Response.Fail("User not found");
+		if (user == null)
+			return Response.Fail("User not found");
 
 		var result = await _signInManager.PasswordSignInAsync(user, password, true, false);
-		if (!result.Succeeded) return Response.Fail("Invalid credentials");
+		if (!result.Succeeded)
+			return Response.Fail("Invalid credentials");
 
 		_logger.LogInformation($"User {user.Email} signed in.");
+
+		try
+		{
+			string htmlMessage = $"<p>Hello {user.FullName},</p>" +
+																								"<p>Welcome back to E-BOOK platform! We're glad to see you again.</p>" +
+																								"<p>Enjoy browsing our library.</p>";
+
+			await _emailSender.SendEmailAsync(user.Email, "Welcome Back!", htmlMessage);
+			_logger.LogInformation($"Welcome email sent to {user.Email}");
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError(ex, $"Failed to send welcome email to {user.Email}");
+		}
+
 		return Response.Ok("Sign-in successful");
 	}
+
 
 	// ===================== SignOut =====================
 	public async Task<Response> SignOutAsync()
