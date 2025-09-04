@@ -1,6 +1,7 @@
 ﻿using Digital_Library.Core.Constant;
 using Digital_Library.Service.Implementation;
 using Digital_Library.Service.Interface;
+using Digital_Library.Service.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +18,7 @@ namespace Digital_Library.Service
 			services.AddScoped<IBorrowService, BorrowService>();
 			services.AddScoped<ICartService,     CartService>();
 			services.AddScoped<IUserService,   UserService>();
+			services.AddScoped<IVendorService, VendorService>();
 
 			return services;
 		}

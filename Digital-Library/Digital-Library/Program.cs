@@ -26,9 +26,7 @@ namespace Digital_Library
             #endregion
 
 
-			//inject for using services in controller constructor
-            builder.Services.AddScoped<IVendorService, VendorService>();
-            #region Dependency injections
+ #region Dependency injections
 
             builder.Services.Add_Module_Infrastructure_Dependencies()
 							.Add_Module_Service_Dependencies()
