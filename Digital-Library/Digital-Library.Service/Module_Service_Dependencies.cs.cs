@@ -15,7 +15,7 @@ namespace Digital_Library.Service
    services.AddScoped<IAuthService, AuthService>();
 			services.AddScoped<IBookService, BookService>();
 			services.AddScoped<IBorrowService, BorrowService>();
-<<<<<<< HEAD
+
 			services.AddScoped<ICartService, CartService>();
 			services.AddScoped<ICategoryService, CategoryService>();
 			services.AddTransient<IEmailSender, EmailSender>();
@@ -23,14 +23,6 @@ namespace Digital_Library.Service
 			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<IVendorService, VendorService>();
 			return services;
-
-=======
-			services.AddScoped<ICartService,     CartService>();
-			services.AddScoped<IUserService,   UserService>();
-            services.AddScoped<ICategoryService, CategoryService>();
-            services.AddScoped<IVendorService, VendorService>();
-            return services;
->>>>>>> 30560cf55767ca06c42bc46c89ed2e31ba2b445b
 		}
 
 		public static IServiceCollection Add_Module_Configuration_Services(this IServiceCollection services, IConfiguration configuration)
