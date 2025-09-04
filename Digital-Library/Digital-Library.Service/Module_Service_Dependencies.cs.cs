@@ -13,7 +13,8 @@ namespace Digital_Library.Service
 		{
 			services.AddTransient<IFileService, FileService>();
 			services.AddTransient<IEmailSender, EmailSender>();
-            return services;
+			services.AddScoped<IBookService, BookService>();
+			return services;
 		}
 
 		public static IServiceCollection Add_Module_Configuration_Services(this IServiceCollection services, IConfiguration configuration)

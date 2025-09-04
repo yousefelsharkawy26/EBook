@@ -29,6 +29,8 @@ namespace Digital_Library.Core.ViewModels.Requests
 		[Required]
 		public string CategoryID { get; set; }
 		public IFormFile? PDFFile { get; set; }
+		[Required]
+		public IFormFile ImageBookCover { get; set; }
 
 
 	}

@@ -10,7 +10,7 @@ namespace Digital_Library.Core.Constant
 	{
 		public const string VendorIdentification = "VendorIdentification";
 		public const string VendorLibraryLogo = "VendorLibraryLogo";
-		public const string BooksImage = "BooksImage";
+		public const string BooksImageCover = "BooksImageCover";
 		public const string BooksPdf = "BooksPdf";
 		public const string UserProfileImage = "UserProfileImage";
 	}

@@ -1,11 +1,7 @@
-﻿using Azure;
+﻿using Digital_Library.Core.Filters;
 using Digital_Library.Core.Models;
 using Digital_Library.Core.ViewModels.Requests;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Digital_Library.Core.ViewModels.Responses;
 
 namespace Digital_Library.Service.Interface
 {
@@ -17,12 +13,9 @@ namespace Digital_Library.Service.Interface
 
 		Task<Response> DeleteBook(string bookId);
 
-		Task<Book> GetBookById(string book);
+		Task<Response> GetBookById(string bookId);
 
-		Task<IEnumerable<Book>> GetAllBooks(string? vendorId);
-
-
-
+		Task<IEnumerable<Book>> GetAllBooks(BookFilter? filter = null);
 
 	}
 }
