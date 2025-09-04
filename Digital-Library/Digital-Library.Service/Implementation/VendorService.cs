@@ -1,4 +1,5 @@
 ﻿using Digital_Library.Core.Models;
+using Digital_Library.Core.ViewModels.Responses;
 using Digital_Library.Infrastructure.Context;
 using Digital_Library.Service.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -48,16 +49,47 @@ namespace Digital_Library.Service.Implementation;
             //await _context.SaveChangesAsync();
             //return existingVendor;
             return null;
-	}
-
-        public async Task<bool> DeleteVendorAsync(int id)
-        {
-            var vendor = await _context.Vendors.FindAsync(id);
-            if (vendor == null) return false;
-
-            _context.Vendors.Remove(vendor);
-            await _context.SaveChangesAsync();
-            return true;
-        }
     }
+
+    public async Task<bool> DeleteVendorAsync(int id)
+    {
+        var vendor = await _context.Vendors.FindAsync(id);
+        if (vendor == null) return false;
+
+        _context.Vendors.Remove(vendor);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+
+    //VendorDashboard
+    public async Task<VendorDashboardResponse> GetVendorDashboardAsync(string vendorId)
+    {
+        var vendor = await _context.Vendors
+            .Include(v => v.Books)
+                .ThenInclude(b => b.OrderDetails)
+            .FirstOrDefaultAsync(v => v.Id == vendorId);
+
+        if (vendor == null) return null;
+
+        var totalSales = vendor.Books?
+            .SelectMany(b => b.OrderDetails ?? new List<OrderDetail>())
+            .Sum(od => od.Quantity * od.Price) ?? 0;
+
+        var totalBooksSold = vendor.Books?
+            .SelectMany(b => b.OrderDetails ?? new List<OrderDetail>())
+            .Sum(od => od.Quantity) ?? 0;
+
+        return new VendorDashboardResponse
+        {
+            VendorId = vendor.Id,
+            LibraryName = vendor.LibraryName,
+            WalletBalance = vendor.WalletBalance,
+            TotalBooks = vendor.Books?.Count ?? 0,
+            TotalBooksSold = totalBooksSold,
+            TotalRevenue = totalSales
+        };
+    }
+
+}
 
