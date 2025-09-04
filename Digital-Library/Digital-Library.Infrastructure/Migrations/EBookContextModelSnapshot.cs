@@ -42,10 +42,6 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.Property<bool>("HasPDF")
                         .HasColumnType("bit");
 
-                    b.Property<string>("ImageBookCoverPath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsBorrowable")
                         .HasColumnType("bit");
 
@@ -78,7 +74,7 @@ namespace Digital_Library.Infrastructure.Migrations
 
                     b.HasIndex("VendorId");
 
-                    b.ToTable("Books");
+                    b.ToTable("Books", (string)null);
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.Borrowing", b =>
@@ -106,7 +102,7 @@ namespace Digital_Library.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Borrowings");
+                    b.ToTable("Borrowings", (string)null);
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.Cart", b =>
@@ -126,7 +122,7 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Carts");
+                    b.ToTable("Carts", (string)null);
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.CartDetail", b =>
@@ -154,7 +150,7 @@ namespace Digital_Library.Infrastructure.Migrations
 
                     b.HasIndex("CartId");
 
-                    b.ToTable("CartsDetails");
+                    b.ToTable("CartsDetails", (string)null);
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.Category", b =>
@@ -175,7 +171,7 @@ namespace Digital_Library.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.Order", b =>
@@ -200,7 +196,7 @@ namespace Digital_Library.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.OrderDetail", b =>
@@ -231,7 +227,7 @@ namespace Digital_Library.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderDetails");
+                    b.ToTable("OrderDetails", (string)null);
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.Transaction", b =>
@@ -263,7 +259,7 @@ namespace Digital_Library.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.Vendor", b =>
@@ -287,21 +283,9 @@ namespace Digital_Library.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RejectionReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ReviewedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("State")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("SubmittedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -319,7 +303,7 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Vendors");
+                    b.ToTable("Vendors", (string)null);
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.VendorIdentityImagesUrl", b =>
@@ -339,7 +323,7 @@ namespace Digital_Library.Infrastructure.Migrations
 
                     b.HasIndex("VendorId");
 
-                    b.ToTable("vendorIdentityImagesUrls");
+                    b.ToTable("vendorIdentityImagesUrls", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -686,7 +670,7 @@ namespace Digital_Library.Infrastructure.Migrations
             modelBuilder.Entity("Digital_Library.Core.Models.VendorIdentityImagesUrl", b =>
                 {
                     b.HasOne("Digital_Library.Core.Models.Vendor", "Vendor")
-                        .WithMany("VendorIdentityImagesUrls")
+                        .WithMany("vendorIdentityImagesUrls")
                         .HasForeignKey("VendorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -775,7 +759,7 @@ namespace Digital_Library.Infrastructure.Migrations
                 {
                     b.Navigation("Books");
 
-                    b.Navigation("VendorIdentityImagesUrls");
+                    b.Navigation("vendorIdentityImagesUrls");
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.User", b =>

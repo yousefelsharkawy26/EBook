@@ -54,7 +54,7 @@ namespace Digital_Library
 			{
 				var services =  scope.ServiceProvider;
 				var context = services.GetRequiredService<EBookContext>();
-				context.Database.Migrate();
+				//context.Database.Migrate();
 				RoleSeeder.SeedRolesAsync(services).Wait();
             }
             
