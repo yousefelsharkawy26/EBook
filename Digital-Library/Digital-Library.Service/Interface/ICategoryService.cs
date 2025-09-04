@@ -1,4 +1,6 @@
 ﻿using Digital_Library.Core.Models;
+using Digital_Library.Core.ViewModels.Requests;
+using Digital_Library.Core.ViewModels.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +11,10 @@ namespace Digital_Library.Service.Interface
 {
     public interface ICategoryService
     {
-        Task CreateCategoryAsync(Category category);
-
-        Task DeleteCategoryAsync(string id);
-
-        Task EditCartegoryAsync(Category category);
-    }
+		Task<Response> AddCategory(CategoryRequest request);
+		Task<Response> UpdateCategory(string categoryId, CategoryRequest request);
+		Task<Response> DeleteCategory(string categoryId);
+		Task<Response> GetCategoryById(string categoryId);
+		Task<IEnumerable<Category>> GetAllCategories();
+	}
 }

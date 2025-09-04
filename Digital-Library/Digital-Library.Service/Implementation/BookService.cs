@@ -65,7 +65,7 @@ namespace Digital_Library.Service.Implementation
 				await _unitOfWork.SaveChangesAsync();
 
 				_logger.LogInformation("Book '{Title}' added successfully by Vendor {VendorId}", book.Title, vendorId);
-				return Response.Ok("Book added successfully", book);
+				return Response.Ok("Book added successfully");
 			}
 			catch (Exception ex)
 			{
