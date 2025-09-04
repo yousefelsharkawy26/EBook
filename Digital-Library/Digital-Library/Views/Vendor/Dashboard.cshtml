@@ -1,0 +1,71 @@
+﻿@model Digital_Library.Core.ViewModels.Responses.VendorDashboardResponse
+
+@{
+    ViewData["Title"] = "Vendor Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@Model.LibraryName Dashboard</h2>
+
+<div class="cards-row">
+    <div class="card stat-card">
+        <h4>@Model.WalletBalance.ToString("C")</h4>
+        <p>Wallet Balance</p>
+    </div>
+    <div class="card stat-card">
+        <h4>@Model.TotalBooks</h4>
+        <p>Total Books</p>
+    </div>
+    <div class="card stat-card">
+        <h4>@Model.TotalBooksSold</h4>
+        <p>Total Books Sold</p>
+    </div>
+    <div class="card stat-card">
+        <h4>@Model.TotalRevenue.ToString("C")</h4>
+        <p>Total Revenue</p>
+    </div>
+</div>
+
+<div class="charts-row">
+    <div class="chart-container">
+        <h4>Revenue</h4>
+        <canvas id="revenueChart" height="200"></canvas>
+    </div>
+    <div class="chart-container">
+        <h4>Books Sold</h4>
+        <canvas id="booksChart" height="200"></canvas>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(revenueCtx, {
+            type: 'bar',
+            data: {
+                labels: ['This Month'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [@Model.TotalRevenue],
+                    backgroundColor: '#4a6cf7'
+                }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+
+        const booksCtx = document.getElementById('booksChart').getContext('2d');
+        new Chart(booksCtx, {
+            type: 'bar',
+            data: {
+                labels: ['This Month'],
+                datasets: [{
+                    label: 'Books Sold',
+                    data: [@Model.TotalBooksSold],
+                    backgroundColor: '#28a745'
+                }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+    </script>
+}
