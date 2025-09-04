@@ -126,7 +126,7 @@ public class AuthService : IAuthService
             IssuedUtc = DateTimeOffset.UtcNow,
             ExpiresUtc = DateTimeOffset.UtcNow.AddDays(10),
             IsPersistent = true,
-            RedirectUri = "/login"
+            RedirectUri = "/auth/login"
         };
 
         await _signInManager.SignInAsync(user, props);
@@ -140,13 +140,20 @@ public class AuthService : IAuthService
         var user = new User()
         {
             Email = email,
-            UserName = await CreateUniqueUsernameFromNameAsync(name),
             FullName = name,
         };
+        user.UserName = await CreateUniqueUsernameFromNameAsync(name);
 
-        var res = await _userManager.CreateAsync(user, password);
+        try
+        {
+            var res = await _userManager.CreateAsync(user, password);
 
-        return res == IdentityResult.Success;
+            return res == IdentityResult.Success;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
     }
     public async Task VerifyEmail(string userId, string token)
     {
@@ -226,8 +233,15 @@ public class AuthService : IAuthService
     private async Task<bool> IsUsernameTakenAsync(string username)
     {
         // Use your UserManager to check if the username exists
-        var user = await _userManager.FindByNameAsync(username);
-        return user != null;
+        try
+        {
+            var user = await _userManager.FindByNameAsync(username);
+            return user != null;
+        }
+        catch
+        {
+            return false;
+        }
     }
     private async Task CreateEmailVerification(User user)
     {

@@ -2,6 +2,7 @@
 using Digital_Library.Service.Implementation;
 using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,6 +14,8 @@ namespace Digital_Library.Service
 		{
 			services.AddTransient<IFileService, FileService>();
 			services.AddTransient<IEmailSender, EmailSender>();
+			services.AddTransient<IActionContextAccessor, ActionContextAccessor>();
+			services.AddTransient<IAuthService, AuthService>();
             return services;
 		}
 
