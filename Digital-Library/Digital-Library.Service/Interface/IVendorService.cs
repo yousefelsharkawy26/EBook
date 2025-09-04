@@ -1,20 +1,25 @@
-﻿using Digital_Library.Core.Models;
+﻿using Digital_Library.Core.Enums;
+using Digital_Library.Core.Models;
+using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Core.ViewModels.Responses;
-using Microsoft.Identity.Client;
-
 namespace Digital_Library.Service.Interface;
 public interface IVendorService
 {
-    Task<IEnumerable<Vendor>> GetAllVendorsAsync();
-    Task<Vendor> GetVendorByIdAsync(string id);
 
-    //get vendor by user id instead of guid
-    Task<Vendor> GetVendorByUserIdAsync(string userId);
+	Task<Response> SubmitVendorRequestAsync(VendorRequest request, string userId);
 
-    Task<Vendor> AddVendorAsync(Vendor vendor);
-    Task<Vendor> UpdateVendorAsync(string id, Vendor vendor);
-    Task<bool> DeleteVendorAsync(string id);
-    Task<VendorDashboardResponse> GetVendorDashboardAsync(string vendorId);
 
+	Task<Vendor?> GetVendorByIdAsync(string vendorId, bool includeBooks = false);
+
+
+	Task<IEnumerable<Vendor>> GetVendorsAsync(VendorStatus? status = null);
+
+
+	Task<Response> UpdateVendorProfileAsync(string vendorId, VendorUpdateRequest request);
+
+
+	Task<Response> ChangeStatusAsync(string vendorId, VendorStatus status, string? reason = null);
 }
+
+
 
