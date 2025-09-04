@@ -4,6 +4,7 @@ using Digital_Library.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Digital_Library.Infrastructure.Migrations
 {
     [DbContext(typeof(EBookContext))]
-    partial class EBookContextModelSnapshot : ModelSnapshot
+    [Migration("20250904094010_Update Vendor Model add VendorStatus field")]
+    partial class UpdateVendorModeladdVendorStatusfield
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -287,21 +290,12 @@ namespace Digital_Library.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RejectionReason")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ReviewedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("State")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("SubmittedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -686,7 +680,7 @@ namespace Digital_Library.Infrastructure.Migrations
             modelBuilder.Entity("Digital_Library.Core.Models.VendorIdentityImagesUrl", b =>
                 {
                     b.HasOne("Digital_Library.Core.Models.Vendor", "Vendor")
-                        .WithMany("VendorIdentityImagesUrls")
+                        .WithMany("vendorIdentityImagesUrls")
                         .HasForeignKey("VendorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -775,7 +769,7 @@ namespace Digital_Library.Infrastructure.Migrations
                 {
                     b.Navigation("Books");
 
-                    b.Navigation("VendorIdentityImagesUrls");
+                    b.Navigation("vendorIdentityImagesUrls");
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.User", b =>

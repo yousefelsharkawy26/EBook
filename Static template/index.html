@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Library — Lend & Leaf</title>
+    <meta name="description" content="A modern library platform to borrow and read books." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="assets/css/styles.css" rel="stylesheet" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>📚</text></svg>">
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav id="siteNav" class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="#">Lend<span class="text-primary">&</span>Leaf</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+            <li class="nav-item"><a class="nav-link" href="#catalog">Library</a></li>
+            <li class="nav-item"><a class="nav-link" href="#testimonials">Testimonials</a></li>
+            <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+          </ul>
+          <div class="d-flex gap-2">
+            <a href="#" class="btn btn-outline-primary">Sign in</a>
+            <a href="#cta" class="btn btn-primary">Get started</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero-section pt-6 pb-5 bg-gradient position-relative overflow-hidden">
+      <div class="container position-relative">
+        <div class="row align-items-center gy-4">
+          <div class="col-lg-6">
+            <h1 class="display-5 fw-bolder mb-3">Read, borrow, and share your love of books</h1>
+            <p class="lead text-secondary mb-4">A smart library platform with quick access to thousands of books, and a comfortable experience across all devices.</p>
+            <div class="d-flex gap-2">
+              <a href="#catalog" class="btn btn-primary btn-lg">Browse books</a>
+              <a href="#features" class="btn btn-outline-secondary btn-lg">Learn more</a>
+            </div>
+            <div class="d-flex align-items-center gap-3 mt-4 small text-muted">
+              <span class="d-inline-flex align-items-center gap-1"><span class="badge bg-success-subtle text-success rounded-pill">+10k</span> Active readers</span>
+              <span class="vr"></span>
+              <span>Personalized recommendations</span>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="hero-visual card border-0 shadow-lg">
+              <div class="ratio ratio-16x9 bg-light rounded-top"></div>
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="avatar bg-primary-subtle text-primary">📗</div>
+                    <div>
+                      <div class="fw-semibold">Book of the Day</div>
+                      <div class="text-secondary small">Fiction, Self‑help, History</div>
+                    </div>
+                  </div>
+                  <button class="btn btn-sm btn-primary">Borrow now</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Features -->
+    <section id="features" class="py-6">
+      <div class="container">
+        <div class="text-center mb-5">
+          <h2 class="fw-bold">Why choose Lend & Leaf?</h2>
+          <p class="text-secondary">Smart features for an enjoyable, efficient reading experience</p>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-3">
+            <div class="feature card h-100 border-0 shadow-sm">
+              <div class="card-body">
+                <div class="feature-icon bg-primary-subtle text-primary">🔍</div>
+                <h5 class="card-title mt-3">Fast, advanced search</h5>
+                <p class="card-text text-secondary">Find books by title, author, or genre with ease.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="feature card h-100 border-0 shadow-sm">
+              <div class="card-body">
+                <div class="feature-icon bg-success-subtle text-success">✨</div>
+                <h5 class="card-title mt-3">Smart recommendations</h5>
+                <p class="card-text text-secondary">Get picks based on your interests and reading history.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="feature card h-100 border-0 shadow-sm">
+              <div class="card-body">
+                <div class="feature-icon bg-warning-subtle text-warning">📱</div>
+                <h5 class="card-title mt-3">Responsive experience</h5>
+                <p class="card-text text-secondary">Smooth UI across phones, tablets, and desktops.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="feature card h-100 border-0 shadow-sm">
+              <div class="card-body">
+                <div class="feature-icon bg-danger-subtle text-danger">🔐</div>
+                <h5 class="card-title mt-3">Secure lending management</h5>
+                <p class="card-text text-secondary">Track your borrowings and returns easily and securely.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Catalog -->
+    <section id="catalog" class="py-6 bg-body-tertiary">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
+          <div>
+            <h2 class="fw-bold mb-1">Featured titles</h2>
+            <p class="text-secondary mb-0">Discover the latest and most‑read</p>
+          </div>
+          <div class="input-group input-group-lg w-auto" style="min-width: 280px;">
+            <span class="input-group-text bg-white">🔎</span>
+            <input id="searchInput" type="search" class="form-control" placeholder="Search by title or author..." />
+          </div>
+        </div>
+
+        <div id="bookGrid" class="row g-4">
+          <!-- Cards will be filtered by JS -->
+          <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+              <div class="ratio ratio-3x2 bg-light">
+                <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1200&auto=format&fit=crop" class="object-fit-cover" alt="Design book" />
+              </div>
+              <div class="card-body">
+                <h5 class="card-title">The Art of Design</h5>
+                <p class="card-text text-secondary">John Doe — Design</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="badge bg-primary-subtle text-primary">Available</span>
+                  <button class="btn btn-sm btn-primary">Borrow</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+              <div class="ratio ratio-3x2 bg-light">
+                <img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=1200&auto=format&fit=crop" class="object-fit-cover" alt="Novel" />
+              </div>
+              <div class="card-body">
+                <h5 class="card-title">City Shadows</h5>
+                <p class="card-text text-secondary">Sarah Ahmed — Novel</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="badge bg-secondary-subtle text-secondary">Coming soon</span>
+                  <button class="btn btn-sm btn-outline-secondary" disabled>Unavailable</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+              <div class="ratio ratio-3x2 bg-light">
+                <img src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?q=80&w=1200&auto=format&fit=crop" class="object-fit-cover" alt="Self-help" />
+              </div>
+              <div class="card-body">
+                <h5 class="card-title">Tiny Habits</h5>
+                <p class="card-text text-secondary">Mohamed Ali — Self‑help</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="badge bg-primary-subtle text-primary">Available</span>
+                  <button class="btn btn-sm btn-primary">Borrow</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-4">
+          <a href="#" class="btn btn-outline-primary">View more</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="py-6">
+      <div class="container">
+        <div class="text-center mb-5">
+          <h2 class="fw-bold">What do readers say?</h2>
+          <p class="text-secondary">Real experiences that reflect our platform quality</p>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="avatar bg-primary text-white">A</div>
+                  <div>
+                    <div class="fw-semibold">Ahmed</div>
+                    <div class="small text-secondary">Avid reader</div>
+                  </div>
+                </div>
+                <p class="mb-0">تجربة رائعة! وجدت كتباً كنت أبحث عنها منذ فترة طويلة. التوصيات ممتازة.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="avatar bg-success text-white">S</div>
+                  <div>
+                    <div class="fw-semibold">Sarah</div>
+                    <div class="small text-secondary">University student</div>
+                  </div>
+                </div>
+                <p class="mb-0">Fast and easy to use, especially on mobile. Highly recommended!</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="avatar bg-warning text-white">M</div>
+                  <div>
+                    <div class="fw-semibold">Mahmoud</div>
+                    <div class="small text-secondary">Writer</div>
+                  </div>
+                </div>
+                <p class="mb-0">Impressed by the organization and how easy it is to track borrowings.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section id="cta" class="py-6 position-relative overflow-hidden">
+      <div class="container">
+        <div class="cta-box card border-0 shadow-lg">
+          <div class="card-body p-4 p-lg-5 d-flex flex-column flex-lg-row align-items-center justify-content-between gap-4">
+            <div>
+              <h3 class="fw-bold mb-2">Start your reading journey today</h3>
+              <p class="mb-0 text-secondary">Create your account and enjoy access to a rich, ever‑growing library.</p>
+            </div>
+            <div class="d-flex gap-2">
+              <a href="#" class="btn btn-primary btn-lg">Create account</a>
+              <a href="#contact" class="btn btn-outline-secondary btn-lg">Contact us</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="footer py-5 bg-dark text-white-50">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-4">
+            <h5 class="text-white">Lend & Leaf</h5>
+            <p>A digital library platform for a modern borrowing and reading experience.</p>
+          </div>
+          <div class="col-6 col-lg-2">
+            <h6 class="text-white">Links</h6>
+            <ul class="list-unstyled small">
+              <li><a class="link-light link-underline-opacity-0" href="#features">Features</a></li>
+              <li><a class="link-light link-underline-opacity-0" href="#catalog">Library</a></li>
+              <li><a class="link-light link-underline-opacity-0" href="#cta">Get started</a></li>
+            </ul>
+          </div>
+          <div class="col-6 col-lg-2">
+            <h6 class="text-white">Support</h6>
+            <ul class="list-unstyled small">
+              <li><a class="link-light link-underline-opacity-0" href="#">FAQ</a></li>
+              <li><a class="link-light link-underline-opacity-0" href="#">Privacy</a></li>
+              <li><a class="link-light link-underline-opacity-0" href="#">Terms</a></li>
+            </ul>
+          </div>
+          <div class="col-lg-4">
+            <h6 class="text-white">Newsletter</h6>
+            <form class="input-group">
+              <input type="email" class="form-control" placeholder="Your email" />
+              <button class="btn btn-primary" type="button">Subscribe</button>
+            </form>
+          </div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center pt-4 mt-4 border-top border-secondary">
+          <small>© <span id="year"></span> Lend & Leaf</small>
+          <a href="#" class="btn btn-sm btn-outline-light" id="backToTop">Top</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="assets/js/main.js"></script>
+  </body>
+  </html>
+
+
