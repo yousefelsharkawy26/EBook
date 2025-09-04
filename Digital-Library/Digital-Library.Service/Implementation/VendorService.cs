@@ -20,19 +20,28 @@ namespace Digital_Library.Service.Implementation;
             return await _context.Vendors.ToListAsync();
         }
 
-        public async Task<Vendor> GetVendorByIdAsync(int id)
+        public async Task<Vendor> GetVendorByIdAsync(string id)
         {
             return await _context.Vendors.FindAsync(id);
         }
 
-        public async Task<Vendor> AddVendorAsync(Vendor vendor)
+
+    public async Task<Vendor> GetVendorByUserIdAsync(string userId)
+    {
+        return await _context.Vendors
+            .Include(v => v.Books)
+            .FirstOrDefaultAsync(v => v.UserId == userId);
+    }
+
+
+    public async Task<Vendor> AddVendorAsync(Vendor vendor)
         {
             _context.Vendors.Add(vendor);
             await _context.SaveChangesAsync();
             return vendor;
         }
 
-        public async Task<Vendor> UpdateVendorAsync(int id, Vendor vendor)
+        public async Task<Vendor> UpdateVendorAsync(string id, Vendor vendor)
         {
             //var existingVendor = await _context.Vendors.FindAsync(id);
             //if (existingVendor == null) return null;
@@ -51,7 +60,7 @@ namespace Digital_Library.Service.Implementation;
             return null;
     }
 
-    public async Task<bool> DeleteVendorAsync(int id)
+    public async Task<bool> DeleteVendorAsync(string id)
     {
         var vendor = await _context.Vendors.FindAsync(id);
         if (vendor == null) return false;

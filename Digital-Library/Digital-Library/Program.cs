@@ -2,6 +2,8 @@ using Digital_Library.Core.Models;
 using Digital_Library.Infrastructure;
 using Digital_Library.Infrastructure.Context;
 using Digital_Library.Service;
+using Digital_Library.Service.Implementation;
+using Digital_Library.Service.Interface;
 using Digital_Library.Service.Seed;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,11 +23,14 @@ namespace Digital_Library
 			{
 				option.UseSqlServer(builder.Configuration.GetConnectionString("DevConn"));
 			});
-			#endregion
+            #endregion
 
-			#region Dependency injections
 
-			builder.Services.Add_Module_Infrastructure_Dependencies()
+			//inject for using services in controller constructor
+            builder.Services.AddScoped<IVendorService, VendorService>();
+            #region Dependency injections
+
+            builder.Services.Add_Module_Infrastructure_Dependencies()
 							.Add_Module_Service_Dependencies()
                             .Add_Module_Configuration_Services(builder.Configuration);
 																				
