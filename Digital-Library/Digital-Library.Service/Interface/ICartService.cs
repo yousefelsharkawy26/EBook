@@ -1,4 +1,7 @@
-﻿using Digital_Library.Core.Models;
+﻿using Digital_Library.Core.Enums;
+using Digital_Library.Core.Models;
+using Digital_Library.Core.ViewModels.Requests;
+using Digital_Library.Core.ViewModels.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,16 +10,17 @@ using System.Threading.Tasks;
 
 namespace Digital_Library.Service.Interface
 {
-    public interface ICartService
-    {
-        Task<Cart> GetCartAsync(string userId);
+	public interface ICartService
+	{
+		Task<Response> GetCartAsync(string userId);
 
-        Task AddItemAsync(string userId , CartDetail item);
+		Task<Response> AddItemAsync(string userId, CartDetailRequest request);
 
-        Task RemoveItemAsync(string userId , CartDetail item);
+		Task<Response> RemoveItemAsync(string userId, string bookId, FormatType formatType);
 
-        Task UpdateQuantityAsync(string userId, string productId, int quantity);
+		Task<Response> UpdateCartAsync(string userId, string bookId, int quantity, FormatType formatType);
 
-        Task ClearCartAsync(string userId);
-    }
+		Task<Response> ClearCartAsync(string userId);
+	}
+
 }

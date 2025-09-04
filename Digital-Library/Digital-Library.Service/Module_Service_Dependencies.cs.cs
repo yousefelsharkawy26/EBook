@@ -15,6 +15,7 @@ namespace Digital_Library.Service
 			services.AddTransient<IEmailSender,  EmailSender>();
 			services.AddScoped<IBookService,     BookService>();
 			services.AddScoped<IBorrowService, BorrowService>();
+			services.AddScoped<ICartService,     CartService>();
 
 			return services;
 		}
