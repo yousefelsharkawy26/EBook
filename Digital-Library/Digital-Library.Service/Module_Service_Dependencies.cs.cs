@@ -3,6 +3,7 @@ using Digital_Library.Service.Implementation;
 using Digital_Library.Service.Interface;
 using Digital_Library.Service.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,10 +13,10 @@ namespace Digital_Library.Service
 	{
 		public static IServiceCollection Add_Module_Service_Dependencies(this IServiceCollection services)
 		{
+   services.AddTransient<IActionContextAccessor, ActionContextAccessor>();
    services.AddScoped<IAuthService, AuthService>();
 			services.AddScoped<IBookService, BookService>();
 			services.AddScoped<IBorrowService, BorrowService>();
-
 			services.AddScoped<ICartService, CartService>();
 			services.AddScoped<ICategoryService, CategoryService>();
 			services.AddTransient<IEmailSender, EmailSender>();
