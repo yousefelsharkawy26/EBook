@@ -16,7 +16,7 @@ public class AuthController : Controller
     public async Task<IActionResult> Login()
     {
 
-        await _authService.SignUp("Yousef", "yousef@gmail.com", "123midoA@");
+        await _authService.SignUpAsync("Yousef", "yousef@gmail.com", "123midoA@");
 
         return View();
     }
@@ -28,7 +28,7 @@ public class AuthController : Controller
         {
             try
             {
-                await _authService.SignIn(model.Email, model.Password);
+                await _authService.SignInAsync(model.Email, model.Password);
 
                 return RedirectToAction("Index", "Home", null);
             }
