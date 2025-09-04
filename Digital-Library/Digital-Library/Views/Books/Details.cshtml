@@ -1,0 +1,419 @@
+﻿@model Digital_Library.Core.Models.Book
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<section id="selling-product" class="single-product py-2 my-2 py-md-5 my-md-5">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-8">
+                <div class="row flex-column-reverse flex-lg-row">
+                    <div class="col-md-12 col-lg-2">
+                        <!-- product-thumbnail-slider -->
+                        <div class="swiper product-thumbnail-slider">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <img src="images/card-image1.jpg" alt="" class="thumb-image img-fluid">
+                                </div>
+                                <div class="swiper-slide">
+                                    <img src="images/card-image2.jpg" alt="" class="thumb-image img-fluid">
+                                </div>
+                                <div class="swiper-slide">
+                                    <img src="images/card-image3.jpg" alt="" class="thumb-image img-fluid">
+                                </div>
+                                <div class="swiper-slide">
+                                    <img src="images/card-image4.jpg" alt="" class="thumb-image img-fluid">
+                                </div>
+                                <div class="swiper-slide">
+                                    <img src="images/card-image5.jpg" alt="" class="thumb-image img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- / product-thumbnail-slider -->
+                    </div>
+                    <div class="col-md-12 col-lg-10">
+                        <!-- product-large-slider -->
+                        <div class="swiper product-large-slider">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <div class="image-zoom" data-scale="2.5" data-image="images/product-large-1.jpg">
+                                        <img src="images/card-image1.jpg" alt="product-large" class="img-fluid">
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="image-zoom" data-scale="2.5" data-image="images/product-large-2.jpg">
+                                        <img src="images/card-image2.jpg" alt="product-large" class="img-fluid">
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="image-zoom" data-scale="2.5" data-image="images/product-large-3.jpg">
+                                        <img src="images/card-image3.jpg" alt="product-large" class="img-fluid">
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="image-zoom" data-scale="2.5" data-image="images/product-large-4.jpg">
+                                        <img src="images/card-image4.jpg" alt="product-large" class="img-fluid">
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="image-zoom" data-scale="2.5" data-image="images/product-large-5.jpg">
+                                        <img src="images/card-image5.jpg" alt="product-large" class="img-fluid">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-pagination"></div>
+                        </div>
+                        <!-- / product-large-slider -->
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="product-info">
+                    <div class="element-header">
+                        <h3 itemprop="name" class="display-6 fw-bold">Nike Shoes</h3>
+                    </div>
+                    <div class="product-price py-3">
+                        <strong class="fs-5 fw-bold">$99</strong>
+                    </div>
+                    <p>
+                        This Shoes is comfortable for wearing for men. imperdiet nulla molestie ac vulputate scelerisque amet.
+                        Bibendum adipiscing platea blandit sit sed quam semper rhoncus. Diam ultrices maecenas consequat eu tortor
+                        orci.
+                    </p>
+                    <div class="cart-wrap padding-small">
+                        <div class="color-options product-select">
+                            <div class="color-toggle" data-option-index="0">
+                                <h5 class="widget-title text-decoration-underline pe-2">Color:</h5>
+                                <ul class="select-list list-unstyled d-flex">
+                                    <li class="select-item pe-3" data-val="Green" title="Green">
+                                        <a href="#">Green</a>
+                                    </li>
+                                    <li class="select-item pe-3" data-val="Orange" title="Orange">
+                                        <a href="#">Orange</a>
+                                    </li>
+                                    <li class="select-item pe-3" data-val="Red" title="Red">
+                                        <a href="#">Red</a>
+                                    </li>
+                                    <li class="select-item" data-val="Black" title="Black">
+                                        <a href="#">Black</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="swatch product-select" data-option-index="1">
+                            <h5 class="widget-title text-decoration-underline pe-2">Size:</h5>
+                            <ul class="select-list list-unstyled d-flex">
+                                <li data-value="S" class="select-item pe-3">
+                                    <a href="#">XL</a>
+                                </li>
+                                <li data-value="M" class="select-item pe-3">
+                                    <a href="#">L</a>
+                                </li>
+                                <li data-value="L" class="select-item pe-3">
+                                    <a href="#">M</a>
+                                </li>
+                                <li data-value="L" class="select-item">
+                                    <a href="#">S</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="product-quantity">
+                            <div class="stock-number text-dark">12 in stock</div>
+                            <div class="stock-button-wrap pt-3">
+                                <div class="quantity-price d-flex justify-content-between align-items-center">
+                                    <div class="input-group product-qty">
+                                        <button type="button" class="quantity-left-minus btn btn-light rounded-0 rounded-start btn-number"
+                                                data-type="minus">
+                                            <svg width="16" height="16">
+                                                <use xlink:href="#minus"></use>
+                                            </svg>
+                                        </button>
+                                        <input type="text" name="quantity" class="form-control input-number quantity" value="1">
+                                        <button type="button" class="quantity-right-plus btn btn-light rounded-0 rounded-end btn-number"
+                                                data-type="plus">
+                                            <svg width="16" height="16">
+                                                <use xlink:href="#plus"></use>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- quantity-price -->
+                                <div class="qty-button d-flex flex-wrap pt-3">
+                                    <button type="submit" class="btn btn-black text-uppercase me-3 mt-3 hvr-sweep-to-right">
+                                        Buy
+                                        now
+                                    </button>
+                                    <button type="submit" name="add-to-cart" value="1269"
+                                            class="btn btn-outline-gray text-uppercase mt-3 hvr-sweep-to-right">
+                                        Add to cart
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="meta-product padding-small">
+                        <div class="meta-item d-flex align-items-baseline">
+                            <h5 class="widget-title text-decoration-underline pe-2">SKU:</h5>
+                            <ul class="select-list list-unstyled d-flex">
+                                <li data-value="S" class="select-item">1223</li>
+                            </ul>
+                        </div>
+                        <div class="meta-item d-flex align-items-baseline">
+                            <h5 class="widget-title text-decoration-underline pe-2">Category:</h5>
+                            <ul class="select-list list-unstyled d-flex">
+                                <li data-value="S" class="select-item">
+                                    <a href="#">Men</a>,
+                                </li>
+                                <li data-value="S" class="select-item">
+                                    <a href="#">Casual</a>,
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="meta-item d-flex align-items-baseline">
+                            <h5 class="widget-title text-decoration-underline pe-2">Tags:</h5>
+                            <ul class="select-list list-unstyled d-flex">
+                                <li data-value="S" class="select-item">
+                                    <a href="#">Classic</a>,
+                                </li>
+                                <li data-value="S" class="select-item">
+                                    <a href="#">Modern</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="product-info-tabs">
+    <div class="container">
+        <div class="row">
+            <div class="tabs-listing">
+                <nav>
+                    <div class="nav nav-tabs d-flex flex-wrap justify-content-center" id="nav-tab" role="tablist">
+                        <button class="nav-link active text-dark fs-5" id="nav-home-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
+                                aria-selected="true">
+                            Description
+                        </button>
+                        <button class="nav-link text-dark fs-5" id="nav-information-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-information" type="button" role="tab" aria-controls="nav-information"
+                                aria-selected="false">
+                            Additional information
+                        </button>
+                        <button class="nav-link text-dark fs-5" id="nav-review-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-review" type="button" role="tab" aria-controls="nav-review"
+                                aria-selected="false">
+                            Reviews
+                        </button>
+                    </div>
+                </nav>
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active padding-small" id="nav-home" role="tabpanel"
+                         aria-labelledby="nav-home-tab">
+                        <p>Product Description</p>
+                        <p>
+                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros.
+                            Nullam malesuada erat ut turpis. Suspendisse urna viverra non, semper suscipit, posuere a, pede. Donec
+                            nec justo eget felis facilisis fermentum. Aliquam porttitor mauris sit amet orci. Aenean dignissim
+                            pellentesque felis. Phasellus ultrices nulla quis nibh. Quisque a lectus. Donec consectetuer ligula
+                            vulputate sem tristique cursus.
+                        </p>
+                        <ul style="list-style-type:disc;" class="list-unstyled ps-4">
+                            <li>Donec nec justo eget felis facilisis fermentum.</li>
+                            <li>Suspendisse urna viverra non, semper suscipit pede.</li>
+                            <li>Aliquam porttitor mauris sit amet orci.</li>
+                        </ul>
+                        <p>
+                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros.
+                            Nullam malesuada erat ut turpis. Suspendisse urna viverra non, semper suscipit, posuere a, pede. Donec
+                            nec justo eget felis facilisis fermentum. Aliquam porttitor mauris sit amet orci. Aenean dignissim
+                            pellentesque felis. Phasellus ultrices nulla quis nibh. Quisque a lectus. Donec consectetuer ligula
+                            vulputate sem tristique cursus.
+                        </p>
+                    </div>
+                    <div class="tab-pane fade padding-small" id="nav-information" role="tabpanel"
+                         aria-labelledby="nav-information-tab">
+                        <p>It is Comfortable and Best</p>
+                        <p>
+                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
+                            laborum. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+                            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim
+                            id est laborum.
+                        </p>
+                    </div>
+                    <div class="tab-pane fade padding-small" id="nav-review" role="tabpanel" aria-labelledby="nav-review-tab">
+                        <div class="review-box d-flex flex-wrap">
+                            <div class="col-lg-6 d-flex flex-wrap">
+                                <div class="col-md-2 me-3 mb-3">
+                                    <div class="image-holder">
+                                        <img src="images/review-item1.jpg" alt="review" class="img-fluid">
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="review-content">
+                                        <div class="rating-container d-flex align-items-center mb-3">
+                                            <div class="rating" data-rating="1" onclick="rate(1)">
+                                                <svg class="star-fill" width="16" height="16">
+                                                    <use xlink:href="#star-fill"></use>
+                                                </svg>
+                                            </div>
+                                            <div class="rating" data-rating="2" onclick="rate(1)">
+                                                <svg class="star-fill" width="16" height="16">
+                                                    <use xlink:href="#star-fill"></use>
+                                                </svg>
+                                            </div>
+                                            <div class="rating" data-rating="3" onclick="rate(1)">
+                                                <svg class="star-fill" width="16" height="16">
+                                                    <use xlink:href="#star-fill"></use>
+                                                </svg>
+                                            </div>
+                                            <div class="rating" data-rating="4" onclick="rate(1)">
+                                                <svg class="star-half" width="16" height="16">
+                                                    <use xlink:href="#star-half"></use>
+                                                </svg>
+                                            </div>
+                                            <div class="rating" data-rating="5" onclick="rate(1)">
+                                                <svg class="star-empty" width="16" height="16">
+                                                    <use xlink:href="#star-empty"></use>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="review-header">
+                                            <span class="author-name">Mina Brown</span>
+                                            <span class="review-date">– 03/07/2023</span>
+                                        </div>
+                                        <p>
+                                            Vitae tortor condimentum lacinia quis vel eros donec ac. Nam at lectus urna duis convallis
+                                            convallis
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 d-flex flex-wrap">
+                                <div class="col-md-2 me-3 mb-3">
+                                    <div class="image-holder">
+                                        <img src="images/review-item2.jpg" alt="review" class="img-fluid">
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="review-content">
+                                        <div class="rating-container d-flex align-items-center mb-3">
+                                            <div class="rating" data-rating="1" onclick="rate(1)">
+                                                <svg class="star-fill" width="16" height="16">
+                                                    <use xlink:href="#star-fill"></use>
+                                                </svg>
+                                            </div>
+                                            <div class="rating" data-rating="2" onclick="rate(1)">
+                                                <svg class="star-fill" width="16" height="16">
+                                                    <use xlink:href="#star-fill"></use>
+                                                </svg>
+                                            </div>
+                                            <div class="rating" data-rating="3" onclick="rate(1)">
+                                                <svg class="star-fill" width="16" height="16">
+                                                    <use xlink:href="#star-fill"></use>
+                                                </svg>
+                                            </div>
+                                            <div class="rating" data-rating="4" onclick="rate(1)">
+                                                <svg class="star-half" width="16" height="16">
+                                                    <use xlink:href="#star-half"></use>
+                                                </svg>
+                                            </div>
+                                            <div class="rating" data-rating="5" onclick="rate(1)">
+                                                <svg class="star-empty" width="16" height="16">
+                                                    <use xlink:href="#star-empty"></use>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="review-header">
+                                            <span class="author-name">Jenny Rose</span>
+                                            <span class="review-date">– 03/06/2022</span>
+                                        </div>
+                                        <p>
+                                            Vitae tortor condimentum lacinia quis vel eros donec ac. Nam at lectus urna duis convallis
+                                            convallis
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="add-review mt-5">
+                            <h3>Add a review</h3>
+                            <p>Your email address will not be published. Required fields are marked *</p>
+                            <form id="form" class="form-group">
+
+                                <div class="pb-3">
+                                    <div class="review-rating">
+                                        <span>Your rating *</span>
+                                        <div class="rating-container d-flex align-items-center">
+                                            <div class="rating" data-rating="1">
+                                                <svg width="24" height="24" class="text-primary">
+                                                    <use xlink:href="#star-solid"></use>
+                                                </svg>
+                                            </div>
+                                            <div class="rating" data-rating="2">
+                                                <svg width="24" height="24" class="text-primary">
+                                                    <use xlink:href="#star-solid"></use>
+                                                </svg>
+                                            </div>
+                                            <div class="rating" data-rating="3">
+                                                <svg width="24" height="24" class="text-primary">
+                                                    <use xlink:href="#star-solid"></use>
+                                                </svg>
+                                            </div>
+                                            <div class="rating" data-rating="4">
+                                                <svg width="24" height="24" class="text-secondary">
+                                                    <use xlink:href="#star-solid"></use>
+                                                </svg>
+                                            </div>
+                                            <div class="rating" data-rating="5">
+                                                <svg width="24" height="24" class="text-secondary">
+                                                    <use xlink:href="#star-solid"></use>
+                                                </svg>
+                                            </div>
+                                            <span class="rating-count">(3.5)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="pb-3">
+                                    <input type="file" class="form-control" data-text="Choose your file">
+                                </div>
+                                <div class="pb-3">
+                                    <label>Your Review *</label>
+                                    <textarea class="form-control" placeholder="Write your review here"></textarea>
+                                </div>
+                                <div class="pb-3">
+                                    <label>Your Name *</label>
+                                    <input type="text" name="name" placeholder="Write your name here" class="form-control">
+                                </div>
+                                <div class="pb-3">
+                                    <label>Your Email *</label>
+                                    <input type="text" name="email" placeholder="Write your email here" class="form-control">
+                                </div>
+                                <div class="pb-3">
+                                    <label>
+                                        <input type="checkbox" required="">
+                                        <span class="label-body">
+                                            Save my name, email, and website in this browser for the next
+                                            time.
+                                        </span>
+                                    </label>
+                                </div>
+                                <button type="submit" name="submit"
+                                        class="btn btn-dark btn-large text-uppercase w-100">
+                                    Submit
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

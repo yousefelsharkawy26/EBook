@@ -1,0 +1,84 @@
+﻿@model Digital_Library.Core.ViewModels.Requests.BookRequest;
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Book</h4>
+
+<form asp-action="Create" enctype="multipart/form-data" method="post">
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Author" class="form-label"></label>
+        <input asp-for="Author" class="form-control" />
+        <span asp-validation-for="Author" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PricePhysical" class="form-label"></label>
+        <input asp-for="PricePhysical" class="form-control" />
+        <span asp-validation-for="PricePhysical" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PricePDFPerDay" class="form-label"></label>
+        <input asp-for="PricePDFPerDay" class="form-control" />
+        <span asp-validation-for="PricePDFPerDay" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Stock" class="form-label"></label>
+        <input asp-for="Stock" class="form-control" />
+        <span asp-validation-for="Stock" class="text-danger"></span>
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="HasPDF" class="form-check-input" />
+        <label asp-for="HasPDF" class="form-check-label"></label>
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="IsBorrowable" class="form-check-input" />
+        <label asp-for="IsBorrowable" class="form-check-label"></label>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CategoryID" class="form-label">Category</label>
+        <select asp-for="CategoryID" asp-items="@ViewBag.Categories" class="form-select">
+            <option value="">-- Select Category --</option>
+        </select>
+        <span asp-validation-for="CategoryID" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PDFFile" class="form-label"></label>
+        <input asp-for="PDFFile" type="file" class="form-control" />
+        <span asp-validation-for="PDFFile" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ImageBookCover" class="form-label"></label>
+        <input asp-for="ImageBookCover" type="file" class="form-control" />
+        <span asp-validation-for="ImageBookCover" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
