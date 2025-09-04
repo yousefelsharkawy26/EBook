@@ -11,7 +11,7 @@ public class EmailSender : IEmailSender
 {
     private readonly EmailSettings _emailSettings;
 
-    // The constructor gets the settings via dependency injection
+    
     public EmailSender(IOptions<EmailSettings> emailSettings)
     {
         _emailSettings = emailSettings.Value;
@@ -22,21 +22,20 @@ public class EmailSender : IEmailSender
         var fromAddress = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName);
         var toAddress = new MailAddress(toEmail);
 
-        // Create the email message
+        
         var mailMessage = new MailMessage(fromAddress, toAddress)
         {
             Subject = subject,
             Body = htmlMessage,
-            IsBodyHtml = true // This is crucial for sending HTML content
+            IsBodyHtml = true 
         };
 
-        // Create the SmtpClient and configure it
+        
         using (var smtpClient = new SmtpClient(_emailSettings.SmtpServer, _emailSettings.Port))
         {
-            smtpClient.EnableSsl = true; // Gmail requires SSL
+            smtpClient.EnableSsl = true; 
             smtpClient.Credentials = new NetworkCredential(_emailSettings.SenderEmail, _emailSettings.Password);
 
-            // Send the email asynchronously
             await smtpClient.SendMailAsync(mailMessage);
         }
     }
