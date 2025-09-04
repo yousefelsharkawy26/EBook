@@ -11,9 +11,11 @@ namespace Digital_Library.Service
 	{
 		public static IServiceCollection Add_Module_Service_Dependencies(this IServiceCollection services)
 		{
-			services.AddTransient<IFileService, FileService>();
-			services.AddTransient<IEmailSender, EmailSender>();
-			services.AddScoped<IBookService, BookService>();
+			services.AddTransient<IFileService,  FileService>();
+			services.AddTransient<IEmailSender,  EmailSender>();
+			services.AddScoped<IBookService,     BookService>();
+			services.AddScoped<IBorrowService, BorrowService>();
+
 			return services;
 		}
 
