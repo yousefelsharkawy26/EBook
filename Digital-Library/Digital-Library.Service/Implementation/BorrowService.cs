@@ -16,7 +16,7 @@ namespace Digital_Library.Service.Implementation
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task BorrowBookAsync(string userId, string bookId , int days = 14)
+        public async Task BorrowBookAsync(string userId, string bookId , int days)
         {
             var book = await _unitOfWork.Books.GetByIdAsync(bookId);
 
@@ -50,31 +50,6 @@ namespace Digital_Library.Service.Implementation
             await _unitOfWork.SaveChangesAsync();
         }
 
-
-        public async Task ReturnBookAsync(string userId, string bookId)
-        {
-            var borrowing = await _unitOfWork.Borrowings.GetSingleAsync(b => b.UserId == userId && b.BookId == bookId);
-            if( borrowing == null)
-            {
-                throw new Exception("No borrowing record found for this book");
-            }
-
-            var book = await _unitOfWork.Books.GetByIdAsync(bookId);
-            if ( book == null )
-            {
-                throw new Exception("Book not found");
-            }
-
-            book.Stock++;
-
-            book.IsBorrowable = true;
-
-            _unitOfWork.Borrowings.Delete(borrowing);
-            _unitOfWork.Books.Update(book) ;
-
-            await _unitOfWork.SaveChangesAsync();
-
-        }
         public async Task<IEnumerable<Borrowing>> GetUserBorrowsAsync(string userId)
         {
             return await _unitOfWork.Borrowings.GetManyAsync(b => b.UserId == userId, b => b.Book);

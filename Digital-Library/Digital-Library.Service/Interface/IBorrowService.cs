@@ -9,9 +9,7 @@ namespace Digital_Library.Service.Interface
 {
     public interface IBorrowService
     {
-        Task BorrowBookAsync(string userId, string bookId , int days = 14);
-        Task ReturnBookAsync(string userId, string bookId);
-
+        Task BorrowBookAsync(string userId, string bookId , int days);
         Task<IEnumerable<Borrowing>> GetUserBorrowsAsync(string userId);
     }
 }
