@@ -12,18 +12,17 @@ namespace Digital_Library.Service
 	{
 		public static IServiceCollection Add_Module_Service_Dependencies(this IServiceCollection services)
 		{
-			services.AddTransient<IFileService,  FileService>();
-			services.AddTransient<IEmailSender,  EmailSender>();
-			services.AddScoped<IBookService,     BookService>();
+   services.AddScoped<IAuthService, AuthService>();
+			services.AddScoped<IBookService, BookService>();
 			services.AddScoped<IBorrowService, BorrowService>();
-			services.AddScoped<ICartService,     CartService>();
+			services.AddScoped<ICartService, CartService>();
 			services.AddScoped<ICategoryService, CategoryService>();
-			services.AddScoped<IUserService,   UserService>();
+			services.AddTransient<IEmailSender, EmailSender>();
+			services.AddTransient<IFileService, FileService>();
+			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<IVendorService, VendorService>();
-			services.AddScoped<IAuthService, AuthService>();
-
-
 			return services;
+
 		}
 
 		public static IServiceCollection Add_Module_Configuration_Services(this IServiceCollection services, IConfiguration configuration)
