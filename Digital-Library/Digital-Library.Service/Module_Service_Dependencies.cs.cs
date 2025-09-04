@@ -16,6 +16,7 @@ namespace Digital_Library.Service
 			services.AddScoped<IBookService,     BookService>();
 			services.AddScoped<IBorrowService, BorrowService>();
 			services.AddScoped<ICartService,     CartService>();
+			services.AddScoped<IUserService,   UserService>();
 
 			return services;
 		}
