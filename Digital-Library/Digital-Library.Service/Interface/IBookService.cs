@@ -24,9 +24,5 @@ namespace Digital_Library.Service.Interface
 
 
 
-
-
-
-
 	}
 }
