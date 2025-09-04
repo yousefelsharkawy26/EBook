@@ -25,17 +25,11 @@ namespace Digital_Library
 			});
             #endregion
 
+ #region Dependency injections
 
-
-			
-
-			//inject for using services in controller constructor
-            #region Dependency injections
-
-
-            builder.Services.Add_Module_Infrastructure_Dependencies()
+builder.Services.Add_Module_Infrastructure_Dependencies()
 							.Add_Module_Service_Dependencies()
-                            .Add_Module_Configuration_Services(builder.Configuration);
+       .Add_Module_Configuration_Services(builder.Configuration);
 																				
 			#endregion
 
