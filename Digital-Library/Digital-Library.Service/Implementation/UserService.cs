@@ -1,49 +1,74 @@
-﻿using Digital_Library.Infrastructure.UnitOfWork.Interface;
+﻿using Digital_Library.Core.Constant;
+using Digital_Library.Core.Models;
+using Digital_Library.Core.ViewModels.Requests;
+using Digital_Library.Core.ViewModels.Responses;
+using Digital_Library.Infrastructure.UnitOfWork.Interface;
 using Digital_Library.Service.Interface;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace Digital_Library.Service.Implementation;
 public class UserService : IUserService
 {
-    private readonly IUnitOfWork _unitOfWork;
-    public UserService(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-    public async Task ChangeAddress(string id, string City, string State, string ZipCode)
-    {
-        var vendor = await _unitOfWork.Vendors.GetByIdAsync(id);
-        if (vendor == null)
-        {
-            throw new KeyNotFoundException($"User with this {id} not found");
-        }
+	private readonly UserManager<User> _userManager;
+	private readonly IFileService _fileService;
+	private readonly ILogger<UserService> _logger;
 
-        vendor.City = City;
-        vendor.State = State;
-        vendor.ZipCode = ZipCode;
+	public UserService(UserManager<User> userManager, IFileService fileService, ILogger<UserService> logger)
+	{
+		_userManager = userManager;
+		_fileService = fileService;
+		_logger = logger;
+	}
 
-        await _unitOfWork.SaveChangesAsync();
+	public async Task<Response> GetProfileAsync(string userId)
+	{
+		var user = await _userManager.FindByIdAsync(userId);
 
-    }
+		if (user == null)
+			return Response.Fail("User not found");
 
-    public async Task ChangeName(string id, string name)
-    {
-        var user = await _unitOfWork.Users.GetByIdAsync(id);
-        if (user == null)
-        {
-            throw new KeyNotFoundException($"User with this {id} not found");
-        }
+		var profile = new
+		{
+			user.Id,
+			user.UserName,
+			user.Email,
+			user.FullName,
+			user.ImageUrl
+		};
 
-        user.FullName = name;
-    }
+		_logger.LogInformation("Profile retrieved for user {UserId}", userId);
+		return Response.Ok("Profile retrieved successfully", profile);
+	}
 
-    public async Task ChangePhoneNumber(string id, string PhoneNumber)
-    {
-        var user = await _unitOfWork.Users.GetByIdAsync(id);
-        if (user == null)
-        {
-            throw new KeyNotFoundException($"User with this {id} not found");
-        }
+	public async Task<Response> UpdateProfileAsync(string userId, UserRequest request)
+	{
+		var user = await _userManager.FindByIdAsync(userId);
 
-        user.PhoneNumber = PhoneNumber;
-    }
+		if (user == null)
+			return Response.Fail("User not found");
+
+		if (!string.IsNullOrEmpty(request.FullName))
+			user.FullName = request.FullName;
+
+		if (request.ImageProfile != null)
+		{
+			if (!string.IsNullOrEmpty(user.ImageUrl))
+				await _fileService.DeleteFile(user.ImageUrl);
+
+			user.ImageUrl = await _fileService.AddFile(request.ImageProfile, FileFoldersName.UserProfileImage);
+		}
+
+		var result = await _userManager.UpdateAsync(user);
+
+		if (!result.Succeeded)
+		{
+			var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+			_logger.LogError("Failed to update profile for user {UserId}: {Errors}", userId, errors);
+			return Response.Fail("Failed to update profile: " + errors);
+		}
+
+		_logger.LogInformation("Profile updated successfully for user {UserId}", userId);
+		return Response.Ok("Profile updated successfully", user);
+	}
 }

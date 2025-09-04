@@ -42,6 +42,10 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.Property<bool>("HasPDF")
                         .HasColumnType("bit");
 
+                    b.Property<string>("ImageBookCoverPath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsBorrowable")
                         .HasColumnType("bit");
 
@@ -283,9 +287,21 @@ namespace Digital_Library.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("RejectionReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("State")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -670,7 +686,7 @@ namespace Digital_Library.Infrastructure.Migrations
             modelBuilder.Entity("Digital_Library.Core.Models.VendorIdentityImagesUrl", b =>
                 {
                     b.HasOne("Digital_Library.Core.Models.Vendor", "Vendor")
-                        .WithMany("vendorIdentityImagesUrls")
+                        .WithMany("VendorIdentityImagesUrls")
                         .HasForeignKey("VendorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -759,7 +775,7 @@ namespace Digital_Library.Infrastructure.Migrations
                 {
                     b.Navigation("Books");
 
-                    b.Navigation("vendorIdentityImagesUrls");
+                    b.Navigation("VendorIdentityImagesUrls");
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.User", b =>

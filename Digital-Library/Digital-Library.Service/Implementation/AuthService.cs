@@ -1,6 +1,6 @@
 ﻿using Digital_Library.Core.Models;
+using Digital_Library.Core.ViewModels.Responses;
 using Digital_Library.Service.Interface;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -13,278 +13,247 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Digital_Library.Service.Implementation;
+
 public class AuthService : IAuthService
 {
-    private readonly UserManager<User> _userManager;
-    private readonly SignInManager<User> _signInManager;
-    private readonly IEmailSender _emailSender;
-    private readonly IUrlHelperFactory _urlHelperFactory;
-    private readonly IActionContextAccessor _actionContextAccessor;
-    private readonly ILogger<AuthService> _logger;
-    private readonly IWebHostEnvironment _webHostEnvironment;
-    public AuthService(UserManager<User> userManager,
-                       SignInManager<User> signInManager,
-                       IEmailSender emailSender,
-                       IUrlHelperFactory urlHelperFactory,
-                       IActionContextAccessor actionContextAccessor,
-                       ILogger<AuthService> logger,
-                       IWebHostEnvironment webHostEnvironment)
-    {
-        _userManager = userManager;
-        _signInManager = signInManager;
-        _emailSender = emailSender;
-        _urlHelperFactory = urlHelperFactory;
-        _actionContextAccessor = actionContextAccessor;
-        _logger = logger;
-        _webHostEnvironment = webHostEnvironment;
-    }
+	private readonly UserManager<User> _userManager;
+	private readonly SignInManager<User> _signInManager;
+	private readonly IEmailSender _emailSender;
+	private readonly IUrlHelperFactory _urlHelperFactory;
+	private readonly IActionContextAccessor _actionContextAccessor;
+	private readonly ILogger<AuthService> _logger;
+	private readonly IWebHostEnvironment _webHostEnvironment;
 
-    public async Task<bool> ChangePassword(string userId, string oldPassword, string newPassword)
-    {
-        var user = await _userManager.FindByIdAsync(userId);
-        
-        if (user == null) 
-            throw new ArgumentNullException($"User by Id = {userId} does not exists");
+	public AuthService(UserManager<User> userManager,
+																				SignInManager<User> signInManager,
+																				IEmailSender emailSender,
+																				IUrlHelperFactory urlHelperFactory,
+																				IActionContextAccessor actionContextAccessor,
+																				ILogger<AuthService> logger,
+																				IWebHostEnvironment webHostEnvironment)
+	{
+		_userManager = userManager;
+		_signInManager = signInManager;
+		_emailSender = emailSender;
+		_urlHelperFactory = urlHelperFactory;
+		_actionContextAccessor = actionContextAccessor;
+		_logger = logger;
+		_webHostEnvironment = webHostEnvironment;
+	}
 
-        if (await _userManager.CheckPasswordAsync(user, oldPassword) is false)
-            throw new ArgumentException("The old password is wrong");
+	// ===================== SignIn =====================
+	public async Task<Response> SignInAsync(string email, string password)
+	{
+		var user = await _userManager.FindByEmailAsync(email);
+		if (user == null) return Response.Fail("User not found");
 
-        var res = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+		var result = await _signInManager.PasswordSignInAsync(user, password, true, false);
+		if (!result.Succeeded) return Response.Fail("Invalid credentials");
 
-        if (res == IdentityResult.Success)
-            return true;
+		_logger.LogInformation($"User {user.Email} signed in.");
+		return Response.Ok("Sign-in successful");
+	}
 
-        return false;
-    }
-    public async Task ForgetPassword(string email)
-    {
-        var user = await _userManager.FindByEmailAsync(email);
+	// ===================== SignOut =====================
+	public async Task<Response> SignOutAsync()
+	{
+		await _signInManager.SignOutAsync();
+		_logger.LogInformation("User signed out.");
+		return Response.Ok("Sign-out successful");
+	}
 
-        if (user == null)
-            throw new ArgumentNullException($"User by email = {email} does not exists");
+	// ===================== SignUp =====================
+	public async Task<Response> SignUpAsync(string name, string email, string password)
+	{
+		var existingUser = await _userManager.FindByEmailAsync(email);
+		if (existingUser != null) return Response.Fail("Email already exists");
 
-        try
-        {
-            // 2. Generate a password reset token and the callback URL
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var actionContext = _actionContextAccessor.ActionContext;
-            var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
+		var user = new User()
+		{
+			Email = email,
+			UserName = await CreateUniqueUsernameFromNameAsync(name),
+			FullName = name
+		};
 
-            var resetLink = urlHelper.Action("ResetPassword", "Account",
-                new { userId = user.Id, token = token },
-                protocol: actionContext.HttpContext.Request.Scheme);
+		var res = await _userManager.CreateAsync(user, password);
+		if (!res.Succeeded) return Response.Fail(res.Errors.FirstOrDefault()?.Description ?? "Sign-up failed");
 
-            // 3. Read the HTML email template from the file
-            string wwwRootPath = _webHostEnvironment.WebRootPath;
-            string templatePath = Path.Combine(wwwRootPath, "templates/email/PasswordReset.html");
-            string htmlTemplate = await File.ReadAllTextAsync(templatePath);
+		await SendEmailVerificationAsync(user);
 
-            // 4. Replace the placeholders with actual data
-            htmlTemplate = htmlTemplate.Replace("[User's Name]", user.FullName);
-            htmlTemplate = htmlTemplate.Replace("[Reset Link]", resetLink);
-            htmlTemplate = htmlTemplate.Replace("[App Name]", "E-BOOK");
-            htmlTemplate = htmlTemplate.Replace("[Company Name]", "ITI");
-            htmlTemplate = htmlTemplate.Replace("[Company Address]", "Mansoura University");
+		_logger.LogInformation($"User {user.Email} signed up.");
+		return Response.Ok("Sign-up successful", user);
+	}
 
-            // 5. Send the email using your service
-            await _emailSender.SendEmailAsync(
-                email: user.Email,
-                subject: "Reset Your Password",
-                htmlMessage: htmlTemplate
-            );
+	// ===================== ForgetPassword =====================
+	public async Task<Response> ForgetPasswordAsync(string email)
+	{
+		var user = await _userManager.FindByEmailAsync(email);
+		if (user == null) return Response.Fail("User not found");
 
-            _logger.LogInformation($"Message Send Success From {nameof(ForgetPassword)}");
-        }
-        catch (Exception ex)
-        {
-            // Log the exception (using an ILogger is recommended here)
-            _logger.LogError(ex, $"Error occurred during forgot password process for email {email}", $"From {nameof(ForgetPassword)}");
+		try
+		{
+			var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+			await SendPasswordResetEmail(user, token);
+			_logger.LogInformation($"Password reset email sent to {email}");
+			return Response.Ok("Password reset email sent");
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError(ex, "Error sending password reset email");
+			return Response.Fail("Failed to send password reset email");
+		}
+	}
 
-        }
-    }
-    public async Task<bool> ResetPassword(string userId, string token, string newPassword)
-    {
-        var user = await _userManager.FindByIdAsync(userId);
+	// ===================== ResetPassword =====================
+	public async Task<Response> ResetPasswordAsync(string userId, string token, string newPassword)
+	{
+		var user = await _userManager.FindByIdAsync(userId);
+		if (user == null) return Response.Fail("User not found");
 
-        if (user == null)
-            throw new ArgumentNullException($"User by Id = {userId} does not exists");
+		var res = await _userManager.ResetPasswordAsync(user, token, newPassword);
+		if (!res.Succeeded) return Response.Fail(res.Errors.FirstOrDefault()?.Description ?? "Reset password failed");
 
-        var res = await _userManager.ResetPasswordAsync(user, token, newPassword);
+		_logger.LogInformation($"Password reset for user {user.Email}");
+		return Response.Ok("Password reset successful");
+	}
 
-        return res == IdentityResult.Success? true: false;
-    }
-    public async Task SignIn(string email, string password)
-    {
-        var user = await _userManager.FindByEmailAsync( email );
+	// ===================== ChangePassword =====================
+	public async Task<Response> ChangePasswordAsync(string userId, string oldPassword, string newPassword)
+	{
+		var user = await _userManager.FindByIdAsync(userId);
+		if (user == null) return Response.Fail("User not found");
 
-        if (user == null)
-            throw new ArgumentNullException($"User by email = {email} does not exists");
+		var check = await _userManager.CheckPasswordAsync(user, oldPassword);
+		if (!check) return Response.Fail("Old password is incorrect");
 
-        var props = new AuthenticationProperties()
-        {
-            AllowRefresh = true,
-            IssuedUtc = DateTimeOffset.UtcNow,
-            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(10),
-            IsPersistent = true,
-            RedirectUri = "/auth/login"
-        };
+		var res = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+		if (!res.Succeeded) return Response.Fail(res.Errors.FirstOrDefault()?.Description ?? "Change password failed");
 
-        await _signInManager.SignInAsync(user, props);
-    }
-    public async Task SignOut()
-    {
-        await _signInManager.SignOutAsync();
-    }
-    public async Task<bool> SignUp(string name, string email, string password)
-    {
-        var user = new User()
-        {
-            Email = email,
-            FullName = name,
-        };
-        user.UserName = await CreateUniqueUsernameFromNameAsync(name);
+		_logger.LogInformation($"Password changed for user {user.Email}");
+		return Response.Ok("Password changed successfully");
+	}
 
-        try
-        {
-            var res = await _userManager.CreateAsync(user, password);
+	// ===================== VerifyEmail =====================
+	public async Task<Response> VerifyEmailAsync(string userId, string token)
+	{
+		var user = await _userManager.FindByIdAsync(userId);
+		if (user == null) return Response.Fail("User not found");
 
-            return res == IdentityResult.Success;
-        }
-        catch (Exception ex)
-        {
-            return false;
-        }
-    }
-    public async Task VerifyEmail(string userId, string token)
-    {
-        var user = await _userManager.FindByIdAsync(userId);
+		var res = await _userManager.ConfirmEmailAsync(user, token);
+		if (!res.Succeeded) return Response.Fail(res.Errors.FirstOrDefault()?.Description ?? "Email verification failed");
 
-        if (user == null)
-            throw new ArgumentNullException($"User by Id = {userId} does not exists");
+		_logger.LogInformation($"Email verified for user {user.Email}");
+		return Response.Ok("Email verified successfully");
+	}
 
-        await _userManager.ConfirmEmailAsync(user, token);
-    }
+	// ===================== ChangeEmail =====================
+	public async Task<Response> ChangeEmailAsync(string userId, string newEmail)
+	{
+		var user = await _userManager.FindByIdAsync(userId);
+		if (user == null) return Response.Fail("User not found");
 
-    #region Helper Methods
+		var token = await _userManager.GenerateChangeEmailTokenAsync(user, newEmail);
+		var result = await _userManager.ChangeEmailAsync(user, newEmail, token);
 
-    private async Task<string> CreateUniqueUsernameFromNameAsync(string fullName)
-    {
-        // 1. Generate the base username prefix from the full name
-        string baseUsername = GenerateUsernamePrefix(fullName);
-        string currentUsername = baseUsername;
-        int counter = 1;
+		if (!result.Succeeded) return Response.Fail(result.Errors.FirstOrDefault()?.Description ?? "Change email failed");
 
-        // 2. Check for uniqueness and append a number if it's already taken
-        // In a real app, you would check against your database of users.
-        while (await IsUsernameTakenAsync(currentUsername))
-        {
-            // If "johndoe" is taken, try "johndoe1", "johndoe2", etc.
-            currentUsername = $"{baseUsername}{counter}";
-            counter++;
-        }
+		_logger.LogInformation($"Email changed for user {user.UserName} to {newEmail}");
+		return Response.Ok("Email changed successfully");
+	}
 
-        return currentUsername;
-    }
-    private static string GenerateUsernamePrefix(string fullName, int maxLength = 20)
-    {
-        if (string.IsNullOrWhiteSpace(fullName))
-        {
-            return "user"; // Fallback for empty names
-        }
+	// ===================== Helpers =====================
+	#region Helper Methods
 
-        // 1. Split the name into parts
-        string[] nameParts = fullName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+	private async Task<string> CreateUniqueUsernameFromNameAsync(string fullName)
+	{
+		string baseUsername = GenerateUsernamePrefix(fullName);
+		string currentUsername = baseUsername;
+		int counter = 1;
 
-        string firstName = SanitizePart(nameParts.FirstOrDefault());
-        string lastName = nameParts.Length > 1 ? SanitizePart(nameParts.LastOrDefault()) : "";
+		while (await _userManager.FindByNameAsync(currentUsername) != null)
+		{
+			currentUsername = $"{baseUsername}{counter}";
+			counter++;
+		}
 
-        // 2. Combine the parts
-        string usernamePrefix = string.IsNullOrEmpty(lastName) ? firstName : $"{firstName}{lastName}";
+		return currentUsername;
+	}
 
-        // 3. Handle cases where sanitization results in an empty string
-        if (string.IsNullOrWhiteSpace(usernamePrefix))
-        {
-            return "user";
-        }
+	private static string GenerateUsernamePrefix(string fullName, int maxLength = 20)
+	{
+		if (string.IsNullOrWhiteSpace(fullName)) return "user";
 
-        // 4. Truncate to the max length
-        if (usernamePrefix.Length > maxLength)
-        {
-            usernamePrefix = usernamePrefix.Substring(0, maxLength);
-        }
+		string[] nameParts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+		string firstName = SanitizePart(nameParts.FirstOrDefault());
+		string lastName = nameParts.Length > 1 ? SanitizePart(nameParts.LastOrDefault()) : "";
 
-        return usernamePrefix;
-    }
-    private static string SanitizePart(string namePart)
-    {
-        if (string.IsNullOrEmpty(namePart)) return "";
+		string usernamePrefix = string.IsNullOrEmpty(lastName) ? firstName : $"{firstName}{lastName}";
+		if (usernamePrefix.Length > maxLength) usernamePrefix = usernamePrefix.Substring(0, maxLength);
 
-        // ToLower and remove accents (diacritics)
-        string normalized = new string(namePart.ToLowerInvariant()
-            .Normalize(NormalizationForm.FormD)
-            .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
-            .ToArray());
+		return string.IsNullOrWhiteSpace(usernamePrefix) ? "user" : usernamePrefix;
+	}
 
-        // Remove all non-alphanumeric characters
-        string sanitized = Regex.Replace(normalized, @"[^a-z0-9]", "");
+	private static string SanitizePart(string namePart)
+	{
+		if (string.IsNullOrEmpty(namePart)) return "";
+		string normalized = new string(namePart.ToLowerInvariant()
+						.Normalize(NormalizationForm.FormD)
+						.Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+						.ToArray());
+		return Regex.Replace(normalized, @"[^a-z0-9]", "");
+	}
 
-        return sanitized;
-    }
-    private async Task<bool> IsUsernameTakenAsync(string username)
-    {
-        // Use your UserManager to check if the username exists
-        try
-        {
-            var user = await _userManager.FindByNameAsync(username);
-            return user != null;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-    private async Task CreateEmailVerification(User user)
-    {
-        try
-        {
-            // 1. Generate the email confirmation token and the callback URL
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var actionContext = _actionContextAccessor.ActionContext;
-            var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
+	private async Task SendEmailVerificationAsync(User user)
+	{
+		try
+		{
+			var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+			var actionContext = _actionContextAccessor.ActionContext;
+			var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
 
-            var verificationLink = urlHelper.Action("ConfirmEmail", "Account",
-                new { userId = user.Id, token = token },
-                protocol: actionContext.HttpContext.Request.Scheme);
+			var verificationLink = urlHelper.Action("ConfirmEmail", "Account",
+							new { userId = user.Id, token = token },
+							protocol: actionContext.HttpContext.Request.Scheme);
 
-            // 2. Read the HTML email template
-            string wwwRootPath = _webHostEnvironment.WebRootPath;
-            string templatePath = Path.Combine(wwwRootPath, "html/EmailVerification.html");
-            string htmlTemplate = await File.ReadAllTextAsync(templatePath);
+			string wwwRoot = _webHostEnvironment.WebRootPath;
+			string template = Path.Combine(wwwRoot, "html/EmailVerification.html");
+			string html = await File.ReadAllTextAsync(template);
 
-            // 3. Replace placeholders
-            htmlTemplate = htmlTemplate.Replace("[User's Name]", user.UserName);
-            htmlTemplate = htmlTemplate.Replace("[Verification Link]", verificationLink);
-            htmlTemplate = htmlTemplate.Replace("[App Name]", "E-BOOK");
-            htmlTemplate = htmlTemplate.Replace("[Company Name]", "ITI");
-            htmlTemplate = htmlTemplate.Replace("[Company Address]", "Mansoura University");
-            // ... replace any other placeholders
+			html = html.Replace("[User's Name]", user.UserName)
+														.Replace("[Verification Link]", verificationLink)
+														.Replace("[App Name]", "E-BOOK")
+														.Replace("[Company Name]", "ITI")
+														.Replace("[Company Address]", "Mansoura University");
 
-            // 4. Send the email
-            await _emailSender.SendEmailAsync(
-                email: user.Email,
-                subject: "Please Verify Your Email Address",
-                htmlMessage: htmlTemplate
-            );
+			await _emailSender.SendEmailAsync(user.Email, "Please Verify Your Email Address", html);
+			_logger.LogInformation($"Email verification sent to {user.Email}");
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError(ex, "Failed to send email verification");
+		}
+	}
 
-            _logger.LogInformation("Message Send Success...");
-        }
-        catch (Exception ex)
-        {
-            // Log the error
-            _logger.LogError($"Send Message Failed From {nameof(CreateEmailVerification)}");
-        }
-    }
-    
-    #endregion
+	private async Task SendPasswordResetEmail(User user, string token)
+	{
+		var actionContext = _actionContextAccessor.ActionContext;
+		var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
+		var resetLink = urlHelper.Action("ResetPassword", "Account",
+						new { userId = user.Id, token = token },
+						protocol: actionContext.HttpContext.Request.Scheme);
 
+		string wwwRoot = _webHostEnvironment.WebRootPath;
+		string template = Path.Combine(wwwRoot, "templates/email/PasswordReset.html");
+		string html = await File.ReadAllTextAsync(template);
+
+		html = html.Replace("[User's Name]", user.FullName)
+													.Replace("[Reset Link]", resetLink)
+													.Replace("[App Name]", "E-BOOK")
+													.Replace("[Company Name]", "ITI")
+													.Replace("[Company Address]", "Mansoura University");
+
+		await _emailSender.SendEmailAsync(user.Email, "Reset Your Password", html);
+	}
+
+	#endregion
 }
