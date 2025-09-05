@@ -1,4 +1,5 @@
 ﻿using Digital_Library.Core.ViewModels;
+using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -93,5 +94,35 @@ public class AuthController : Controller
         var res = await _authService.VerifyEmailAsync(userId, token);
 
         return res.Success ? View() : NotFound();
+    }
+
+    public async Task<IActionResult> ForgetPassword()
+    {
+        await Task.CompletedTask;
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ForgetPassword(string email)
+    {
+        var res = await _authService.ForgetPasswordAsync(email);
+
+        return View();
+    }
+
+    public async Task<IActionResult> ChangePassword()
+    {
+        await Task.CompletedTask;
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ChangePassword(ChangePasswordRequest model)
+    {
+        var res = await _authService.ChangePasswordAsync(model.UserId, model.OldPassword, model.NewPassword);
+
+        if (res.Success) return RedirectToAction("Login");
+
+        return View();
     }
 }
