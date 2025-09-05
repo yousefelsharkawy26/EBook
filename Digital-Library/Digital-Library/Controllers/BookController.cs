@@ -10,6 +10,7 @@ using System.Security.Claims;
 
 namespace Digital_Library.Controllers
 {
+	[Route("Book")]
 	public class BookController : Controller
 	{
 		private readonly IBookService bookService;
@@ -22,12 +23,12 @@ namespace Digital_Library.Controllers
 			this.categoryService = categoryService;
 			this.vendorService = vendorService;
 		}
-		[HttpGet]
+		[HttpGet("Index")]
 		[Authorize(Roles = Roles.Vendor)]
 		public async Task<IActionResult> Index()
 		{
 			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			var vendorId=	await vendorService.ReturnVendorIdFromUserId(userId);
+			var vendorId = await vendorService.ReturnVendorIdFromUserId(userId);
 			if (!vendorId.Success)
 			{
 				return BadRequest();
@@ -37,7 +38,7 @@ namespace Digital_Library.Controllers
 			return View(books);
 		}
 
-		[HttpGet]
+		[HttpGet("AddBook")]
 		[Authorize(Roles = Roles.Vendor)]
 		public async Task<IActionResult> AddBook()
 		{
@@ -50,7 +51,7 @@ namespace Digital_Library.Controllers
 			return View();
 		}
 
-		[HttpPost]
+		[HttpPost("AddBook")]
 		[ValidateAntiForgeryToken]
 		[Authorize(Roles = Roles.Vendor)]
 		public async Task<IActionResult> AddBook(BookRequest request)
@@ -100,7 +101,7 @@ namespace Digital_Library.Controllers
 			if (!response.Success || response.Data == null)
 				return NotFound(response.Message);
 
-			var book = response.Data as Book; 
+			var book = response.Data as Book;
 
 			if (book == null)
 				return NotFound("Book data not found");
@@ -108,7 +109,7 @@ namespace Digital_Library.Controllers
 
 			var request = new UpdateBookRequest
 			{
-				BookID=book.Id,
+				BookID = book.Id,
 				Title = book.Title,
 				Author = book.Author,
 				PricePhysical = book.PricePhysical,
@@ -128,7 +129,7 @@ namespace Digital_Library.Controllers
 				Text = c.CategoryName
 			}).ToList();
 
-			return View(request); 
+			return View(request);
 		}
 
 		[HttpPost("Edit/{id}")]
@@ -146,7 +147,7 @@ namespace Digital_Library.Controllers
 				}).ToList();
 				return View(request);
 			}
-			var response = await bookService.UpdateBook(request.BookID, request );
+			var response = await bookService.UpdateBook(request.BookID, request);
 			if (!response.Success)
 			{
 				ModelState.AddModelError("", response.Message);
@@ -175,7 +176,7 @@ namespace Digital_Library.Controllers
 			}
 
 			TempData["SuccessMessage"] = "Book deleted successfully.";
-			return RedirectToAction("Index", "Books");
+			return RedirectToAction("Index", "Book");
 		}
 
 		[HttpGet("Details/{id}")]
@@ -188,5 +189,24 @@ namespace Digital_Library.Controllers
 			}
 			return View(bookResponse.Data as Book);
 		}
+
+		[HttpGet("ShowPdf/{id}")]
+		[Authorize(Roles = Roles.Vendor)]
+		public async Task<IActionResult> ShowPdf(string id)
+		{
+			if (string.IsNullOrEmpty(id))
+				return NotFound();
+
+			var res = await bookService.GetBookById(id);
+			var book = res.Data as Book;
+			if (book == null || !book.HasPDF || string.IsNullOrEmpty(book.PDFFilePath))
+				return NotFound("PDF not available");
+
+			ViewBag.PdfPath = book.PDFFilePath;
+			return View();
+		}
+
+
+
 	}
 }
