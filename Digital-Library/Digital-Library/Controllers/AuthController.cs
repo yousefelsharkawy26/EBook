@@ -110,16 +110,16 @@ public class AuthController : Controller
         return View();
     }
 
-    public async Task<IActionResult> ChangePassword()
+    public async Task<IActionResult> ResetPassword(string userId, string token)
     {
         await Task.CompletedTask;
         return View();
     }
 
     [HttpPost]
-    public async Task<IActionResult> ChangePassword(ChangePasswordRequest model)
+    public async Task<IActionResult> ResetPassword(string userId, string token,[FromForm] string newPassword)
     {
-        var res = await _authService.ChangePasswordAsync(model.UserId, model.OldPassword, model.NewPassword);
+        var res = await _authService.ResetPasswordAsync(userId, token, newPassword);
 
         if (res.Success) return RedirectToAction("Login");
 
