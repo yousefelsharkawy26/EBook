@@ -51,6 +51,7 @@ namespace Digital_Library.Service.Implementation
 					Author = request.Author,
 					PricePhysical = request.PricePhysical,
 					PricePDFPerDay = request.PricePDFPerDay,
+					PricePdf = request.PricePDF,
 					Description = request.Description,
 					Stock = request.Stock,
 					HasPDF = request.HasPDF,
@@ -168,7 +169,7 @@ namespace Digital_Library.Service.Implementation
 			return Response.Ok("Book retrieved successfully", book);
 		}
 
-		public async Task<Response> UpdateBook(string bookId, BookRequest request)
+		public async Task<Response> UpdateBook(string bookId, UpdateBookRequest request)
 		{
 			try
 			{
@@ -179,6 +180,7 @@ namespace Digital_Library.Service.Implementation
 				book.Title = request.Title;
 				book.Author = request.Author;
 				book.PricePhysical = request.PricePhysical;
+				book.PricePdf = request.PricePDF;
 				book.PricePDFPerDay = request.PricePDFPerDay;
 				book.Description = request.Description;
 				book.Stock = request.Stock;

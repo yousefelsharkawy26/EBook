@@ -52,7 +52,10 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.Property<string>("PDFFilePath")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("PricePDFPerDay")
+                    b.Property<decimal?>("PricePDFPerDay")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PricePdf")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("PricePhysical")

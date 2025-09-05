@@ -5,6 +5,7 @@ using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Core.ViewModels.Responses;
 using Digital_Library.Infrastructure.UnitOfWork.Interface;
 using Digital_Library.Service.Interface;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,13 +19,19 @@ namespace Digital_Library.Service.Services
 		private readonly IFileService _fileService;
 		private readonly ILogger<VendorService> _logger;
 		private readonly IEmailSender _emailSender;
+		private readonly UserManager<User> userManager;
 
-		public VendorService(IUnitOfWork unitOfWork, IFileService fileService, ILogger<VendorService> logger, IEmailSender emailSender)
+		public VendorService(IUnitOfWork unitOfWork, 
+			IFileService fileService, 
+			ILogger<VendorService> logger, 
+			IEmailSender emailSender,
+			UserManager<User> userManager)
 		{
 			_unitOfWork = unitOfWork;
 			_fileService = fileService;
 			_logger = logger;
 			_emailSender = emailSender;
+			this.userManager = userManager;
 		}
 
 		public async Task<Response> SubmitVendorRequestAsync(VendorRequest request, string userId)
@@ -166,6 +173,12 @@ namespace Digital_Library.Service.Services
 
 				if (status == VendorStatus.Approved)
 				{
+					var roleResult = await userManager.AddToRoleAsync(vendor.User, Roles.Vendor);
+					if (!roleResult.Succeeded)
+					{
+						_logger.LogError("Failed to assign Vendor role to user {UserId}", vendor.UserId);
+						return Response.Fail("Failed to assign Vendor role to user.");
+					}
 					string htmlMessage = $"<p>Hello {vendor.User?.FullName},</p>" +
 																										$"<p>Your vendor request for '<strong>{vendor.LibraryName}</strong>' has been <strong>approved</strong>.</p>" +
 																										"<p>Thank you.</p>";
@@ -196,6 +209,16 @@ namespace Digital_Library.Service.Services
 				return Response.Fail("An error occurred while updating vendor status.");
 			}
 		}
+
+		public async Task<Response> ReturnVendorIdFromUserId(string userId)
+		{
+			var vendor =  await _unitOfWork.Vendors.GetSingleAsync(v => v.UserId == userId);
+			if (vendor == null)
+				return Response.Fail("Vendor not found.");
+
+			return Response.Ok("Vendor found.", vendor.Id);
+		}
+
 
 	}
 }
