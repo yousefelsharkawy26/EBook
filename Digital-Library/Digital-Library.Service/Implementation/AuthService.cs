@@ -229,7 +229,7 @@ public class AuthService : IAuthService
 			var actionContext = _actionContextAccessor.ActionContext;
 			var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
 
-			var verificationLink = urlHelper.Action("ConfirmEmail", "Account",
+			var verificationLink = urlHelper.Action("ConfirmEmail", "Auth",
 							new { userId = user.Id, token = token },
 							protocol: actionContext.HttpContext.Request.Scheme);
 
