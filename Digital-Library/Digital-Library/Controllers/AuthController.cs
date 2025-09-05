@@ -8,16 +8,18 @@ namespace Digital_Library.Controllers;
 public class AuthController : Controller
 {
     private readonly IAuthService _authService;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IAuthService authService, 
+                          ILogger<AuthController> logger)
     {
         _authService = authService;
+        _logger = logger;
     }
 
     public async Task<IActionResult> Login()
     {
-
-        await _authService.SignUpAsync("Yousef", "yousef@gmail.com", "123midoA@");
+        await Task.CompletedTask;
 
         return View();
     }
@@ -29,12 +31,17 @@ public class AuthController : Controller
         {
             try
             {
-                await _authService.SignInAsync(model.Email, model.Password);
+                var res = await _authService.SignInAsync(model.Email, model.Password);
 
-                return RedirectToAction("Index", "Home", null);
+                if (res.Success)
+                    return RedirectToAction("Index", "Home", null);
+                 
+                _logger.LogWarning(res.Message, $"in {nameof(Login)}");
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex.Message, $"in {nameof(Login)}");
+
                 return View();
             }
         }
@@ -45,6 +52,8 @@ public class AuthController : Controller
     [HttpGet]
     public async Task<IActionResult> Register()
     {
+        await Task.CompletedTask;
+
         return View();
     }
 
@@ -55,8 +64,12 @@ public class AuthController : Controller
         {
             try
             {
-                await _authService.SignUpAsync(model.UserName, model.Email, model.Password);
-                return RedirectToAction("Index", "Home", null);
+                var res = await _authService.SignUpAsync(model.UserName, model.Email, model.Password);
+
+                if (res.Success)
+                    return await Login(new LoginViewModel() { Email =  model.Email, Password = model.Password });
+
+                _logger.LogWarning(res.Message, $"in {nameof(Login)}");
             }
             catch
             {
@@ -64,12 +77,21 @@ public class AuthController : Controller
             }
         }
         return View();
-
     }
 
     public async Task<IActionResult> Logout()
     {
         await _authService.SignOutAsync();
         return RedirectToAction("Index", "Home", null);
+    }
+
+    public async Task<IActionResult> ConfirmEmail(string userId, string token)
+    {
+        if (userId == null || token == null)
+            return BadRequest();
+        
+        var res = await _authService.VerifyEmailAsync(userId, token);
+
+        return res.Success ? View() : NotFound();
     }
 }
