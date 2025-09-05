@@ -45,6 +45,12 @@
    @if (roles.Contains(Digital_Library.Core.Constant.Roles.Vendor))
    {
     <li>
+     <a class="dropdown-item d-flex align-items-center" asp-controller="Vendor" asp-action="Dashboard">
+      <i class="bi bi-journal-bookmark me-2"></i> My Library
+     </a>
+    </li>
+
+    <li>
      <a class="dropdown-item d-flex align-items-center" asp-controller="Book" asp-action="Index">
       <i class="bi bi-book me-2"></i> My Books
      </a>
@@ -53,7 +59,7 @@
    else
    {
     <li>
-     <a class="dropdown-item d-flex align-items-center" href="/Vendor/Become">
+     <a class="dropdown-item d-flex align-items-center" asp-controller="Vendor" asp-action="BecomeVendor">
       <i class="bi bi-shop me-2"></i> Become Vendor
      </a>
     </li>
