@@ -16,10 +16,10 @@ namespace Digital_Library.Controllers
             _orderService = orderService;
         }
 
-        // GET: Orders (بتجيب طلبات المستخدم الحالي)
+        // GET: Orders
         public async Task<IActionResult> Index()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // لو عندك Identity
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var orders = await _orderService.GetUserOrdersAsync(userId);
             return View(orders);
         }
@@ -45,19 +45,16 @@ namespace Digital_Library.Controllers
         public async Task<IActionResult> Create(List<OrderDetailRequest> items)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             var response = await _orderService.CreateOrderAsync(userId, items);
 
             if (response.Success)
-            {
                 return RedirectToAction(nameof(Index));
-            }
 
             ModelState.AddModelError("", response.Message);
             return View(items);
         }
 
-        // GET: Orders/Edit/5 (لتغيير الحالة مثلاً)
+        // GET: Orders/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
             var response = await _orderService.GetOrderByIdAsync(id);
@@ -74,9 +71,7 @@ namespace Digital_Library.Controllers
             var response = await _orderService.UpdateOrderStatusAsync(id, status);
 
             if (response.Success)
-            {
                 return RedirectToAction(nameof(Index));
-            }
 
             ModelState.AddModelError("", response.Message);
             return View();
