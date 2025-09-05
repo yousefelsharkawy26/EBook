@@ -115,7 +115,8 @@ public class AuthService : IAuthService
 			var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 			await SendPasswordResetEmail(user, token);
 			_logger.LogInformation($"Password reset email sent to {email}");
-			return Response.Ok("Password reset email sent");
+			var obg = new {userID = user.Id, token = token};
+			return Response.Ok("Password reset email sent", obg);
 		}
 		catch (Exception ex)
 		{
@@ -261,12 +262,12 @@ public class AuthService : IAuthService
 	{
 		var actionContext = _actionContextAccessor.ActionContext;
 		var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
-		var resetLink = urlHelper.Action("ResetPassword", "Account",
+		var resetLink = urlHelper.Action("ResetPassword", "Auth",
 						new { userId = user.Id, token = token },
 						protocol: actionContext.HttpContext.Request.Scheme);
 
 		string wwwRoot = _webHostEnvironment.WebRootPath;
-		string template = Path.Combine(wwwRoot, "templates/email/PasswordReset.html");
+		string template = Path.Combine(wwwRoot, "html/PasswordReset.html");
 		string html = await File.ReadAllTextAsync(template);
 
 		html = html.Replace("[User's Name]", user.FullName)

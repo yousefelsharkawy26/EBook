@@ -234,7 +234,7 @@
     <!-- Offcanvas Menu -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="bdNavbar" aria-labelledby="bdNavbarOffcanvasLabel">
      <div class="offcanvas-header px-4 pb-0">
-      <a class="navbar-brand" href="index.html">
+      <a class="navbar-brand" href="index.cshtml">
        <img src="images/main-logo.png" class="logo">
       </a>
       <button type="button" class="btn-close btn-close-black" data-bs-dismiss="offcanvas" aria-label="Close"
@@ -245,7 +245,7 @@
       <ul id="navbar"
           class="navbar-nav text-uppercase justify-content-start justify-content-lg-center align-items-start align-items-lg-center flex-grow-1">
        <li class="nav-item">
-        <a class="nav-link me-4 active" href="index.html">Home</a>
+        <a class="nav-link me-4 active" asp-controller="Home" asp-action="Index">Home</a>
        </li>
        <li class="nav-item">
         <a class="nav-link me-4" href="index.html">About</a>
