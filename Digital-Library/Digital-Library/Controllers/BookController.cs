@@ -22,6 +22,20 @@ namespace Digital_Library.Controllers
 			this.categoryService = categoryService;
 			this.vendorService = vendorService;
 		}
+		[HttpGet]
+		[Authorize(Roles = Roles.Vendor)]
+		public async Task<IActionResult> Index()
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var vendorId=	await vendorService.ReturnVendorIdFromUserId(userId);
+			if (!vendorId.Success)
+			{
+				return BadRequest();
+			}
+			var books = await bookService.GetAllBooks(new BookFilter { VendorId = (string)vendorId.Data });
+
+			return View(books);
+		}
 
 		[HttpGet]
 		[Authorize(Roles = Roles.Vendor)]
@@ -75,31 +89,52 @@ namespace Digital_Library.Controllers
 				return View(request);
 			}
 
-			return RedirectToAction("Index", "Books");
+			return RedirectToAction("Index", "Book");
 		}
 
 		[HttpGet("Edit/{id}")]
 		[Authorize(Roles = Roles.Vendor)]
 		public async Task<IActionResult> EditBook(string id)
 		{
-			var bookResponse = await bookService.GetBookById(id);
-			if (!bookResponse.Success)
+			var response = await bookService.GetBookById(id);
+			if (!response.Success || response.Data == null)
+				return NotFound(response.Message);
+
+			var book = response.Data as Book; 
+
+			if (book == null)
+				return NotFound("Book data not found");
+
+
+			var request = new UpdateBookRequest
 			{
-				return NotFound();
-			}
+				BookID=book.Id,
+				Title = book.Title,
+				Author = book.Author,
+				PricePhysical = book.PricePhysical,
+				PricePDF = book.PricePdf,
+				PricePDFPerDay = book.PricePDFPerDay,
+				Description = book.Description,
+				Stock = book.Stock,
+				HasPDF = book.HasPDF,
+				IsBorrowable = book.IsBorrowable,
+				CategoryID = book.CategoryID
+			};
+
 			var categories = await categoryService.GetAllCategories();
 			ViewBag.Categories = categories.Select(c => new SelectListItem
 			{
 				Value = c.Id,
 				Text = c.CategoryName
 			}).ToList();
-			return View(bookResponse);
+
+			return View(request); 
 		}
 
-		[HttpPost]
+		[HttpPost("Edit/{id}")]
 		[ValidateAntiForgeryToken]
 		[Authorize(Roles = Roles.Vendor)]
-		public async Task<IActionResult> EditBook(string id, BookRequest request)
+		public async Task<IActionResult> EditBook(UpdateBookRequest request)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -111,7 +146,7 @@ namespace Digital_Library.Controllers
 				}).ToList();
 				return View(request);
 			}
-			var response = await bookService.UpdateBook(id, request);
+			var response = await bookService.UpdateBook(request.BookID, request );
 			if (!response.Success)
 			{
 				ModelState.AddModelError("", response.Message);
@@ -123,7 +158,7 @@ namespace Digital_Library.Controllers
 				}).ToList();
 				return View(request);
 			}
-			return RedirectToAction("Index", "Books");
+			return RedirectToAction("Index", "Book");
 		}
 
 		[HttpPost]
@@ -151,7 +186,7 @@ namespace Digital_Library.Controllers
 			{
 				return NotFound();
 			}
-			return View(bookResponse);
+			return View(bookResponse.Data as Book);
 		}
 	}
 }

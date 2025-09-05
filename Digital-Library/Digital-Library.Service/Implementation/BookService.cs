@@ -169,7 +169,7 @@ namespace Digital_Library.Service.Implementation
 			return Response.Ok("Book retrieved successfully", book);
 		}
 
-		public async Task<Response> UpdateBook(string bookId, BookRequest request)
+		public async Task<Response> UpdateBook(string bookId, UpdateBookRequest request)
 		{
 			try
 			{

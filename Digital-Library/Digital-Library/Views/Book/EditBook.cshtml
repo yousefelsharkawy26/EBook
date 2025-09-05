@@ -1,21 +1,20 @@
 ﻿@using Digital_Library.Core.ViewModels.Requests
-@model BookRequest
+@model UpdateBookRequest
 @{
  ViewData["Title"] = "Edit Book";
 }
 
 <div class="container my-5">
  <div class="card shadow-lg border-0 rounded-4">
-  <div class="card-header bg-warning text-dark rounded-top-4">
-   <h3 class="mb-0">✏️ Edit Book</h3>
+  <div class="card-header bg-primary text-white rounded-top-4">
+   <h3 class="mb-0">📚 Edit Book</h3>
   </div>
   <div class="card-body p-4">
-   <form asp-action="EditBook" enctype="multipart/form-data" method="post" class="needs-validation" novalidate>
+   <form asp-controller="Book" asp-action="EditBook" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="BookID" />
+
     <div class="row g-4">
-
-     <!-- Hidden Id -->
-     <input type="hidden" asp-for="CategoryID" />
-
      <!-- Title -->
      <div class="col-md-6">
       <label asp-for="Title" class="form-label fw-bold"></label>
@@ -109,22 +108,13 @@
       <label asp-for="ImageBookCover" class="form-label fw-bold">Book Cover</label>
       <input asp-for="ImageBookCover" class="form-control" type="file" accept="image/*" />
       <span asp-validation-for="ImageBookCover" class="text-danger"></span>
-
-      @* Preview Old Cover *@
-      @if (ViewBag.CurrentCover != null)
-      {
-       <div class="mt-3">
-        <p class="fw-bold">Current Cover:</p>
-        <img src="@ViewBag.CurrentCover" alt="Book Cover" class="img-thumbnail" style="max-height:200px;" />
-       </div>
-      }
      </div>
     </div>
 
     <!-- Buttons -->
     <div class="mt-4 d-flex justify-content-end">
-     <a asp-action="Index" class="btn btn-outline-secondary me-2">Cancel</a>
-     <button type="submit" class="btn btn-warning">Update Book</button>
+     <a asp-action="Index" asp-controller="Books" class="btn btn-outline-secondary me-2">Cancel</a>
+     <button type="submit" class="btn btn-primary">Update Book</button>
     </div>
    </form>
   </div>
