@@ -1,6 +1,8 @@
 ﻿using Digital_Library.Core.ViewModels;
 using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Service.Interface;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Threading.Tasks;
@@ -18,14 +20,20 @@ public class AuthController : Controller
         _logger = logger;
     }
 
+    [HttpGet]
     public async Task<IActionResult> Login()
     {
+        TempData.Remove("CanAccessReset");
+        if (User.Identity?.IsAuthenticated == true)
+            return RedirectToAction("Index", "Home");
+
         await Task.CompletedTask;
 
         return View();
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
         if (ModelState.IsValid)
@@ -36,7 +44,8 @@ public class AuthController : Controller
 
                 if (res.Success)
                     return RedirectToAction("Index", "Home", null);
-                 
+
+                ModelState.AddModelError(string.Empty, "Email or password is wrong");
                 _logger.LogWarning(res.Message, $"in {nameof(Login)}");
             }
             catch (Exception ex)
@@ -47,18 +56,23 @@ public class AuthController : Controller
             }
         }
 
-        return View();
+        return View(model);
     }
 
     [HttpGet]
     public async Task<IActionResult> Register()
     {
+        TempData.Remove("CanAccessReset");
+        if (User.Identity?.IsAuthenticated == true)
+            return RedirectToAction("Index", "Home");
+
         await Task.CompletedTask;
 
         return View();
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
         if (ModelState.IsValid)
@@ -96,33 +110,59 @@ public class AuthController : Controller
         return res.Success ? View() : NotFound();
     }
 
+    [HttpGet]
     public async Task<IActionResult> ForgetPassword()
     {
+        if (User.Identity?.IsAuthenticated == true)
+            return RedirectToAction("Index", "Home");
+
         await Task.CompletedTask;
         return View();
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> ForgetPassword(ForgetPasswordViewModel model)
     {
         var res = await _authService.ForgetPasswordAsync(model.Email);
 
+        if (res.Success)
+        {
+            TempData["CanAccessReset"] = true;
+            return RedirectToAction("ResetPassword",res.Data);
+        }
         return View();
     }
 
-    public async Task<IActionResult> ResetPassword(string userId, string token)
+    [HttpGet]
+    public IActionResult ResetPassword(string userId, string token)
     {
-        await Task.CompletedTask;
-        return View();
+        if (TempData["CanAccessReset"] == null)
+        {
+            return RedirectToAction("Index", "Home"); 
+        }
+
+        // keep TempData alive for refresh
+        TempData.Keep("CanAccessReset");
+        return View(new ResetPasswordViewModel { UserId = userId, Token = token });
     }
 
     [HttpPost]
-    public async Task<IActionResult> ResetPassword(string userId, string token,[FromForm] string newPassword)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
     {
-        var res = await _authService.ResetPasswordAsync(userId, token, newPassword);
+        if (!ModelState.IsValid) return View(model);
 
-        if (res.Success) return RedirectToAction("Login");
+        var res = await _authService.ResetPasswordAsync(model.UserId, model.Token, model.NewPassword);
 
-        return View();
+        if (!res.Success)
+        {
+            ModelState.AddModelError("", res.Message);
+            return View(model);
+        }
+
+        TempData.Remove("CanAccessReset");
+        return RedirectToAction("Login");
     }
+
 }
