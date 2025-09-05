@@ -103,9 +103,9 @@ public class AuthController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> ForgetPassword(string email)
+    public async Task<IActionResult> ForgetPassword(ForgetPasswordViewModel model)
     {
-        var res = await _authService.ForgetPasswordAsync(email);
+        var res = await _authService.ForgetPasswordAsync(model.Email);
 
         return View();
     }
