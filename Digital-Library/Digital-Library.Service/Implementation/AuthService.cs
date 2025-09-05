@@ -106,7 +106,7 @@ public class AuthService : IAuthService
 	public async Task<Response> ForgetPasswordAsync(string email)
 	{
 		var user = await _userManager.FindByEmailAsync(email);
-		if (user == null) return Response.Fail("User not found");
+		if (user == null) return Response.Fail("Password reset email sent");
 
 		try
 		{
