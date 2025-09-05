@@ -4,80 +4,56 @@
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
 
-<div class="header-top border-bottom py-2">
- <div class="container-lg">
-  <div class="row justify-content-evenly">
-   <div class="col">
-    <ul class="social-links list-unstyled d-flex m-0">
-     <li class="pe-2">
-      <a href="#">
-       <svg class="facebook" width="20" height="20">
-        <use xlink:href="#facebook"></use>
-       </svg>
-      </a>
-     </li>
-     <li class="pe-2">
-      <a href="#">
-       <svg class="instagram" width="20" height="20">
-        <use xlink:href="#instagram"></use>
-       </svg>
-      </a>
-     </li>
-     <li class="pe-2">
-      <a href="#">
-       <svg class="youtube" width="20" height="20">
-        <use xlink:href="#youtube"></use>
-       </svg>
-      </a>
-     </li>
-     <li>
-      <a href="#">
-       <svg class="pinterest" width="20" height="20">
-        <use xlink:href="#pinterest"></use>
-       </svg>
-      </a>
-     </li>
-    </ul>
-   </div>
-   <div class="col d-none d-md-block">
-    <p class="text-center text-black m-0">
-     <strong>Special Offer</strong>: Free Shipping on all the orders above $100
-    </p>
-   </div>
-   <div class="col">
-    <ul class="d-flex justify-content-end gap-3 list-unstyled m-0">
-     @if (SignInManager.IsSignedIn(User))
-     {
 
-      @*Profile page*@
-      <li >
-       <a  asp-area="Identity" asp-page="/Account/Manage/Index"
-          title="Manage">Hello @User.Identity?.Name!</a>
-      </li>
-      <li >
-       <form class="d-inline" asp-controller="Auth" asp-action="Logout"
-             asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-        <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-       </form>
-      </li>
+ <li class="nav-item dropdown pe-3">
+  <a href="#" class="nav-link dropdown-toggle" id="userDropdown" role="button"
+     data-bs-toggle="dropdown" aria-expanded="false">
+   <svg class="user">
+    <use xlink:href="#user"></use>
+   </svg>
+  </a>
+@if (SignInManager.IsSignedIn(User))
+ {
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+   <li>
+    <a class="dropdown-item d-flex align-items-center" href="/Account/Profile">
+     <i class="bi bi-person-circle me-2"></i> My Profile
+    </a>
+   </li>
+   <li>
+    <a class="dropdown-item d-flex align-items-center" href="/Orders/MyOrders">
+     <i class="bi bi-bag-check me-2"></i> My Orders
+    </a>
+   </li>
+   <li>
+    <a class="dropdown-item d-flex align-items-center" href="/Vendor/Become">
+     <i class="bi bi-shop me-2"></i> Become Vendor
+    </a>
+   </li>
+   <li><hr class="dropdown-divider" /></li>
+   <li>
+    <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" class="dropdown-item p-0">
+     <button type="submit" class="btn btn-link d-flex align-items-center text-decoration-none text-dark w-100">
+      <i class="bi bi-box-arrow-right me-2"></i> Logout
+     </button>
+    </form>
+   </li>
+  </ul>
+ }
+ else
+ {
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+   <li>
+    <a class="dropdown-item d-flex align-items-center" asp-controller="Auth" asp-action="Login">
+     <i class="bi bi-box-arrow-in-right me-2"></i> Login
+    </a>
+   </li>
+   <li>
+    <a class="dropdown-item d-flex align-items-center" asp-controller="Auth" asp-action="Register">
+     <i class="bi bi-person-plus me-2"></i> Register
+    </a>
+   </li>
+  </ul>
+ }
+</li>
 
-
-
-     }
-     else
-     {
-
-      <li >
-       <a  asp-controller="Auth" asp-action="Register">Register</a>
-      </li>
-      <li >
-       <a  asp-controller="Auth" asp-action="Login">Login</a>
-      </li>
-
-
-     }
-    </ul>
-   </div>
-  </div>
- </div>
-</div>
