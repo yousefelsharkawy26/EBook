@@ -13,6 +13,7 @@ namespace Digital_Library.Controllers
         private readonly ICategoryService _categoryService;
         private readonly ILogger<BooksController> _logger;
 
+
         public BooksController(IBookService bookService, ICategoryService categoryService, ILogger<BooksController> logger)
         {
             _bookService = bookService;
@@ -54,6 +55,7 @@ namespace Digital_Library.Controllers
         public async Task<IActionResult> Create()
         {
             await PopulateCategoriesDropdown();
+            ViewBag.Categories = new SelectList((await _categoryService.GetAllCategories()).ToList() , "Id" , "CategoryName");
             return View();
         }
 
