@@ -5,16 +5,16 @@
 namespace Digital_Library.Infrastructure.Migrations
 {
 	/// <inheritdoc />
-	public partial class SeedAllCategoies : Migration
+	public partial class SeedAllCategory : Migration
 	{
 		/// <inheritdoc />
 		protected override void Up(MigrationBuilder migrationBuilder)
 		{
 			migrationBuilder.InsertData(
-									table: "Categories",
-									columns: new[] { "Id", "CategoryName", "Description", "IsApproved" },
-									values: new object[,]
-									{
+								table: "Categories",
+								columns: new[] { "Id", "CategoryName", "Description", "IsApproved" },
+								values: new object[,]
+								{
 																				{ "b1d6f8e4-1c2a-4c3d-8e5f-001111111111", "Fiction", "Stories based on imagination", true },
 																				{ "b1d6f8e4-1c2a-4c3d-8e5f-001111111112", "Non-Fiction", "Informative books about real events", true },
 																				{ "b1d6f8e4-1c2a-4c3d-8e5f-001111111113", "Science", "Books about scientific topics", true },
@@ -71,7 +71,7 @@ namespace Digital_Library.Infrastructure.Migrations
 																				{ "b1d8f8e4-1c2a-4c3d-8e5f-001111111164", "Computer Science", "Books about programming and computing", true },
 																				{ "b1d8f8e4-1c2a-4c3d-8e5f-001111111165", "Networking", "Networking and communication books", true },
 																				{ "b1d8f8e4-1c2a-4c3d-8e5f-001111111166", "Robotics", "Books about robotics and automation", true }
-									});
+								});
 
 		}
 
@@ -79,7 +79,7 @@ namespace Digital_Library.Infrastructure.Migrations
 		protected override void Down(MigrationBuilder migrationBuilder)
 		{
 			string[] categoryIds = new string[]
-					{
+		{
 																"b1d6f8e4-1c2a-4c3d-8e5f-001111111111",
 																"b1d6f8e4-1c2a-4c3d-8e5f-001111111112",
 																"b1d6f8e4-1c2a-4c3d-8e5f-001111111113",
@@ -136,7 +136,7 @@ namespace Digital_Library.Infrastructure.Migrations
 																"b1d8f8e4-1c2a-4c3d-8e5f-001111111164",
 																"b1d8f8e4-1c2a-4c3d-8e5f-001111111165",
 																"b1d8f8e4-1c2a-4c3d-8e5f-001111111166"
-					};
+		};
 
 			foreach (var id in categoryIds)
 			{
@@ -148,4 +148,3 @@ namespace Digital_Library.Infrastructure.Migrations
 		}
 	}
 }
-
