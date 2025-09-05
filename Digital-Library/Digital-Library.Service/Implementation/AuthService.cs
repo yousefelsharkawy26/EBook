@@ -1,4 +1,5 @@
-﻿using Digital_Library.Core.Models;
+﻿using Digital_Library.Core.Constant;
+using Digital_Library.Core.Models;
 using Digital_Library.Core.ViewModels.Responses;
 using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Hosting;
@@ -95,7 +96,8 @@ public class AuthService : IAuthService
 
 		var res = await _userManager.CreateAsync(user, password);
 		if (!res.Succeeded) return Response.Fail(res.Errors.FirstOrDefault()?.Description ?? "Sign-up failed");
-
+		var roleResult = await _userManager.AddToRoleAsync(user, Roles.Customer);
+		if (!roleResult.Succeeded) return Response.Fail(roleResult.Errors.FirstOrDefault()?.Description ?? "Assign role failed");
 		await SendEmailVerificationAsync(user);
 
 		_logger.LogInformation($"User {user.Email} signed up.");
