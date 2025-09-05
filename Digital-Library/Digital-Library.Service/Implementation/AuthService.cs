@@ -25,12 +25,12 @@ public class AuthService : IAuthService
 	private readonly IWebHostEnvironment _webHostEnvironment;
 
 	public AuthService(UserManager<User> userManager,
-																				SignInManager<User> signInManager,
-																				IEmailSender emailSender,
-																				IUrlHelperFactory urlHelperFactory,
-																				IActionContextAccessor actionContextAccessor,
-																				ILogger<AuthService> logger,
-																				IWebHostEnvironment webHostEnvironment)
+					   SignInManager<User> signInManager,
+					   IEmailSender emailSender,
+					   IUrlHelperFactory urlHelperFactory,
+					   IActionContextAccessor actionContextAccessor,
+					   ILogger<AuthService> logger,
+					   IWebHostEnvironment webHostEnvironment)
 	{
 		_userManager = userManager;
 		_signInManager = signInManager;
@@ -157,7 +157,10 @@ public class AuthService : IAuthService
 		var user = await _userManager.FindByIdAsync(userId);
 		if (user == null) return Response.Fail("User not found");
 
-		var res = await _userManager.ConfirmEmailAsync(user, token);
+		var isConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+		if (isConfirmed) return Response.Fail("Your email is already verified. You can log in directly.");
+
+        var res = await _userManager.ConfirmEmailAsync(user, token);
 		if (!res.Succeeded) return Response.Fail(res.Errors.FirstOrDefault()?.Description ?? "Email verification failed");
 
 		_logger.LogInformation($"Email verified for user {user.Email}");

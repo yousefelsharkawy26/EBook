@@ -2,11 +2,20 @@
     ViewData["Title"] = "Email Verified";
 }
 
-<div class="d-flex justify-content-center align-items-center vh-100 text-center bg-dark text-white">
-    <div>
-        <h1 class="text-success mb-4">Your Email Verified Successfully 🎉</h1>
-        <a asp-controller="Home" asp-action="Index" class="btn btn-lg btn-success px-4">
-            Go Home
+<div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div class="text-center p-5 shadow-lg rounded-4 bg-white">
+        <div class="mb-4">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+        </div>
+        <h1 class="text-success mb-3">Your Email Has Been Verified 🎉</h1>
+        <p class="text-muted mb-4">
+            Thank you for verifying your email. You can now log in and start using all features of the Digital Library.
+        </p>
+        <a asp-controller="Auth" asp-action="Login" class="btn btn-success btn-lg px-4 me-2">
+            Go to Login
+        </a>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
+            Back to Home
         </a>
     </div>
 </div>
