@@ -4,9 +4,9 @@
 
 namespace Digital_Library.Infrastructure.Migrations
 {
-	/// <inheritdoc />
-	public partial class SeedAllCategory : Migration
-	{
+    /// <inheritdoc />
+    public partial class SeedAllCatgories : Migration
+    {
 		/// <inheritdoc />
 		protected override void Up(MigrationBuilder migrationBuilder)
 		{

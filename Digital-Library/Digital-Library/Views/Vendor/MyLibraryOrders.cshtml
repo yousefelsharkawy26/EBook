@@ -1,21 +1,27 @@
-﻿@* @using System
+﻿@using System
 @using System.Linq
+@using System.Globalization
 @using Digital_Library.Core.Enum
 @using Digital_Library.Core.Enums
-@model IEnumerable<Digital_Library.Core.Models.Order>
+@model IEnumerable<Digital_Library.Core.Models.OrderHeader>
 
 @{
  ViewData["Title"] = "Vendor Orders";
- var orders = (Model ?? Enumerable.Empty<Digital_Library.Core.Models.Order>()).ToList();
 
- var totalRevenue = orders.Sum(o => o.TotalAmount);
- var statusGroups = orders
-     .GroupBy(o => o.Status)
+ var headers = (Model ?? Enumerable.Empty<Digital_Library.Core.Models.OrderHeader>()).ToList();
+
+ Func<Digital_Library.Core.Models.OrderHeader, decimal> VendorTotal = h =>
+     h?.OrderDetails?.Sum(d => d.Price * d.Quantity) ?? 0m;
+
+ var totalRevenue = headers.Sum(VendorTotal);
+ var statusGroups = headers
+     .GroupBy(h => h.Status)
      .Select(g => new { Status = g.Key, Count = g.Count() })
      .OrderByDescending(g => g.Count)
      .ToList();
 
  string FormatCurrency(decimal amount) => amount.ToString("C");
+ var currencySymbol = CultureInfo.CurrentCulture.NumberFormat.CurrencySymbol;
 }
 
 <style>
@@ -133,7 +139,6 @@
   border: 1px solid transparent;
  }
 
- /* Basic status colors (will apply if names match) */
  .status-pending {
   background: #fff7ed;
   color: #9a3412;
@@ -178,17 +183,14 @@
   }
 
  @@media (max-width: 900px) {
-  .filters
+  .filters {
+   grid-template-columns: 1fr 1fr;
+  }
 
- {
-  grid-template-columns: 1fr 1fr;
- }
-
- .orders-header {
-  flex-direction: column;
-  align-items: flex-start;
- }
-
+  .orders-header {
+   flex-direction: column;
+   align-items: flex-start;
+  }
  }
 </style>
 
@@ -198,11 +200,11 @@
   <div class="summary">
    <div class="summary-card">
     <span>Orders:</span>
-    <strong id="orders-count">@orders.Count</strong>
+    <strong id="orders-count">@headers.Count</strong>
    </div>
    <div class="summary-card">
     <span>Revenue:</span>
-    <strong id="orders-revenue">@FormatCurrency(totalRevenue)</strong>
+    <strong id="orders-revenue" data-curr="@currencySymbol">@FormatCurrency(totalRevenue)</strong>
    </div>
    <div class="status-chips">
     @foreach (var g in statusGroups)
@@ -230,7 +232,7 @@
   </div>
  </div>
 
- @if (!orders.Any())
+ @if (!headers.Any())
  {
   <div class="text-center py-4" style="padding: 24px; text-align:center;">
    <div>There are no orders yet.</div>
@@ -251,17 +253,20 @@
     </tr>
    </thead>
    <tbody>
-    @foreach (var o in orders.OrderByDescending(o => o.OrderDate))
+    @foreach (var h in headers.OrderByDescending(h => h.Order?.OrderDate))
     {
-     var buyer = o.User?.UserName ?? o.User?.Email ?? "N/A";
-     var statusText = o.Status.ToString();
+     var order = h.Order;
+     var buyer = order?.User?.UserName ?? order?.User?.Email ?? "N/A";
+     var statusText = h.Status.ToString();
      var statusCss = $"status-{statusText.ToLower()}";
-     var itemsCount = o.OrderDetails?.Count ?? 0; // If you have Quantity per item, you can sum it instead.
-     var dateIso = o.OrderDate.ToString("s");     // ISO-like for JS parsing
-     var totalInvariant = o.TotalAmount.ToString(System.Globalization.CultureInfo.InvariantCulture);
+     var itemsCount = h.OrderDetails?.Sum(d => d.Quantity) ?? (h.OrderDetails?.Count ?? 0);
+     var dateIso = order?.OrderDate.ToString("s", CultureInfo.InvariantCulture) ?? "";
+     var vendorTotal = VendorTotal(h);
+     var totalInvariant = vendorTotal.ToString(CultureInfo.InvariantCulture);
 
      <tr class="order-row"
-         data-id="@o.Id"
+         data-orderid="@h.OrderId"
+         data-hid="@h.Id"
          data-buyer="@buyer"
          data-status="@statusText"
          data-date="@dateIso"
@@ -269,24 +274,32 @@
       <td>
        <div style="display:flex; flex-direction:column;">
         <div style="display:flex; align-items:center; gap:8px;">
-         <code>@o.Id</code>
-         <button class="btn btn-copy" data-copy="@o.Id" title="Copy ID">Copy</button>
+         <code>@h.OrderId</code>
+         <button class="btn btn-copy" data-copy="@h.OrderId" title="Copy ID">Copy</button>
         </div>
-        <span class="muted"># @o.Id.Substring(0, Math.Min(8, o.Id.Length))…</span>
+        <span class="muted">Header #@h.Id</span>
        </div>
       </td>
       <td>
-       <div>@o.OrderDate.ToString("MMM dd, yyyy")</div>
-       <div class="muted">@o.OrderDate.ToString("HH:mm")</div>
+       @if (order != null)
+       {
+        <div>@order.OrderDate.ToString("MMM dd, yyyy")</div>
+        <div class="muted">@order.OrderDate.ToString("HH:mm")</div>
+       }
+       else
+       {
+        <div>N/A</div>
+       }
       </td>
       <td>@buyer</td>
       <td>
        <span class="status-badge @statusCss">@statusText</span>
       </td>
       <td style="text-align:right;">@itemsCount</td>
-      <td style="text-align:right;"><strong>@FormatCurrency(o.TotalAmount)</strong></td>
+      <td style="text-align:right;"><strong>@FormatCurrency(vendorTotal)</strong></td>
       <td class="actions">
-       <button class="btn btn-view" onclick="location.href='@Url.Action("Details", "Order", new { id = o.Id })'">Details</button>
+       <!-- Adjust action name/route as needed -->
+       <button class="btn btn-view" onclick="location.href='@Url.Action("VendorOrderDetails", "Order", new { id = h.Id })'">Details</button>
       </td>
      </tr>
     }
@@ -326,15 +339,16 @@
 
          $rows.each(function(){
              const $r = $(this);
-             const id = ($r.data('id') || '').toString().toLowerCase();
+             const orderId = ($r.data('orderid') || '').toString().toLowerCase();
              const buyer = ($r.data('buyer') || '').toString().toLowerCase();
              const st = ($r.data('status') || '').toString();
-             const dt = new Date(($r.data('date') || '').toString());
+             const dtStr = ($r.data('date') || '').toString();
+             const dt = dtStr ? new Date(dtStr) : null;
              const total = toNumber($r.data('total'));
 
-             const matchesSearch = !q || id.includes(q) || buyer.includes(q);
+             const matchesSearch = !q || orderId.includes(q) || buyer.includes(q);
              const matchesStatus = !status || st === status;
-             const matchesDate = inRange(dt, start, end);
+             const matchesDate = !dt || inRange(dt, start, end); // if missing date, don't filter it out
 
              const show = matchesSearch && matchesStatus && matchesDate;
              $r.toggle(show);
@@ -346,7 +360,8 @@
          });
 
          $('#orders-count').text(visible);
-         $('#orders-revenue').text('' + new Intl.NumberFormat(undefined, { style: 'currency', currency: (Intl.NumberFormat().resolvedOptions().currency || 'USD') }).format(sum));
+         const currency = $('#orders-revenue').data('curr') || '';
+         $('#orders-revenue').text(currency + sum.toFixed(2));
      }
 
      $('#applyFilters').on('click', applyFilters);
@@ -376,4 +391,4 @@
          }
      });
  })();
-</script> *@
+</script>
