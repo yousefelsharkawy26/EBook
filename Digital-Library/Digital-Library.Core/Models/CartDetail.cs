@@ -27,5 +27,6 @@ namespace Digital_Library.Core.Models
 		public string BookId { get; set; }
 		public Book? Book { get; set; }
 
+
 	}
 }

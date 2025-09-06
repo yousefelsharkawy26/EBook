@@ -1,4 +1,5 @@
 ﻿using Digital_Library.Core.Enum;
+using Digital_Library.Core.Models;
 using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
@@ -12,10 +13,12 @@ namespace Digital_Library.Controllers
 	public class OrdersController : Controller
 	{
 		private readonly IOrderService _orderService;
+		private readonly ICartService cartService;
 
-		public OrdersController(IOrderService orderService)
+		public OrdersController(IOrderService orderService,ICartService cartService)
 		{
 			_orderService = orderService;
+			this.cartService = cartService;
 		}
 		[HttpGet("MyOrders")]
 		public async Task<IActionResult> MyOrders()
@@ -26,22 +29,29 @@ namespace Digital_Library.Controllers
 			var orders = await _orderService.GetUserOrders(userId);
 			return View(orders);
 		}
-		//[HttpPost("PlaceOrder")]
-		//[ValidateAntiForgeryToken]
-		//public async Task<IActionResult> PlaceOrder(PlaceOrderRequest request)
-		//{
-		//	var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-		//	if (userId == null)
-		//		return Unauthorized();
-		//	var items=await	_orderService.GetUserOrders(userId);
-		//	if (items == null || !items.Any())
-		//		return BadRequest("Order details cannot be empty.");
-		//	var result = await _orderService.CreateOrderAsync(userId, request.Items,request.Address,request.PhoneNumber);
-		//	if (result.Success)
-		//		return Ok(result);
-		//	else
-		//		return BadRequest(result.Message);
-		//}
+		[HttpPost("PlaceOrder")]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> PlaceOrder(PlaceOrderRequest request)
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if (userId == null)
+				return Unauthorized();
+			var cart = await cartService.GetCartAsync(userId);
+			var items=((Cart)cart.Data)?.CartDetails.Select(cd => new OrderDetailRequest
+			{
+				BookId = cd.BookId,
+				Quantity = cd.Quantity,
+				Price = cd.FormatType is Core.Enums.FormatType.Physical?cd.Book.PricePhysical:(cd.Book.PricePdf??0),
+				VendorId = cd.Book.VendorId
+			}).ToList();
+			if (!cart.Success || cart.Data == null || cart.Data.CartDetails == null || !cart.Data.CartDetails.Any())
+			{
+				ModelState.AddModelError(string.Empty, "Your cart is empty.");
+				return View("Index", cart.Data); 
+			}
+
+
+		}
 
 
 	}

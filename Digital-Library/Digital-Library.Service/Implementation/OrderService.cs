@@ -50,7 +50,7 @@ namespace Digital_Library.Service.Services
 					VendorId = vendorGroup.Key,
 					OrderDetails = new List<OrderDetail>()
 				};
-
+				decimal orderHeaderAmount = 0;
 				foreach (var item in vendorGroup)
 				{
 					if (item.Quantity <= 0 || item.Price < 0)
@@ -72,8 +72,9 @@ namespace Digital_Library.Service.Services
 						Quantity = item.Quantity,
 						Price = item.Price
 					});
+					orderHeaderAmount += item.Price * item.Quantity;
 				}
-
+				await MakeTransation(orderHeader.Id, orderHeaderAmount);
 				order.OrderHeaders.Add(orderHeader);
 			}
 
@@ -171,12 +172,15 @@ namespace Digital_Library.Service.Services
 			var transaction = new Transaction
 			{
 				OrderHeaderId = ordeHeaderId,
-				TransactionDate = DateTime.UtcNow,
-				TransactionStatus=Status.Complete
+				TransactionStatus=Status.Complete,
+				Amount=	amount
 			};
 			try
 			{
 				await _unitOfWork.Transactions.AddAsync(transaction);
+				var orderHeader = await _unitOfWork.OrderHeaders.GetSingleAsync(t => t.Id == ordeHeaderId);
+				var vendor = await _unitOfWork.Vendors.GetSingleAsync(v => v.Id == orderHeader.VendorId);
+				vendor.WalletBalance += amount;
 				await _unitOfWork.SaveChangesAsync();
 				return	true;
 			}
