@@ -3,12 +3,11 @@ using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Digital_Library.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class OrdersController : ControllerBase
+    public class OrdersController : Controller
     {
         private readonly IOrderService _orderService;
 
@@ -17,53 +16,65 @@ namespace Digital_Library.Controllers
             _orderService = orderService;
         }
 
-        
-        [HttpPost]
-        [Authorize] 
-        public async Task<IActionResult> CreateOrder([FromBody] List<OrderDetailRequest> items)
+        // GET: Orders
+        public async Task<IActionResult> Index()
         {
-            var userId = User?.Identity?.Name; 
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized("User not found.");
-
-            var response = await _orderService.CreateOrderAsync(userId, items);
-            if (!response.Success)
-                return BadRequest(response);
-
-            return Ok(response);
-        }
-
-        
-        [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> GetUserOrders([FromQuery] string? userId = null)
-        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var orders = await _orderService.GetUserOrdersAsync(userId);
-            return Ok(orders);
+            return View(orders);
         }
 
-      
-        [HttpGet("{id}")]
-        [Authorize]
-        public async Task<IActionResult> GetOrderById(string id)
+        // GET: Orders/Details/5
+        public async Task<IActionResult> Details(string id)
         {
             var response = await _orderService.GetOrderByIdAsync(id);
-            if (!response.Success)
-                return NotFound(response);
+            if (!response.Success) return NotFound();
 
-            return Ok(response);
+            return View(response.Data);
         }
 
-       
-        [HttpPut("{id}/status")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateOrderStatus(string id, [FromQuery] Status status)
+        // GET: Orders/Create
+        public IActionResult Create()
+        {
+            return View(new List<OrderDetailRequest>());
+        }
+
+        // POST: Orders/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(List<OrderDetailRequest> items)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var response = await _orderService.CreateOrderAsync(userId, items);
+
+            if (response.Success)
+                return RedirectToAction(nameof(Index));
+
+            ModelState.AddModelError("", response.Message);
+            return View(items);
+        }
+
+        // GET: Orders/Edit/5
+        public async Task<IActionResult> Edit(string id)
+        {
+            var response = await _orderService.GetOrderByIdAsync(id);
+            if (!response.Success) return NotFound();
+
+            return View(response.Data);
+        }
+
+        // POST: Orders/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(string id, Status status)
         {
             var response = await _orderService.UpdateOrderStatusAsync(id, status);
-            if (!response.Success)
-                return BadRequest(response);
 
-            return Ok(response);
+            if (response.Success)
+                return RedirectToAction(nameof(Index));
+
+            ModelState.AddModelError("", response.Message);
+            return View();
         }
     }
 }

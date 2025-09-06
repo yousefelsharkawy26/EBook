@@ -1,0 +1,45 @@
+﻿@model Digital_Library.Core.Models.Order
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<div class="container my-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white rounded-top-4">
+            <h3 class="mb-0">🧾 Order @Model.Id</h3>
+        </div>
+        <div class="card-body p-4">
+            <h5>Date: <strong>@Model.OrderDate.ToString("f")</strong></h5>
+            <h5>Status: <span class="badge bg-info">@Model.Status</span></h5>
+            <h5>Total: <strong>$@Model.TotalAmount</strong></h5>
+            <hr />
+
+            <h4 class="mt-4">📚 Books</h4>
+            <table class="table table-striped mt-3">
+                <thead>
+                    <tr>
+                        <th>Book</th>
+                        <th>Format</th>
+                        <th>Price</th>
+                        <th>Qty</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.OrderDetails)
+                    {
+                        <tr>
+                            <td>@item.Book?.Title</td>
+                            <td>@item.FormatType</td>
+                            <td>$@item.Price</td>
+                            <td>@item.Quantity</td>
+                            <td>$@(item.Price* item.Quantity)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <a asp-action="Index" class="btn btn-outline-secondary mt-3">⬅ Back to Orders</a>
+        </div>
+    </div>
+</div>
