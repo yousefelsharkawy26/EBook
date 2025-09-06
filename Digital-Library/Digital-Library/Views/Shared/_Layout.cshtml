@@ -220,7 +220,7 @@
   <nav id="header-nav" class="navbar navbar-expand-lg py-3">
    <div class="container">
     <!-- Brand -->
-    <a class="navbar-brand" href="index.html">
+    <a class="navbar-brand" asp-controller="Home" asp-action="Index">
      <img src="~/images/main-logo.png" class="logo">
     </a>
 
@@ -262,7 +262,7 @@
            aria-expanded="false">Pages</a>
         <ul class="dropdown-menu animate slide border">
          <li><a href="index.html" class="dropdown-item fw-light">About</a></li>
-         <li><a href="index.html" class="dropdown-item fw-light">Shop</a></li>
+         <li><a asp-controller="Books" asp-action="Index" class="dropdown-item fw-light">Shop</a></li>
          <li><a href="index.html" class="dropdown-item fw-light">Single Product</a></li>
          <li><a href="index.html" class="dropdown-item fw-light">Cart</a></li>
          <li><a href="index.html" class="dropdown-item fw-light">Checkout</a></li>
@@ -322,7 +322,7 @@
                     <div class="row d-flex flex-wrap justify-content-between">
                         <div class="col-lg-3 col-sm-6 pb-3">
                             <div class="footer-menu">
-                                <img src="images/main-logo.png" alt="logo" class="img-fluid mb-2">
+                                <img src="~/images/main-logo.png" alt="logo" class="img-fluid mb-2">
                                 <p>
                                     Nisi, purus vitae, ultrices nunc. Sit ac sit suscipit hendrerit. Gravida massa volutpat aenean odio
                                     erat nullam fringilla.
