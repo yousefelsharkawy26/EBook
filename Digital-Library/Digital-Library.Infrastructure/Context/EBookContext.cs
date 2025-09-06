@@ -31,6 +31,12 @@ namespace Digital_Library.Infrastructure.Context
 				.WithMany(o => o.OrderDetails)
 				.HasForeignKey(od => od.OrderId)
 				.OnDelete(DeleteBehavior.Restrict);
+
+			modelBuilder.Entity<OrderDetail>()
+				.HasOne(od => od.Vendor)
+				.WithMany(b => b.OrderDetails)
+				.HasForeignKey(od => od.VendorId)
+				.OnDelete(DeleteBehavior.Restrict);
 		}
 
 		#region Entities
