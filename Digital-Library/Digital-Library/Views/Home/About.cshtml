@@ -1,0 +1,446 @@
+﻿@{
+    var imageUrl1 = Url.Content("~/images/banner-image-bg-1.jpg");
+    var imageUrl2 = Url.Content("~/images/banner-image-bg.jpg");
+}
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol xmlns="http://www.w3.org/2000/svg" id="play" viewBox="0 0 24 24">
+        <path fill="currentColor" fill-rule="evenodd" d="M7.238 3.044C5.652 2.182 3.75 3.32 3.75 5.033v13.934c0 1.714 1.902 2.851 3.488 1.989l12.812-6.967c1.6-.87 1.6-3.108 0-3.977zM2.25 5.033c0-2.905 3.167-4.687 5.705-3.306l12.812 6.967c2.644 1.438 2.644 5.174 0 6.612L7.955 22.273c-2.538 1.38-5.705-.4-5.705-3.306z" clip-rule="evenodd" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="alt-arrow-right-outline" viewBox="0 0 24 24">
+        <path fill="currentColor" fill-rule="evenodd" d="M8.512 4.43a.75.75 0 0 1 1.057.082l6 7a.75.75 0 0 1 0 .976l-6 7a.75.75 0 0 1-1.138-.976L14.012 12L8.431 5.488a.75.75 0 0 1 .08-1.057" clip-rule="evenodd" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="alt-arrow-left-outline" viewBox="0 0 24 24">
+        <path fill="currentColor" fill-rule="evenodd" d="M15.488 4.43a.75.75 0 0 1 .081 1.058L9.988 12l5.581 6.512a.75.75 0 1 1-1.138.976l-6-7a.75.75 0 0 1 0-.976l6-7a.75.75 0 0 1 1.057-.081" clip-rule="evenodd" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="cart-outline" viewBox="0 0 16 16">
+        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="quality" viewBox="0 0 16 16">
+        <path d="M9.669.864 8 0 6.331.864l-1.858.282-.842 1.68-1.337 1.32L2.6 6l-.306 1.854 1.337 1.32.842 1.68 1.858.282L8 12l1.669-.864 1.858-.282.842-1.68 1.337-1.32L13.4 6l.306-1.854-1.337-1.32-.842-1.68L9.669.864zm1.196 1.193.684 1.365 1.086 1.072L12.387 6l.248 1.506-1.086 1.072-.684 1.365-1.51.229L8 10.874l-1.355-.702-1.51-.229-.684-1.365-1.086-1.072L3.614 6l-.25-1.506 1.087-1.072.684-1.365 1.51-.229L8 1.126l1.356.702 1.509.229z" />
+        <path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1 4 11.794z" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="price-tag" viewBox="0 0 16 16">
+        <path d="M6 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm-1 0a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z" />
+        <path d="M2 1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 1 6.586V2a1 1 0 0 1 1-1zm0 5.586 7 7L13.586 9l-7-7H2v4.586z" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="shield-plus" viewBox="0 0 16 16">
+        <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z" />
+        <path d="M8 4.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V9a.5.5 0 0 1-1 0V7.5H6a.5.5 0 0 1 0-1h1.5V5a.5.5 0 0 1 .5-.5z" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="star-fill" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M9.153 5.408C10.42 3.136 11.053 2 12 2c.947 0 1.58 1.136 2.847 3.408l.328.588c.36.646.54.969.82 1.182c.28.213.63.292 1.33.45l.636.144c2.46.557 3.689.835 3.982 1.776c.292.94-.546 1.921-2.223 3.882l-.434.507c-.476.557-.715.836-.822 1.18c-.107.345-.071.717.001 1.46l.066.677c.253 2.617.38 3.925-.386 4.506c-.766.582-1.918.051-4.22-1.009l-.597-.274c-.654-.302-.981-.452-1.328-.452c-.347 0-.674.15-1.328.452l-.596.274c-2.303 1.06-3.455 1.59-4.22 1.01c-.767-.582-.64-1.89-.387-4.507l.066-.676c.072-.744.108-1.116 0-1.46c-.106-.345-.345-.624-.821-1.18l-.434-.508c-1.677-1.96-2.515-2.941-2.223-3.882c.293-.941 1.523-1.22 3.983-1.776l.636-.144c.699-.158 1.048-.237 1.329-.45c.28-.213.46-.536.82-1.182z" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="star-empty" viewBox="0 0 16 16">
+        <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="star-half" viewBox="0 0 16 16">
+        <path d="M5.354 5.119 7.538.792A.516.516 0 0 1 8 .5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0 1 16 6.32a.548.548 0 0 1-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256a.52.52 0 0 1-.146.05c-.342.06-.668-.254-.6-.642l.83-4.73L.173 6.765a.55.55 0 0 1-.172-.403.58.58 0 0 1 .085-.302.513.513 0 0 1 .37-.245l4.898-.696zM8 12.027a.5.5 0 0 1 .232.056l3.686 1.894-.694-3.957a.565.565 0 0 1 .162-.505l2.907-2.77-4.052-.576a.525.525 0 0 1-.393-.288L8.001 2.223 8 2.226v9.8z" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="instagram" viewBox="0 0 256 256">
+        <path fill="currentColor" d="M128 80a48 48 0 1 0 48 48a48.05 48.05 0 0 0-48-48Zm0 80a32 32 0 1 1 32-32a32 32 0 0 1-32 32Zm48-136H80a56.06 56.06 0 0 0-56 56v96a56.06 56.06 0 0 0 56 56h96a56.06 56.06 0 0 0 56-56V80a56.06 56.06 0 0 0-56-56Zm40 152a40 40 0 0 1-40 40H80a40 40 0 0 1-40-40V80a40 40 0 0 1 40-40h96a40 40 0 0 1 40 40ZM192 76a12 12 0 1 1-12-12a12 12 0 0 1 12 12Z" />
+    </symbol>
+</svg>
+
+<section class="hero-section position-relative padding-large" style="background-image: url(@imageUrl1); background-size: cover; background-repeat: no-repeat; background-position: center; height: 400px;">
+    <div class="hero-content">
+        <div class="container">
+            <div class="row">
+                <div class="text-center">
+                    <h1>About Us</h1>
+                    <div class="breadcrumbs">
+                        <span class="item">
+                            <a href="index.html">Home > </a>
+                        </span>
+                        <span class="item text-decoration-underline">About Us</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="company-services" class="padding-large">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-6 pb-3 pb-lg-0">
+                <div class="icon-box d-flex">
+                    <div class="icon-box-icon pe-3 pb-3">
+                        <svg class="cart-outline">
+                            <use xlink:href="#cart-outline" />
+                        </svg>
+                    </div>
+                    <div class="icon-box-content">
+                        <h4 class="card-title mb-1 text-capitalize text-dark">Free delivery</h4>
+                        <p>Consectetur adipi elit lorem ipsum dolor sit amet.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 pb-3 pb-lg-0">
+                <div class="icon-box d-flex">
+                    <div class="icon-box-icon pe-3 pb-3">
+                        <svg class="quality">
+                            <use xlink:href="#quality" />
+                        </svg>
+                    </div>
+                    <div class="icon-box-content">
+                        <h4 class="card-title mb-1 text-capitalize text-dark">Quality guarantee</h4>
+                        <p>Dolor sit amet orem ipsu mcons ectetur adipi elit.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 pb-3 pb-lg-0">
+                <div class="icon-box d-flex">
+                    <div class="icon-box-icon pe-3 pb-3">
+                        <svg class="price-tag">
+                            <use xlink:href="#price-tag" />
+                        </svg>
+                    </div>
+                    <div class="icon-box-content">
+                        <h4 class="card-title mb-1 text-capitalize text-dark">Daily offers</h4>
+                        <p>Amet consectetur adipi elit loreme ipsum dolor sit.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 pb-3 pb-lg-0">
+                <div class="icon-box d-flex">
+                    <div class="icon-box-icon pe-3 pb-3">
+                        <svg class="shield-plus">
+                            <use xlink:href="#shield-plus" />
+                        </svg>
+                    </div>
+                    <div class="icon-box-content">
+                        <h4 class="card-title mb-1 text-capitalize text-dark">100% secure payment</h4>
+                        <p>Rem Lopsum dolor sit amet, consectetur adipi elit.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="about-us" class="padding-large pt-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="image-holder position-relative mb-4 d-flex align-items-center justify-content-center">
+                    <a data-bs-toggle="modal" 
+                       data-src="https://www.youtube.com/embed/l4MOE3hZATA" 
+                       data-bs-target="#myModal" 
+                       class="play-btn position-absolute"
+                       style="cursor: pointer">
+                        <div class="play-icon border border-2 border-dark rounded-pill p-5">
+                            <svg class="search" width="40" height="40">
+                                <use xlink:href="#play"></use>
+                            </svg>
+                        </div>
+                    </a>
+                    <div class="image">
+                        <img src="~/images/single-image-about.jpg" alt="single" class="img-fluid rounded-3 single-image">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="detail ps-md-5 mt-5">
+                    <div class="display-header">
+                        <h3 class="mb-3">Best Bookstore of all time</h3>
+                        <p class="pb-1">Risus augue curabitur diam senectus congue velit et. Sed vitae metus nibh sit era. Nulla adipiscing pharetra pellentesque maecenas odio eros at. Et libero vulputate amet duis erat volutpat vitae eget. Sed vitae metus nibh sit era. Nulla adipiscing pharetra eros at.
+                        <p>Nulla adipiscing pharetra pellentesque maecenas odio eros at. Et libero vulputate amet duis erat volutpat vitae eget. Quam libero etiam et in ac at quis. Risus augue curabitur diam senectus congue velit et. </p>
+                        <a href="shop.html" class="btn mt-3">Go to shop</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="customers-reviews" class="position-relative padding-large"
+         style="background-image: url(@imageUrl2); background-size: cover; background-repeat: no-repeat; background-position: center; height: 600px;">
+    <div class="container offset-md-3 col-md-6 ">
+        <div class="position-absolute top-50 end-0 pe-0 pe-xxl-5 me-0 me-xxl-5 swiper-next testimonial-button-next">
+            <svg class="chevron-forward-circle d-flex justify-content-center align-items-center p-2" width="80" height="80">
+                <use xlink:href="#alt-arrow-right-outline"></use>
+            </svg>
+        </div>
+        <div class="position-absolute top-50 start-0 ps-0 ps-xxl-5 ms-0 ms-xxl-5 swiper-prev testimonial-button-prev">
+            <svg class="chevron-back-circle d-flex justify-content-center align-items-center p-2" width="80" height="80">
+                <use xlink:href="#alt-arrow-left-outline"></use>
+            </svg>
+        </div>
+        <div class="section-title mb-4 text-center">
+            <h3 class="mb-4">Customers reviews</h3>
+        </div>
+        <div class="swiper testimonial-swiper ">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <div class="card position-relative text-left p-5 border rounded-3">
+                        <blockquote>"I stumbled upon this bookstore while visiting the city, and it instantly became my favorite spot. The cozy atmosphere, friendly staff, and wide selection of books make every visit a delight!"</blockquote>
+                        <div class="rating text-warning d-flex align-items-center">
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                        </div>
+                        <h5 class="mt-1 fw-normal">Emma Chamberlin</h5>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="card position-relative text-left p-5 border rounded-3">
+                        <blockquote>"As an avid reader, I'm always on the lookout for new releases, and this bookstore never disappoints. They always have the latest titles, and their recommendations have introduced me to some incredible reads!"</blockquote>
+                        <div class="rating text-warning d-flex align-items-center">
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                        </div>
+                        <h5 class="mt-1 fw-normal">Thomas John</h5>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="card position-relative text-left p-5 border rounded-3">
+                        <blockquote>"I ordered a few books online from this store, and I was impressed by the quick delivery and careful packaging. It's clear that they prioritize customer satisfaction, and I'll definitely be shopping here again!"</blockquote>
+                        <div class="rating text-warning d-flex align-items-center">
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                        </div>
+                        <h5 class="mt-1 fw-normal">Kevin Bryan</h5>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="card position-relative text-left p-5 border rounded-3">
+                        <blockquote>
+                            “I stumbled upon this tech store while searching for a new laptop, and I couldn't be happier
+                            with my experience! The staff was incredibly knowledgeable and guided me through the process of choosing
+                            the perfect device for my needs. Highly recommended!”
+                        </blockquote>
+                        <div class="rating text-warning d-flex align-items-center">
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                        </div>
+                        <h5 class="mt-1 fw-normal">Stevin</h5>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="card position-relative text-left p-5 border rounded-3">
+                        <blockquote>
+                            “I stumbled upon this tech store while searching for a new laptop, and I couldn't be happier
+                            with my experience! The staff was incredibly knowledgeable and guided me through the process of choosing
+                            the perfect device for my needs. Highly recommended!”
+                        </blockquote>
+                        <div class="rating text-warning d-flex align-items-center">
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                            <svg class="star star-fill">
+                                <use xlink:href="#star-fill"></use>
+                            </svg>
+                        </div>
+                        <h5 class="mt-1 fw-normal">Roman</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="latest-posts" class="padding-large">
+    <div class="container">
+        <div class="section-title d-md-flex justify-content-between align-items-center mb-4">
+            <h3 class="d-flex align-items-center">Latest posts</h3>
+            <a href="shop.html" class="btn">View All</a>
+        </div>
+        <div class="row">
+            <div class="col-md-3 posts mb-4">
+                <img src="~/images/post-item1.jpg" alt="post image" class="img-fluid rounded-3">
+                <a href="blog.html" class="fs-6 text-primary">Books</a>
+                <h4 class="card-title mb-2 text-capitalize text-dark"><a href="single-post.html">10 Must-Read Books of the Year: Our Top Picks!</a></h4>
+                <p class="mb-2">
+                    Dive into the world of cutting-edge technology with our latest blog post, where we highlight
+                    five essential gadg <span><a class="text-decoration-underline text-black-50" href="single-post.html">Read More</a></span>
+                </p>
+            </div>
+            <div class="col-md-3 posts mb-4">
+                <img src="~/images/post-item2.jpg" alt="post image" class="img-fluid rounded-3">
+                <a href="blog.html" class="fs-6 text-primary">Books</a>
+                <h4 class="card-title mb-2 text-capitalize text-dark"><a href="single-post.html">The Fascinating Realm of Science Fiction</a></h4>
+                <p class="mb-2">
+                    Explore the intersection of technology and sustainability in our latest blog post. Learn about
+                    the innovative <span><a class="text-decoration-underline text-black-50" href="single-post.html">Read More</a></span>
+                </p>
+            </div>
+            <div class="col-md-3 posts mb-4">
+                <img src="~/images/post-item3.jpg" alt="post image" class="img-fluid rounded-3">
+                <a href="blog.html" class="fs-6 text-primary">Books</a>
+                <h4 class="card-title mb-2 text-capitalize text-dark"><a href="single-post.html">Finding Love in the Pages of a Book</a></h4>
+                <p class="mb-2">
+                    Stay ahead of the curve with our insightful look into the rapidly evolving landscape of
+                    wearable technology. <span><a class="text-decoration-underline text-black-50" href="single-post.html">Read More</a></span>
+                </p>
+            </div>
+            <div class="col-md-3 posts mb-4">
+                <img src="~/images/post-item4.jpg" alt="post image" class="img-fluid rounded-3">
+                <a href="blog.html" class="fs-6 text-primary">Books</a>
+                <h4 class="card-title mb-2 text-capitalize text-dark"><a href="single-post.html">Reading for Mental Health: How Books Can Heal and Inspire</a></h4>
+                <p class="mb-2">
+                    In today's remote work environment, productivity is key. Discover the top apps and tools that
+                    can help you stay <span><a class="text-decoration-underline text-black-50" href="single-post.html">Read More</a></span>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="instagram">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h3>Instagram</h3>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <figure class="instagram-item position-relative rounded-3">
+                    <a href="https://templatesjungle.com/" class="image-link position-relative">
+                        <div class="icon-overlay position-absolute d-flex justify-content-center">
+                            <svg class="instagram">
+                                <use xlink:href="#instagram"></use>
+                            </svg>
+                        </div>
+                        <img src="~/images/insta-item1.jpg" alt="instagram" class="img-fluid rounded-3 insta-image">
+                    </a>
+                </figure>
+            </div>
+            <div class="col-md-2">
+                <figure class="instagram-item position-relative rounded-3">
+                    <a href="https://templatesjungle.com/" class="image-link position-relative">
+                        <div class="icon-overlay position-absolute d-flex justify-content-center">
+                            <svg class="instagram">
+                                <use xlink:href="#instagram"></use>
+                            </svg>
+                        </div>
+                        <img src="~/images/insta-item2.jpg" alt="instagram" class="img-fluid rounded-3 insta-image">
+                    </a>
+                </figure>
+            </div>
+            <div class="col-md-2">
+                <figure class="instagram-item position-relative rounded-3">
+                    <a href="https://templatesjungle.com/" class="image-link position-relative">
+                        <div class="icon-overlay position-absolute d-flex justify-content-center">
+                            <svg class="instagram">
+                                <use xlink:href="#instagram"></use>
+                            </svg>
+                        </div>
+                        <img src="~/images/insta-item3.jpg" alt="instagram" class="img-fluid rounded-3 insta-image">
+                    </a>
+                </figure>
+            </div>
+            <div class="col-md-2">
+                <figure class="instagram-item position-relative rounded-3">
+                    <a href="https://templatesjungle.com/" class="image-link position-relative">
+                        <div class="icon-overlay position-absolute d-flex justify-content-center">
+                            <svg class="instagram">
+                                <use xlink:href="#instagram"></use>
+                            </svg>
+                        </div>
+                        <img src="~/images/insta-item4.jpg" alt="instagram" class="img-fluid rounded-3 insta-image">
+                    </a>
+                </figure>
+            </div>
+            <div class="col-md-2">
+                <figure class="instagram-item position-relative rounded-3">
+                    <a href="https://templatesjungle.com/" class="image-link position-relative">
+                        <div class="icon-overlay position-absolute d-flex justify-content-center">
+                            <svg class="instagram">
+                                <use xlink:href="#instagram"></use>
+                            </svg>
+                        </div>
+                        <img src="~/images/insta-item5.jpg" alt="instagram" class="img-fluid rounded-3 insta-image">
+                    </a>
+                </figure>
+            </div>
+            <div class="col-md-2">
+                <figure class="instagram-item position-relative rounded-3">
+                    <a href="https://templatesjungle.com/" class="image-link position-relative">
+                        <div class="icon-overlay position-absolute d-flex justify-content-center">
+                            <svg class="instagram">
+                                <use xlink:href="#instagram"></use>
+                            </svg>
+                        </div>
+                        <img src="~/images/insta-item6.jpg" alt="instagram" class="img-fluid rounded-3 insta-image">
+                    </a>
+                </figure>
+            </div>
+        </div>
+    </div>
+</section><!-- Video Popup -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><svg class="bi" width="40" height="40"><use xlink:href="#close-sharp"></use></svg></button>
+                <div class="ratio ratio-16x9">
+                    <iframe class="embed-responsive-item" src="" id="video" allowscriptaccess="always" allow="autoplay"></iframe>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
