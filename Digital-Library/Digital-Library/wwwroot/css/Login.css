@@ -1,0 +1,196 @@
+﻿/* ============================
+   Global Styles
+============================ */
+body {
+    margin: 0; /* Remove default margin */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ============================
+   Wrapper & Background
+============================ */
+.login-wrapper {
+    background: url('/images/book-composition-with-open-book.jpg') center/cover no-repeat fixed;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    min-height: calc(100vh - 100px); /* Adjust for header/footer if needed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+    /* Dark overlay for readability */
+    .login-wrapper::before {
+        content: '';
+        position: absolute;
+        inset: 0; /* shorthand for top:0; right:0; bottom:0; left:0 */
+        background-color: rgba(0, 0, 0, 0.4);
+        z-index: -1;
+    }
+
+/* ============================
+   Login Card
+============================ */
+.login-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 0.75rem;
+    box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.25);
+    padding: 3rem;
+    max-width: 450px;
+    width: 100%;
+    color: #333;
+    position: relative;
+    z-index: 10;
+    animation: fadeInUp 0.8s ease-out;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    /* Hover effect */
+    .login-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.3);
+    }
+
+    .login-card h2 {
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .login-card p.subtitle {
+        color: #6c757d;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+/* ============================
+   Form Inputs
+============================ */
+.form-control-custom {
+    border: 1px solid #ced4da;
+    border-radius: 0.4rem;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    color: #495057;
+    background-color: #fff;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+    .form-control-custom::placeholder {
+        color: #6c757d;
+        opacity: 0.8;
+    }
+
+    .form-control-custom:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        outline: none;
+    }
+
+    /* Hover effect */
+    .form-control-custom:hover {
+        border-color: #212529;
+        box-shadow: 0 0 8px rgba(33, 37, 41, 0.3);
+    }
+
+/* ============================
+   Buttons
+============================ */
+.btn-login {
+    background-color: #212529;
+    color: #fff;
+    border: 1px solid #212529;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+    border-radius: 0.4rem;
+    transition: all 0.2s ease-in-out;
+    width: 100%;
+}
+
+    .btn-login:hover {
+        background-color: #343a40;
+        color: #fff;
+    }
+
+    .btn-login:active {
+        transform: scale(0.97);
+    }
+
+/* ============================
+   Links
+============================ */
+.login-card .text-link {
+    color: #212529;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+    .login-card .text-link:hover {
+        color: #000;
+        text-decoration: underline;
+    }
+
+/* ============================
+   Form Animations
+============================ */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animate each form child */
+.login-card form > * {
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards;
+}
+
+    .login-card form > *:nth-child(1) {
+        animation-delay: 0.2s;
+    }
+
+    .login-card form > *:nth-child(2) {
+        animation-delay: 0.4s;
+    }
+
+    .login-card form > *:nth-child(3) {
+        animation-delay: 0.6s;
+    }
+
+    .login-card form > *:nth-child(4) {
+        animation-delay: 0.8s;
+    }
+
+    .login-card form > *:nth-child(5) {
+        animation-delay: 1s;
+    }
+
+/* ============================
+   Checkboxes
+============================ */
+.form-check-input:checked {
+    background-color: #212529;
+    border-color: #212529;
+}

@@ -9,7 +9,7 @@ namespace Digital_Library.Service.Interface
 	{
 		Task<Response> AddBook(BookRequest request, string vendorId);
 
-		Task<Response> UpdateBook(string bookId, BookRequest request);
+		Task<Response> UpdateBook(string bookId, UpdateBookRequest request);
 
 		Task<Response> DeleteBook(string bookId);
 

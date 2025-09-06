@@ -23,6 +23,8 @@ namespace Digital_Library.Service
 			services.AddTransient<IFileService, FileService>();
 			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<IVendorService, VendorService>();
+			services.AddScoped<IOrderService, OrderService>();
+
 			return services;
 		}
 

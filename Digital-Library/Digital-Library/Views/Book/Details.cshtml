@@ -1,0 +1,40 @@
+﻿@model Digital_Library.Core.Models.Book
+@{
+ ViewData["Title"] = "Book Details";
+}
+
+<div class="container my-5">
+ <div class="card shadow-lg border-0 rounded-4">
+  <div class="card-header bg-primary text-white rounded-top-4">
+   <h3 class="mb-0">📖 @Model.Title</h3>
+  </div>
+  <div class="card-body p-4">
+   <div class="row g-4">
+    <!-- Book Cover -->
+    <div class="col-md-4">
+     <img src="~/@Model.ImageBookCoverPath"
+          class="img-fluid rounded" alt="Book Cover" />
+    </div>
+
+    <!-- Book Info -->
+    <div class="col-md-8">
+     <h5>Author: <strong>@Model.Author</strong></h5>
+     <h5>Category: <strong>@Model.Category?.CategoryName</strong></h5>
+     <h5>Stock: <strong>@Model.Stock</strong></h5>
+     <h5>Price (Physical): <strong>$@Model.PricePhysical</strong></h5>
+     @if (Model.HasPDF)
+     {
+      <h5>Price (PDF): <strong>$@Model.PricePdf</strong></h5>
+      @if (Model.IsBorrowable)
+      {
+       <h5>PDF Daily Price: <strong>$@Model.PricePDFPerDay</strong></h5>
+      }
+     }
+     <hr />
+     <p>@Model.Description</p>
+     <a asp-action="Index" class="btn btn-outline-secondary mt-3">Back to Books</a>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>

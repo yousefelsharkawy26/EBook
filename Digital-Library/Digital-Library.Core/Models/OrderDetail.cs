@@ -13,6 +13,7 @@ namespace Digital_Library.Core.Models
 	{
 		[Key]
 		public string Id { get; set; }=Guid.NewGuid().ToString();
+		[Required]
 		public FormatType FormatType { get; set; }
 		[Required]
 		public decimal Price { get; set; }

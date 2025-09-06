@@ -1,4 +1,5 @@
-﻿using Digital_Library.Core.Models;
+﻿using Digital_Library.Core.Constant;
+using Digital_Library.Core.Models;
 using Digital_Library.Core.ViewModels.Responses;
 using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Hosting;
@@ -25,12 +26,12 @@ public class AuthService : IAuthService
 	private readonly IWebHostEnvironment _webHostEnvironment;
 
 	public AuthService(UserManager<User> userManager,
-																				SignInManager<User> signInManager,
-																				IEmailSender emailSender,
-																				IUrlHelperFactory urlHelperFactory,
-																				IActionContextAccessor actionContextAccessor,
-																				ILogger<AuthService> logger,
-																				IWebHostEnvironment webHostEnvironment)
+					   SignInManager<User> signInManager,
+					   IEmailSender emailSender,
+					   IUrlHelperFactory urlHelperFactory,
+					   IActionContextAccessor actionContextAccessor,
+					   ILogger<AuthService> logger,
+					   IWebHostEnvironment webHostEnvironment)
 	{
 		_userManager = userManager;
 		_signInManager = signInManager;
@@ -95,7 +96,8 @@ public class AuthService : IAuthService
 
 		var res = await _userManager.CreateAsync(user, password);
 		if (!res.Succeeded) return Response.Fail(res.Errors.FirstOrDefault()?.Description ?? "Sign-up failed");
-
+		var roleResult = await _userManager.AddToRoleAsync(user, Roles.Customer);
+		if (!roleResult.Succeeded) return Response.Fail(roleResult.Errors.FirstOrDefault()?.Description ?? "Assign role failed");
 		await SendEmailVerificationAsync(user);
 
 		_logger.LogInformation($"User {user.Email} signed up.");
@@ -106,14 +108,15 @@ public class AuthService : IAuthService
 	public async Task<Response> ForgetPasswordAsync(string email)
 	{
 		var user = await _userManager.FindByEmailAsync(email);
-		if (user == null) return Response.Fail("User not found");
+		if (user == null) return Response.Fail("Password reset email sent");
 
 		try
 		{
 			var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 			await SendPasswordResetEmail(user, token);
 			_logger.LogInformation($"Password reset email sent to {email}");
-			return Response.Ok("Password reset email sent");
+			var obg = new {userID = user.Id, token = token};
+			return Response.Ok("Password reset email sent", obg);
 		}
 		catch (Exception ex)
 		{
@@ -157,7 +160,10 @@ public class AuthService : IAuthService
 		var user = await _userManager.FindByIdAsync(userId);
 		if (user == null) return Response.Fail("User not found");
 
-		var res = await _userManager.ConfirmEmailAsync(user, token);
+		var isConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+		if (isConfirmed) return Response.Fail("Your email is already verified. You can log in directly.");
+
+        var res = await _userManager.ConfirmEmailAsync(user, token);
 		if (!res.Succeeded) return Response.Fail(res.Errors.FirstOrDefault()?.Description ?? "Email verification failed");
 
 		_logger.LogInformation($"Email verified for user {user.Email}");
@@ -229,7 +235,7 @@ public class AuthService : IAuthService
 			var actionContext = _actionContextAccessor.ActionContext;
 			var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
 
-			var verificationLink = urlHelper.Action("ConfirmEmail", "Account",
+			var verificationLink = urlHelper.Action("ConfirmEmail", "Auth",
 							new { userId = user.Id, token = token },
 							protocol: actionContext.HttpContext.Request.Scheme);
 
@@ -256,12 +262,12 @@ public class AuthService : IAuthService
 	{
 		var actionContext = _actionContextAccessor.ActionContext;
 		var urlHelper = _urlHelperFactory.GetUrlHelper(actionContext);
-		var resetLink = urlHelper.Action("ResetPassword", "Account",
+		var resetLink = urlHelper.Action("ResetPassword", "Auth",
 						new { userId = user.Id, token = token },
 						protocol: actionContext.HttpContext.Request.Scheme);
 
 		string wwwRoot = _webHostEnvironment.WebRootPath;
-		string template = Path.Combine(wwwRoot, "templates/email/PasswordReset.html");
+		string template = Path.Combine(wwwRoot, "html/PasswordReset.html");
 		string html = await File.ReadAllTextAsync(template);
 
 		html = html.Replace("[User's Name]", user.FullName)

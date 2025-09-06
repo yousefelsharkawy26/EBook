@@ -1,0 +1,185 @@
+﻿@using Digital_Library.Core.ViewModels.Requests
+@model VendorRequest
+
+@{
+ ViewData["Title"] = "Become Vendor";
+}
+
+<style>
+ .card {
+  border-radius: 1rem;
+ }
+
+ .card-header {
+  font-weight: bold;
+  font-size: 1.1rem;
+ }
+
+ .btn-primary, .btn-success {
+  transition: transform 0.2s, box-shadow 0.2s;
+ }
+
+  .btn-primary:hover, .btn-success:hover {
+   transform: scale(1.05);
+   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+
+ .identity-frame {
+  width: 100%;
+  height: 180px;
+  border: 1px solid #ced4da;
+  border-radius: 0.5rem;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+ }
+
+ .captured-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+ }
+
+ .delete-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 14px;
+  cursor: pointer;
+ }
+
+ .note-text {
+  font-size: 0.85rem;
+  color: #6c757d;
+ }
+</style>
+
+<div class="container my-5">
+ <div class="card shadow-lg">
+  <div class="card-header bg-primary text-white">
+   <h3 class="mb-0">📚 Become Vendor</h3>
+  </div>
+  <div class="card-body">
+   <form asp-action="BecomeVendor" asp-controller="Vendor" method="post" enctype="multipart/form-data">
+    <div class="row g-3">
+     <!-- Library Info -->
+     <div class="col-md-6">
+      <label asp-for="LibraryName" class="form-label fw-bold">Library Name</label>
+      <input asp-for="LibraryName" class="form-control" placeholder="Enter Library Name" />
+      <span asp-validation-for="LibraryName" class="text-danger"></span>
+     </div>
+     <div class="col-md-6">
+      <label asp-for="LibraryLogo" class="form-label fw-bold">Library Logo</label>
+      <input asp-for="LibraryLogo" type="file" class="form-control" accept="image/*" />
+      <span asp-validation-for="LibraryLogo" class="text-danger"></span>
+     </div>
+     <div class="col-md-4">
+      <label asp-for="City" class="form-label fw-bold">City</label>
+      <input asp-for="City" class="form-control" />
+      <span asp-validation-for="City" class="text-danger"></span>
+     </div>
+     <div class="col-md-4">
+      <label asp-for="State" class="form-label fw-bold">State</label>
+      <input asp-for="State" class="form-control" />
+      <span asp-validation-for="State" class="text-danger"></span>
+     </div>
+     <div class="col-md-4">
+      <label asp-for="ZipCode" class="form-label fw-bold">Zip Code</label>
+      <input asp-for="ZipCode" class="form-control" />
+      <span asp-validation-for="ZipCode" class="text-danger"></span>
+     </div>
+     <div class="col-md-6">
+      <label asp-for="ContactNumber" class="form-label fw-bold">Contact Number</label>
+      <input asp-for="ContactNumber" class="form-control" />
+      <span asp-validation-for="ContactNumber" class="text-danger"></span>
+     </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <!-- Identity Images -->
+    <div class="mb-3">
+     <p class="fw-bold mb-3">📷 Identity Images (Front ID, Back ID, Face Photo)</p>
+     <div class="row g-4 text-center">
+      @foreach (var type in new[] { "FrontID", "BackID", "FacePhoto" })
+      {
+       <div class="col-md-4">
+        <div class="card shadow-sm rounded-3">
+         <div class="card-header bg-light fw-bold">@type</div>
+         <div class="card-body">
+          <div class="identity-frame" id="frame-@type">
+           <!-- Image preview appears here -->
+          </div>
+          <input type="file" accept="image/*" class="d-none file-input" data-type="@type" name="IdentityImages" />
+          <button type="button" class="btn btn-success mt-2 w-100 uploadBtn" data-type="@type">
+           <i class="bi bi-upload me-1"></i> Upload
+          </button>
+         </div>
+        </div>
+       </div>
+      }
+     </div>
+     <small class="note-text mt-2 d-block">
+      Ensure your face matches the ID photo for verification. You can remove and re-upload images if incorrect.
+     </small>
+    </div>
+
+    <!-- Submit -->
+    <div class="mt-4 text-end">
+     <button type="submit" class="btn btn-primary">
+      <i class="bi bi-check-circle me-1"></i> Submit Vendor Request
+     </button>
+    </div>
+   </form>
+  </div>
+ </div>
+</div>
+
+@section Scripts {
+ <partial name="_ValidationScriptsPartial" />
+ <script>
+  document.querySelectorAll('.uploadBtn').forEach(btn => {
+      const type = btn.dataset.type;
+      const fileInput = document.querySelector(`.file-input[data-type="${type}"]`);
+      const frame = document.getElementById(`frame-${type}`);
+
+      btn.addEventListener('click', () => fileInput.click());
+
+      fileInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          const url = URL.createObjectURL(file);
+          frame.innerHTML = '';
+
+          const imgWrapper = document.createElement('div');
+          imgWrapper.style.position = 'relative';
+
+          const img = document.createElement('img');
+          img.src = url;
+          img.classList.add('captured-img');
+          imgWrapper.appendChild(img);
+
+          const delBtn = document.createElement('button');
+          delBtn.classList.add('delete-btn');
+          delBtn.innerHTML = '&times;';
+          delBtn.onclick = () => {
+              frame.innerHTML = '';
+              fileInput.value = '';
+          };
+          imgWrapper.appendChild(delBtn);
+
+          frame.appendChild(imgWrapper);
+      });
+  });
+ </script>
+}

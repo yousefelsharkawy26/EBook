@@ -13,9 +13,10 @@ public class Book
 	[Required]
 	public string ImageBookCoverPath { get; set; }
 	[Required]
-	public decimal PricePhysical { get; set; } = 0;
-	[Required]
-	public decimal PricePDFPerDay { get; set; }
+	public decimal PricePhysical { get; set; }
+	public decimal? PricePdf { get; set; }
+	public decimal? PricePDFPerDay { get; set; }
+
 	[Required]
 	public string Description { get; set; }
 	[Required]

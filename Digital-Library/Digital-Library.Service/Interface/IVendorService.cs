@@ -19,6 +19,8 @@ public interface IVendorService
 
 
 	Task<Response> ChangeStatusAsync(string vendorId, VendorStatus status, string? reason = null);
+
+	Task<Response> ReturnVendorIdFromUserId(string userId);
 }
 
 
