@@ -1,0 +1,137 @@
+﻿/* nav tabs */
+.nav-tabs .nav-link {
+    color: var(--black-color);
+}
+
+:focus-visible {
+    outline: none;
+}
+
+/* 4.1 Header
+/*----------------------------------------------*/
+.site-header {
+    width: 100%;
+    z-index: 10;
+    transition: background 0.3s ease-out;
+}
+
+.navbar-toggler svg.navbar-icon {
+    width: 50px;
+    height: 50px;
+}
+
+.navbar-nav .nav-item a.nav-link {
+    font-size: 0.7619em;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    color: var(--black-color);
+}
+
+    .navbar-nav .nav-item a.nav-link.active,
+    .navbar-nav .nav-item a.nav-link:focus,
+    .navbar-nav .nav-item a.nav-link:hover {
+        color: var(--primary-color);
+    }
+
+.modal {
+    --bs-modal-zindex: 99999;
+}
+
+.modal-dialog {
+    max-width: 800px;
+    margin: auto;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-menu {
+    --bs-dropdown-link-active-color: var(--primary-color);
+    --bs-dropdown-link-active-bg: #F5F5F5;
+    --bs-dropdown-zindex: 99999;
+}
+
+.dropdown-item.active, .dropdown-item:active {
+    color: var(--bs-dropdown-link-active-color);
+    text-decoration: none;
+}
+
+.cart-dropdown .dropdown-menu,
+.wishlist-dropdown .dropdown-menu {
+    min-width: 21rem;
+}
+
+.cart-dropdown.dropdown a::after,
+.wishlist-dropdown.dropdown a::after {
+    display: none;
+}
+
+@media only screen and (max-width: 500px) {
+    .cart-dropdown .dropdown-menu,
+    .wishlist-dropdown .dropdown-menu {
+        min-width: fit-content;
+    }
+}
+
+/*------------ Offcanvas -------------- */
+#header-nav .navbar-toggler:focus {
+    box-shadow: none;
+}
+
+#header-nav .offcanvas {
+    transition: 0.5s ease-in-out;
+}
+
+    #header-nav .offcanvas.show {
+        z-index: 99999;
+    }
+
+#header-nav .offcanvas-end {
+    width: 500px;
+}
+
+/*------------ Top User Icons -----------*/
+.site-header .user-items svg {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+}
+
+@media only screen and (max-width: 991px) {
+    #navbar .user-items {
+        display: none;
+    }
+}
+
+/* 4.2 Billboard
+/*----------------------------------------------*/
+/*------------Swiper Arrow -----------*/
+.swiper-next,
+.swiper-prev {
+    color: var(--black-color);
+    z-index: 9999;
+}
+
+.swiper-button-disabled {
+    color: var(--gray-color-500);
+}
+
+@media only screen and (max-width: 765px) {
+    section#billboard {
+        height: 100vh !important;
+    }
+}
+
+/* 4.3 Icon Box - Company Services
+/*----------------------------------------------*/
+.icon-box .icon-box-icon svg {
+    width: 33px;
+    height: 33px;
+    fill: var(--primary-color);
+}
+
+@media only screen and (max-width: 991px) {
+    #company-services .icon-box {
+        flex-wrap: wrap;
+    }
+}
