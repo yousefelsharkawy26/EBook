@@ -68,11 +68,9 @@
 
    <li><hr class="dropdown-divider" /></li>
    <li>
-    <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" class="m-0">
-     <button type="submit" class="dropdown-item d-flex align-items-center logout-item">
+     <a asp-controller="auth" asp-action="logout" class="dropdown-item d-flex align-items-center logout-item">
       <i class="bi bi-box-arrow-right me-2"></i> Logout
-     </button>
-    </form>
+     </a>
    </li>
   </ul>
  }

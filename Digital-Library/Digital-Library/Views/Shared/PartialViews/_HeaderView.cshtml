@@ -1,0 +1,114 @@
+﻿<header id="header" class="site-header">
+
+    <!-- Top Info -->
+    <div class="top-info border-bottom d-none d-md-block ">
+        <div class="container-fluid">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <p class="fs-6 my-2 text-center">Need any help? Call us <a href="#">112233344455</a></p>
+                </div>
+                <div class="col-md-4 border-start border-end">
+                    <p class="fs-6 my-2 text-center">
+                        Summer sale discount off 60% off!
+                        <a class="text-decoration-underline" href="index.html">Shop Now</a>
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <p class="fs-6 my-2 text-center">2-3 business days delivery & free returns</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav id="header-nav" class="navbar navbar-expand-lg py-3">
+        <div class="container">
+            <!-- Brand -->
+            <a class="navbar-brand" href="index.html">
+                <img src="~/images/main-logo.png" class="logo">
+            </a>
+
+            <!-- Toggler -->
+            <button class="navbar-toggler d-flex d-lg-none order-3 p-2" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#bdNavbar" aria-controls="bdNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <svg class="navbar-icon">
+                    <use xlink:href="#navbar-icon"></use>
+                </svg>
+            </button>
+
+            <!-- Offcanvas Menu -->
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="bdNavbar" aria-labelledby="bdNavbarOffcanvasLabel">
+                <div class="offcanvas-header px-4 pb-0">
+                    <a class="navbar-brand" href="index.cshtml">
+                        <img src="images/main-logo.png" class="logo">
+                    </a>
+                    <button type="button" class="btn-close btn-close-black" data-bs-dismiss="offcanvas" aria-label="Close"
+                            data-bs-target="#bdNavbar"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <!-- Navbar Links -->
+                    <ul id="navbar"
+                        class="navbar-nav text-uppercase justify-content-start justify-content-lg-center align-items-start align-items-lg-center flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link me-4 active" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link me-4" href="index.html">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link me-4" href="index.html">Shop</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link me-4" href="index.html">Blogs</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link me-4 dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
+                               aria-expanded="false">Pages</a>
+                            <ul class="dropdown-menu animate slide border">
+                                <li><a href="index.html" class="dropdown-item fw-light">About</a></li>
+                                <li><a href="index.html" class="dropdown-item fw-light">Shop</a></li>
+                                <li><a href="index.html" class="dropdown-item fw-light">Single Product</a></li>
+                                <li><a href="index.html" class="dropdown-item fw-light">Cart</a></li>
+                                <li><a href="index.html" class="dropdown-item fw-light">Checkout</a></li>
+                                <li><a href="index.html" class="dropdown-item fw-light">Blog</a></li>
+                                <li><a href="index.html" class="dropdown-item fw-light">Single Post</a></li>
+                                <li><a href="index.html" class="dropdown-item fw-light">Contact</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link me-4" href="index.html">Contact</a>
+                        </li>
+                    </ul>
+
+                    <!-- Right Side Icons -->
+                    <div class="user-items d-flex">
+                        <ul class="d-flex justify-content-end list-unstyled mb-0">
+                            <!-- Search -->
+                            <li class="search-item pe-3">
+                                <a href="#" class="search-button">
+                                    <svg class="search">
+                                        <use xlink:href="#search"></use>
+                                    </svg>
+                                </a>
+                            </li>
+                            <!-- User Dropdown -->
+                            <partial name="PartialViews/_LoginLayout" />
+                            <!-- Cart -->
+                            <li class="cart-dropdown dropdown">
+                                <a href="index.html" class="dropdown-toggle" data-bs-toggle="dropdown" role="button"
+                                   aria-expanded="false">
+                                    <svg class="cart">
+                                        <use xlink:href="#cart"></use>
+                                    </svg>
+                                    <span class="fs-6 fw-light">(02)</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </nav>
+
+</header>
