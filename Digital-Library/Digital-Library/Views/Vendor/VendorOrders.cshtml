@@ -1,0 +1,379 @@
+﻿@using System
+@using System.Linq
+@using Digital_Library.Core.Enum
+@using Digital_Library.Core.Enums
+@model IEnumerable<Digital_Library.Core.Models.Order>
+
+@{
+ ViewData["Title"] = "Vendor Orders";
+ var orders = (Model ?? Enumerable.Empty<Digital_Library.Core.Models.Order>()).ToList();
+
+ var totalRevenue = orders.Sum(o => o.TotalAmount);
+ var statusGroups = orders
+     .GroupBy(o => o.Status)
+     .Select(g => new { Status = g.Key, Count = g.Count() })
+     .OrderByDescending(g => g.Count)
+     .ToList();
+
+ string FormatCurrency(decimal amount) => amount.ToString("C");
+}
+
+<style>
+ .orders-page {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 3px 15px rgba(0,0,0,0.12);
+  padding: 24px;
+ }
+
+ .orders-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+ }
+
+ .orders-title {
+  font-size: 26px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+ }
+
+ .summary {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+ }
+
+ .summary-card {
+  background: #f7f9fc;
+  border: 1px solid #e6ecf5;
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+ }
+
+ .status-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+ }
+
+ .chip {
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  border: 1px solid #e6ecf5;
+  background: #fafbff;
+ }
+
+ .filters {
+  display: grid;
+  grid-template-columns: 1.3fr 0.8fr 0.8fr 0.8fr auto;
+  gap: 10px;
+  margin: 14px 0 12px;
+ }
+
+  .filters input, .filters select, .filters button {
+   padding: 9px 10px;
+   border-radius: 8px;
+   border: 1px solid #d9e0ea;
+   font-size: 14px;
+  }
+
+  .filters button {
+   background: #0d6efd;
+   color: white;
+   border: none;
+   cursor: pointer;
+  }
+
+   .filters button.clear {
+    background: #6c757d;
+   }
+
+ table.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+ }
+
+ .orders-table th, .orders-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #eef2f6;
+  vertical-align: middle;
+ }
+
+ .orders-table th {
+  text-align: left;
+  color: #4b5563;
+  font-weight: 600;
+  background: #f9fbfd;
+ }
+
+ .muted {
+  color: #6b7280;
+  font-size: 12px;
+ }
+
+ .status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid transparent;
+ }
+
+ /* Basic status colors (will apply if names match) */
+ .status-pending {
+  background: #fff7ed;
+  color: #9a3412;
+  border-color: #fdba74;
+ }
+
+ .status-processing, .status-paid {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+ }
+
+ .status-completed, .status-shipped {
+  background: #ecfdf5;
+  color: #065f46;
+  border-color: #6ee7b7;
+ }
+
+ .status-cancelled, .status-rejected, .status-failed {
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+ }
+
+ .status-refunded {
+  background: #f5f3ff;
+  color: #5b21b6;
+  border-color: #ddd6fe;
+ }
+
+ .actions .btn {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+ }
+
+  .actions .btn:hover {
+   background: #f3f4f6;
+  }
+
+ @@media (max-width: 900px) {
+  .filters
+
+ {
+  grid-template-columns: 1fr 1fr;
+ }
+
+ .orders-header {
+  flex-direction: column;
+  align-items: flex-start;
+ }
+
+ }
+</style>
+
+<div class="orders-page">
+ <div class="orders-header">
+  <div class="orders-title">📦 Vendor Orders</div>
+  <div class="summary">
+   <div class="summary-card">
+    <span>Orders:</span>
+    <strong id="orders-count">@orders.Count</strong>
+   </div>
+   <div class="summary-card">
+    <span>Revenue:</span>
+    <strong id="orders-revenue">@FormatCurrency(totalRevenue)</strong>
+   </div>
+   <div class="status-chips">
+    @foreach (var g in statusGroups)
+    {
+     <div class="chip">@g.Status (@g.Count)</div>
+    }
+   </div>
+  </div>
+ </div>
+
+ <div class="filters">
+  <input type="text" id="searchInput" placeholder="Search by Order ID or Customer..." />
+  <select id="statusFilter">
+   <option value="">All Statuses</option>
+   @foreach (var s in Enum.GetValues(typeof(Status)).Cast<Status>())
+   {
+    <option value="@s">@s</option>
+   }
+  </select>
+  <input type="date" id="startDate" />
+  <input type="date" id="endDate" />
+  <div style="display:flex; gap:8px;">
+   <button id="applyFilters">Filter</button>
+   <button class="clear" id="clearFilters">Clear</button>
+  </div>
+ </div>
+
+ @if (!orders.Any())
+ {
+  <div class="text-center py-4" style="padding: 24px; text-align:center;">
+   <div>There are no orders yet.</div>
+  </div>
+ }
+ else
+ {
+  <table class="orders-table" id="ordersTable">
+   <thead>
+    <tr>
+     <th>Order</th>
+     <th>Date</th>
+     <th>Customer</th>
+     <th>Status</th>
+     <th class="text-end" style="text-align:right;">Items</th>
+     <th class="text-end" style="text-align:right;">Total</th>
+     <th>Actions</th>
+    </tr>
+   </thead>
+   <tbody>
+    @foreach (var o in orders.OrderByDescending(o => o.OrderDate))
+    {
+     var buyer = o.User?.UserName ?? o.User?.Email ?? "N/A";
+     var statusText = o.Status.ToString();
+     var statusCss = $"status-{statusText.ToLower()}";
+     var itemsCount = o.OrderDetails?.Count ?? 0; // If you have Quantity per item, you can sum it instead.
+     var dateIso = o.OrderDate.ToString("s");     // ISO-like for JS parsing
+     var totalInvariant = o.TotalAmount.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+     <tr class="order-row"
+         data-id="@o.Id"
+         data-buyer="@buyer"
+         data-status="@statusText"
+         data-date="@dateIso"
+         data-total="@totalInvariant">
+      <td>
+       <div style="display:flex; flex-direction:column;">
+        <div style="display:flex; align-items:center; gap:8px;">
+         <code>@o.Id</code>
+         <button class="btn btn-copy" data-copy="@o.Id" title="Copy ID">Copy</button>
+        </div>
+        <span class="muted"># @o.Id.Substring(0, Math.Min(8, o.Id.Length))…</span>
+       </div>
+      </td>
+      <td>
+       <div>@o.OrderDate.ToString("MMM dd, yyyy")</div>
+       <div class="muted">@o.OrderDate.ToString("HH:mm")</div>
+      </td>
+      <td>@buyer</td>
+      <td>
+       <span class="status-badge @statusCss">@statusText</span>
+      </td>
+      <td style="text-align:right;">@itemsCount</td>
+      <td style="text-align:right;"><strong>@FormatCurrency(o.TotalAmount)</strong></td>
+      <td class="actions">
+       <button class="btn btn-view" onclick="location.href='@Url.Action("Details", "Order", new { id = o.Id })'">Details</button>
+      </td>
+     </tr>
+    }
+   </tbody>
+  </table>
+ }
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+ (function(){
+     const $rows = $('#ordersTable .order-row');
+
+     function toNumber(val){
+         const n = parseFloat(val);
+         return isNaN(n) ? 0 : n;
+     }
+
+     function inRange(date, start, end){
+         if(!start && !end) return true;
+         if(start && date < start) return false;
+         if(end && date > end) return false;
+         return true;
+     }
+
+     function applyFilters(){
+         const q = ($('#searchInput').val() || '').toString().trim().toLowerCase();
+         const status = ($('#statusFilter').val() || '').toString();
+         const startStr = $('#startDate').val();
+         const endStr = $('#endDate').val();
+
+         const start = startStr ? new Date(startStr + 'T00:00:00') : null;
+         const end = endStr ? new Date(endStr + 'T23:59:59') : null;
+
+         let visible = 0;
+         let sum = 0;
+
+         $rows.each(function(){
+             const $r = $(this);
+             const id = ($r.data('id') || '').toString().toLowerCase();
+             const buyer = ($r.data('buyer') || '').toString().toLowerCase();
+             const st = ($r.data('status') || '').toString();
+             const dt = new Date(($r.data('date') || '').toString());
+             const total = toNumber($r.data('total'));
+
+             const matchesSearch = !q || id.includes(q) || buyer.includes(q);
+             const matchesStatus = !status || st === status;
+             const matchesDate = inRange(dt, start, end);
+
+             const show = matchesSearch && matchesStatus && matchesDate;
+             $r.toggle(show);
+
+             if(show){
+                 visible++;
+                 sum += total;
+             }
+         });
+
+         $('#orders-count').text(visible);
+         $('#orders-revenue').text('' + new Intl.NumberFormat(undefined, { style: 'currency', currency: (Intl.NumberFormat().resolvedOptions().currency || 'USD') }).format(sum));
+     }
+
+     $('#applyFilters').on('click', applyFilters);
+     $('#clearFilters').on('click', function(){
+         $('#searchInput').val('');
+         $('#statusFilter').val('');
+         $('#startDate').val('');
+         $('#endDate').val('');
+         applyFilters();
+     });
+
+     $('#searchInput, #statusFilter, #startDate, #endDate').on('change keyup', function(e){
+         if(e.type === 'keyup' && e.key !== 'Enter') return; // apply on Enter for typing
+         applyFilters();
+     });
+
+     // Copy Order ID
+     $(document).on('click', '.btn-copy', async function(){
+         const text = $(this).data('copy');
+         try {
+             await navigator.clipboard.writeText(text);
+             const old = $(this).text();
+             $(this).text('Copied!');
+             setTimeout(() => $(this).text(old), 1000);
+         } catch {
+             alert('Could not copy');
+         }
+     });
+ })();
+</script>

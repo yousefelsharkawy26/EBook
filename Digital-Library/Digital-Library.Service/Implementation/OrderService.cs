@@ -7,6 +7,7 @@ using Digital_Library.Core.ViewModels.Responses;
 using Digital_Library.Infrastructure.UnitOfWork.Interface;
 using Digital_Library.Service.Interface;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
@@ -77,21 +78,36 @@ namespace Digital_Library.Service.Services
 								predicate: o => o.UserId == userId,
 								includes: new Expression<Func<Order, object>>[]
 								{
-																o => o.OrderDetails,
-																o => o.OrderDetails.Select(d => d.Book)
-								});
+																o => o.User
+								},
+								thenIncludes: new Func<IQueryable<Order>, IIncludableQueryable<Order, object>>[]
+								{
+																q => q.Include(o => o.OrderDetails)
+																						.ThenInclude(d => d.Book)
+								}
+				);
 			}
 			else
 			{
 				query = _unitOfWork.Orders.GetAllQuery(
 								includes: new Expression<Func<Order, object>>[]
 								{
-																o => o.OrderDetails,
-																o => o.OrderDetails.Select(d => d.Book)
-								});
+																o => o.User
+								},
+								thenIncludes: new Func<IQueryable<Order>, IIncludableQueryable<Order, object>>[]
+								{
+																q => q.Include(o => o.OrderDetails)
+																						.ThenInclude(d => d.Book)
+								},
+								orderBy: o => o.OrderDate,
+								orderByDescending: true
+				);
 			}
 
-			return await query.ToListAsync();
+			return await query
+							.AsNoTracking()
+							.AsSplitQuery()
+							.ToListAsync();
 		}
 
 		public async Task<Response> GetOrderByIdAsync(string orderId)

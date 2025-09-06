@@ -22,8 +22,6 @@ namespace Digital_Library.Core.Models
 
 		public ICollection<OrderDetail>? OrderDetails { get; set; }
 
-
-
 		public User? User { get; set; }
 		[ForeignKey(nameof(User))]
 		[Required]

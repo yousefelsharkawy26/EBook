@@ -12,10 +12,12 @@ namespace Digital_Library.Controllers
 	public class VendorController : Controller
 	{
 		private readonly IVendorService vendorService;
+		private readonly IOrderService orderService;
 
-		public VendorController(IVendorService vendorService)
+		public VendorController(IVendorService vendorService,IOrderService orderService)
 		{
 			this.vendorService = vendorService;
+			this.orderService = orderService;
 		}
 		[HttpGet("BecomeVendor")]
 		public async Task<IActionResult> BecomeVendor()
@@ -45,6 +47,7 @@ namespace Digital_Library.Controllers
 			return RedirectToAction("Index", "Home");
 		}
 		[HttpGet("Dashboard")]
+		[Authorize(Roles = Roles.Vendor)]
 		public async Task<IActionResult> Dashboard()
 		{
 			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -108,6 +111,20 @@ namespace Digital_Library.Controllers
 			return RedirectToAction(nameof(Dashboard));
 		}
 
+		[HttpGet("VendorOrders")]
+		[Authorize(Roles = Roles.Vendor)]
+		public async Task<IActionResult> VendorOrders()
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if (userId == null)
+				return Forbid();
+			var vendorIdResponse = await vendorService.ReturnVendorIdFromUserId(userId);
+			if (!vendorIdResponse.Success || vendorIdResponse.Data == null)
+				return NotFound("Vendor profile not found");
+			var orders = await orderService.GetUserOrdersAsync(vendorIdResponse.Data as string);
+
+			return View(orders); 
+		}
 
 
 	}

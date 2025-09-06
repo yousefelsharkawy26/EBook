@@ -228,11 +228,17 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<string>("VendorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BookId");
 
                     b.HasIndex("OrderId");
+
+                    b.HasIndex("VendorId");
 
                     b.ToTable("OrderDetails");
                 });
@@ -659,9 +665,17 @@ namespace Digital_Library.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Digital_Library.Core.Models.Vendor", "Vendor")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Book");
 
                     b.Navigation("Order");
+
+                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.Transaction", b =>
@@ -777,6 +791,8 @@ namespace Digital_Library.Infrastructure.Migrations
             modelBuilder.Entity("Digital_Library.Core.Models.Vendor", b =>
                 {
                     b.Navigation("Books");
+
+                    b.Navigation("OrderDetails");
 
                     b.Navigation("VendorIdentityImagesUrls");
                 });

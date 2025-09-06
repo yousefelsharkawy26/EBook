@@ -27,5 +27,9 @@ namespace Digital_Library.Core.Models
 		[ForeignKey(nameof(Book))]
 		[Required]
 		public string BookId { get; set; }
+		public Vendor? Vendor { get; set; }
+		[ForeignKey(nameof(Vendor))]
+		[Required]
+		public string VendorId { get; set; }
 	}
 }

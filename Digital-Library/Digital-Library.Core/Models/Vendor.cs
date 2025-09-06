@@ -36,6 +36,8 @@ namespace Digital_Library.Core.Models
 
 		public ICollection<Book>? Books { get; set; }
 		public ICollection<VendorIdentityImagesUrl>? VendorIdentityImagesUrls { get; set; }
+		public ICollection<OrderDetail>? OrderDetails { get; set; }
+
 
 		public User? User { get; set; }
 
@@ -51,6 +53,8 @@ namespace Digital_Library.Core.Models
 
 		public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
 		public DateTime? ReviewedAt { get; set; }
+
+
 	}
 
 }
