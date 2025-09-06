@@ -1,0 +1,280 @@
+﻿@using Digital_Library.Core.Enums
+@model Digital_Library.Core.Models.Cart
+
+@{
+	ViewData["Title"] = "My Cart";
+}
+
+
+<style>
+	.shopping-cart {
+		max-width: none;
+		margin: 50px auto;
+		background: #fff;
+		border-radius: 12px;
+		box-shadow: 0 3px 15px rgba(0,0,0,0.15);
+		padding: 30px;
+	}
+
+	.cart-header {
+		font-size: 28px;
+		font-weight: 700;
+		margin-bottom: 20px;
+		text-align: center;
+	}
+
+	.cart-table-header {
+		display: grid;
+		grid-template-columns: 100px 2fr 1fr 1fr 1fr 100px;
+		gap: 20px;
+		font-weight: 600;
+		font-size: 16px;
+		padding: 10px 0;
+		border-bottom: 2px solid #ccc;
+		text-align: center;
+	}
+
+	.item-row {
+		display: grid;
+		grid-template-columns: 100px 2fr 1fr 1fr 1fr 100px;
+		align-items: center;
+		gap: 20px;
+		padding: 20px 0;
+		border-bottom: 1px solid #E1E8EE;
+	}
+
+		.item-row:last-child {
+			border-bottom: none;
+		}
+
+		.item-row .image img {
+			width: 80px;
+			height: 80px;
+			object-fit: cover;
+			border-radius: 8px;
+		}
+
+	.description span:first-child {
+		font-weight: 600;
+		font-size: 18px;
+		display: block;
+	}
+
+	.description span:nth-child(2) {
+		font-size: 14px;
+		color: #555;
+		display: block;
+		margin-top: 4px;
+	}
+
+	.quantity {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 5px;
+	}
+
+		.quantity input {
+			width: 50px;
+			text-align: center;
+			font-size: 16px;
+			padding: 4px 0;
+			border-radius: 6px;
+			border: 1px solid #ccc;
+		}
+
+		.quantity button {
+			width: 30px;
+			height: 30px;
+			border: none;
+			border-radius: 6px;
+			background-color: #E1E8EE;
+			cursor: pointer;
+			font-weight: bold;
+			font-size: 18px;
+		}
+
+	.total-price {
+		text-align: center;
+		font-weight: 600;
+	}
+
+	.remove-btn {
+		background-color: #ff4d4f;
+		color: white;
+		border-radius: 6px;
+		padding: 6px 12px;
+		cursor: pointer;
+		font-size: 14px;
+		border: none;
+	}
+		.remove-btn:hover {
+			background-color: #e04344 !important;
+			text-decoration: none !important;
+			color: white !important;
+		}
+
+	.checkout-section {
+		margin-top: 30px;
+		text-align: right;
+	}
+
+	.checkout-btn {
+		background-color: #28a745;
+		color: white;
+		font-weight: 600;
+		font-size: 18px;
+		padding: 10px 25px;
+		border-radius: 8px;
+		border: none;
+		cursor: pointer;
+	}
+
+		.checkout-btn:hover {
+			background-color: #218838;
+		}
+
+	@@media(max-width: 768px) {
+		.cart-table-header,
+		.item-row {
+			grid-template-columns: 80px 2fr;
+			grid-template-rows: repeat(5, auto);
+			gap: 10px;
+		}
+
+		.format-type, .quantity, .total-price, .remove-btn {
+			grid-column: 2;
+			text-align: left;
+		}
+
+		.checkout-section {
+			text-align: center;
+		}
+	}
+</style>
+
+<div class="shopping-cart">
+	<div class="cart-header">
+		🛒 My Shopping Cart
+	</div>
+
+	@if (Model.CartDetails == null || !Model.CartDetails.Any())
+	{
+		<div class="text-center py-4">
+			<span>Your cart is empty 😔</span>
+		</div>
+	}
+	else
+	{
+		<div class="cart-table-header">
+			<div>Image</div>
+			<div>Book / Author</div>
+			<div>Format</div>
+			<div>Quantity</div>
+			<div>Price</div>
+			<div>Actions</div>
+		</div>
+
+		@foreach (var item in Model.CartDetails)
+		{
+			var isPdf = item.FormatType == FormatType.PDF;
+			<div class="item-row" data-id="@item.Id" data-price="@((isPdf ? item.Book.PricePdf ?? 0 : item.Book.PricePhysical))">
+				<div class="image">
+					<img src="~/@item.Book.ImageBookCoverPath" alt="@item.Book.Title" />
+				</div>
+				<div class="description">
+					<span>@item.Book.Title</span>
+					<span>@item.Book.Author</span>
+				</div>
+				<div class="format-type text-center">
+					@item.FormatType
+				</div>
+				<div class="quantity">
+					@if (isPdf)
+					{
+						<button class="minus-btn" disabled>-</button>
+						<input type="text" value="1" readonly />
+
+						<!-- PDF ثابت -->
+						<button class="plus-btn" disabled>+</button>
+					}
+					else
+					{
+						<button class="minus-btn">-</button>
+						<input type="text" class="cart-quantity" value="@item.Quantity" data-id="@item.Id" />
+						<button class="plus-btn">+</button>
+					}
+				</div>
+				<div class="total-price">
+					@(((isPdf ? item.Book.PricePdf ?? 0 : item.Book.PricePhysical) * item.Quantity).ToString("C"))
+				</div>
+				<a class="remove-btn text-center" asp-action="Remove" asp-controller="Cart" asp-route-cartDetailId="@item.Id">Remove</a>
+			</div>
+		}
+
+		<div class="checkout-section">
+			<span class="me-3" style="font-weight:600; font-size:18px;" id="cart-total">
+				Total:
+				@Model.CartDetails.Sum(cd => (cd.FormatType == FormatType.Physical ? cd.Book.PricePhysical : cd.Book.PricePdf ?? 0) * cd.Quantity).ToString("C")
+			</span>
+			<button class="checkout-btn" onclick="location.href='@Url.Action("Index", "Checkout")'">
+				Proceed to Checkout
+			</button>
+		</div>
+	}
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+	$(document).ready(function(){
+
+					function updateTotals(){
+									let subtotal = 0;
+									$('.item-row').each(function(){
+													const val = parseFloat($(this).find('.total-price').text().replace(/[^0-9.-]+/g,"")) || 0;
+													subtotal += val;
+									});
+									$('#cart-total').text('Total: $' + subtotal.toFixed(2));
+					}
+
+					function recalcRow($row){
+									var quantity = parseInt($row.find('input.cart-quantity').val()) || 1;
+									var unitPrice = parseFloat($row.data('price')) || 0;
+									var total = unitPrice * quantity;
+									$row.find('.total-price').text('$' + total.toFixed(2));
+									updateTotals();
+					}
+
+					$('.plus-btn').click(function(){
+									var $input = $(this).siblings('input');
+									if($input.is('[readonly]')) return;
+									var val = parseInt($input.val()) || 1;
+									if(val < 100) val++;
+									$input.val(val);
+									recalcRow($(this).closest('.item-row'));
+
+									$.post('@Url.Action("UpdateQuantity", "Cart")', { cartDetailId: $input.data('id'), quantity: val });
+					});
+
+					$('.minus-btn').click(function(){
+									var $input = $(this).siblings('input');
+									if($input.is('[readonly]')) return;
+									var val = parseInt($input.val()) || 1;
+									if(val > 1) val--;
+									$input.val(val);
+									recalcRow($(this).closest('.item-row'));
+
+									$.post('@Url.Action("UpdateQuantity", "Cart")', { cartDetailId: $input.data('id'), quantity: val });
+					});
+
+					$('.cart-quantity').on('change', function(){
+									var $row = $(this).closest('.item-row');
+									recalcRow($row);
+
+									if(!$(this).is('[readonly]')){
+													$.post('@Url.Action("UpdateQuantity", "Cart")', { cartDetailId: $(this).data('id'), quantity: parseInt($(this).val()) || 1 });
+									}
+					});
+
+	});
+</script>

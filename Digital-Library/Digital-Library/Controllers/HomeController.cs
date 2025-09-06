@@ -1,19 +1,23 @@
-using System.Diagnostics;
+using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Models;
+using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace Digital_Library.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ICategoryService _categoryService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger , ICategoryService categoryService)
         {
             _logger = logger;
+            _categoryService = categoryService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View();
         }

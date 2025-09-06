@@ -16,9 +16,9 @@ namespace Digital_Library.Service.Interface
 
 		Task<Response> AddItemAsync(string userId, CartDetailRequest request);
 
-		Task<Response> RemoveItemAsync(string userId, string bookId, FormatType formatType);
+		Task<Response> RemoveItemAsync(string cartDetailId);
 
-		Task<Response> UpdateCartAsync(string userId, string bookId, int quantity, FormatType formatType);
+		Task<Response> UpdateCartAsync(string cartDetailId, int quantity);
 
 		Task<Response> ClearCartAsync(string userId);
 	}

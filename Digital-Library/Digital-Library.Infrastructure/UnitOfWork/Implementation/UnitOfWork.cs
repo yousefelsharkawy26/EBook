@@ -9,7 +9,6 @@ namespace Digital_Library.Infrastructure.UnitOfWork.Implementation
 	public class UnitOfWork : IUnitOfWork
 	{
 		public EBookContext _context { get; }
-
 		public IBaseRepository<User> Users { get; }
 		public IBaseRepository<Book> Books { get; }
 		public IBaseRepository<Borrowing> Borrowings { get; }
@@ -33,6 +32,8 @@ namespace Digital_Library.Infrastructure.UnitOfWork.Implementation
 			OrderDetails = new BaseRepository<OrderDetail>(_context);
 			Transactions = new BaseRepository<Transaction>(_context);
 			Vendors = new BaseRepository<Vendor>(_context);
+			CartDetails = new BaseRepository<CartDetail>(_context);
+
 		}
 		public void Dispose()
 		{

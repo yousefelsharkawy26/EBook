@@ -112,7 +112,7 @@ namespace Digital_Library.Service.Implementation
 
 		public async Task<IEnumerable<Category>> GetAllCategories()
 		{
-			var categories = _unitOfWork.Categories.GetAllQuery();
+			var categories =  _unitOfWork.Categories.GetAllQuery();
 			_logger.LogInformation("Retrieved {Count} categories", categories.Count());
 			return await categories.ToListAsync();
 		}

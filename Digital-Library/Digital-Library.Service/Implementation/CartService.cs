@@ -80,44 +80,40 @@ namespace Digital_Library.Service.Implementation
 			return Response.Ok("Item added/updated in cart", cart);
 		}
 
-		public async Task<Response> RemoveItemAsync(string userId, string bookId, FormatType formatType)
+		public async Task<Response> RemoveItemAsync(string cartDetailId)
 		{
-			var cartResponse = await GetCartAsync(userId);
-			var cart = (Cart)cartResponse.Data!;
+			var item = await _unitOfWork.CartDetails.GetByIdAsync(cartDetailId);
 
-			var item = cart.CartDetails
-							.FirstOrDefault(cd => cd.BookId == bookId && cd.FormatType == formatType);
-
-			if (item != null)
+			if (item != null )
 			{
 				_unitOfWork.CartDetails.Delete(item);
 				await _unitOfWork.SaveChangesAsync();
 
-				_logger.LogInformation("Removed book {BookId} from cart for user {UserId}", bookId, userId);
-				return Response.Ok("Item removed from cart", cart);
+				_logger.LogInformation("Removed item {CartDetailId} from cart ", cartDetailId);
+				return Response.Ok("Item removed from cart");
 			}
 
-			return Response.Fail("Item not found in cart");
+			return Response.Fail("Item not found or cart is null");
 		}
 
-		public async Task<Response> UpdateCartAsync(string userId, string bookId, int quantity, FormatType formatType)
+		public async Task<Response> UpdateCartAsync(string cartDetailId,int quantity)
 		{
-			var cartResponse = await GetCartAsync(userId);
-			var cart = (Cart)cartResponse.Data!;
-
-			var item = cart.CartDetails
-							.FirstOrDefault(cd => cd.BookId == bookId && cd.FormatType == formatType);
+			var item = await _unitOfWork.CartDetails.GetByIdAsync(cartDetailId);
 
 			if (item != null)
 			{
 				item.Quantity = quantity;
 				_unitOfWork.CartDetails.Update(item);
 				await _unitOfWork.SaveChangesAsync();
+				_logger.LogInformation("Updated quantity of item {CartDetailId} to {Quantity}", cartDetailId, quantity);
 
-				_logger.LogInformation("Updated quantity of book {BookId} to {Quantity} in cart for user {UserId}",
-								bookId, quantity, userId);
+				var cart = await _unitOfWork.Carts
+								.GetSingleWithIncludeAsync(
+												c => c.Id == item.CartId,
+												q => q.Include(c => c.CartDetails).ThenInclude(cd => cd.Book)
+								);
 
-				return Response.Ok("Item quantity updated", cart);
+				return Response.Ok("Item quantity updated",cart);
 			}
 
 			return Response.Fail("Item not found in cart");
@@ -134,7 +130,7 @@ namespace Digital_Library.Service.Implementation
 				await _unitOfWork.SaveChangesAsync();
 
 				_logger.LogInformation("Cleared cart for user {UserId}", userId);
-				return Response.Ok("Cart cleared", cart);
+				return Response.Ok("Cart cleared");
 			}
 
 			return Response.Fail("Cart is already empty");

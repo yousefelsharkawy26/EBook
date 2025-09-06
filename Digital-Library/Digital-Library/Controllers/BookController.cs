@@ -2,6 +2,7 @@
 using Digital_Library.Core.Filters;
 using Digital_Library.Core.Models;
 using Digital_Library.Core.ViewModels.Requests;
+using Digital_Library.Service.Implementation;
 using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +17,14 @@ namespace Digital_Library.Controllers
 		private readonly IBookService bookService;
 		private readonly ICategoryService categoryService;
 		private readonly IVendorService vendorService;
+		private readonly IFileService fileService;
 
-		public BookController(IBookService bookService, ICategoryService categoryService, IVendorService vendorService)
+		public BookController(IBookService bookService, ICategoryService categoryService, IVendorService vendorService , IFileService fileService)
 		{
 			this.bookService = bookService;
 			this.categoryService = categoryService;
 			this.vendorService = vendorService;
+			this.fileService = fileService;
 		}
 		[HttpGet("Index")]
 		[Authorize(Roles = Roles.Vendor)]
@@ -206,7 +209,49 @@ namespace Digital_Library.Controllers
 			return View();
 		}
 
+        [HttpGet("allbooks")]
+        public async Task<IActionResult> ViewAllBooks(string category, string author, string priceRange, string sort)
+        {
+            var books = await bookService.GetAllBooks();
+
+            // Filter by category
+            if (!string.IsNullOrEmpty(category))
+                books = books.Where(b => b.CategoryID == category).ToList();
+
+            // Filter by author
+            if (!string.IsNullOrEmpty(author))
+                books = books.Where(b => b.Author == author).ToList();
+
+            // Filter by price range
+            if (!string.IsNullOrEmpty(priceRange))
+            {
+                var parts = priceRange.Split('-');
+                if (parts.Length == 2 &&
+                    decimal.TryParse(parts[0], out decimal minPrice) &&
+                    decimal.TryParse(parts[1], out decimal maxPrice))
+                {
+                    books = books.Where(b => b.PricePhysical >= minPrice && b.PricePhysical <= maxPrice).ToList();
+                }
+            }
+
+            // Sorting (optional)
+            books = sort switch
+            {
+                "NameAsc" => books.OrderBy(b => b.Title).ToList(),
+                "NameDesc" => books.OrderByDescending(b => b.Title).ToList(),
+                "PriceLowHigh" => books.OrderBy(b => b.PricePhysical).ToList(),
+                "PriceHighLow" => books.OrderByDescending(b => b.PricePhysical).ToList(),
+                _ => books
+            };
+
+            // Populate viewbags
+            ViewBag.Categories = await categoryService.GetAllCategories();
+            ViewBag.Authors = books.Select(b => b.Author).Distinct().ToList();
 
 
-	}
+            return View(books);
+        }
+
+
+    }
 }
