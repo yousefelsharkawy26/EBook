@@ -13,7 +13,7 @@ public class AuthController : Controller
     private readonly IAuthService _authService;
     private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IAuthService authService, 
+    public AuthController(IAuthService authService,
                           ILogger<AuthController> logger)
     {
         _authService = authService;
@@ -79,10 +79,10 @@ public class AuthController : Controller
         {
             try
             {
-                var res = await _authService.SignUpAsync(model.UserName, model.Email, model.Password);
+                var res = await _authService.SignUpAsync(model.FullName, model.Email, model.Password);
 
                 if (res.Success)
-                    return await Login(new LoginViewModel() { Email =  model.Email, Password = model.Password });
+                    return await Login(new LoginViewModel() { Email = model.Email, Password = model.Password });
 
                 _logger.LogWarning(res.Message, $"in {nameof(Login)}");
             }
@@ -104,7 +104,7 @@ public class AuthController : Controller
     {
         if (userId == null || token == null)
             return BadRequest();
-        
+
         var res = await _authService.VerifyEmailAsync(userId, token);
 
         return res.Success ? View() : NotFound();
@@ -129,7 +129,7 @@ public class AuthController : Controller
         if (res.Success)
         {
             TempData["CanAccessReset"] = true;
-            return RedirectToAction("ResetPassword",res.Data);
+            return RedirectToAction("ResetPassword", res.Data);
         }
         return View();
     }
@@ -139,7 +139,7 @@ public class AuthController : Controller
     {
         if (TempData["CanAccessReset"] == null)
         {
-            return RedirectToAction("Index", "Home"); 
+            return RedirectToAction("Index", "Home");
         }
 
         // keep TempData alive for refresh

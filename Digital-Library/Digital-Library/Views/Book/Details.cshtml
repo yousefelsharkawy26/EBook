@@ -1,40 +1,293 @@
-﻿@model Digital_Library.Core.Models.Book
+﻿@model Digital_Library.Core.ViewModels.BookDetailsViewModel
+
 @{
- ViewData["Title"] = "Book Details";
+    ViewData["Title"] = "Book Details";
 }
 
-<div class="container my-5">
- <div class="card shadow-lg border-0 rounded-4">
-  <div class="card-header bg-primary text-white rounded-top-4">
-   <h3 class="mb-0">📖 @Model.Title</h3>
-  </div>
-  <div class="card-body p-4">
-   <div class="row g-4">
-    <!-- Book Cover -->
-    <div class="col-md-4">
-     <img src="~/@Model.ImageBookCoverPath"
-          class="img-fluid rounded" alt="Book Cover" />
-    </div>
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <!-- Book Info -->
-    <div class="col-md-8">
-     <h5>Author: <strong>@Model.Author</strong></h5>
-     <h5>Category: <strong>@Model.Category?.CategoryName</strong></h5>
-     <h5>Stock: <strong>@Model.Stock</strong></h5>
-     <h5>Price (Physical): <strong>$@Model.PricePhysical</strong></h5>
-     @if (Model.HasPDF)
-     {
-      <h5>Price (PDF): <strong>$@Model.PricePdf</strong></h5>
-      @if (Model.IsBorrowable)
-      {
-       <h5>PDF Daily Price: <strong>$@Model.PricePDFPerDay</strong></h5>
-      }
-     }
-     <hr />
-     <p>@Model.Description</p>
-     <a asp-action="Index" class="btn btn-outline-secondary mt-3">Back to Books</a>
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .book-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #0d3b66; /* Deep navy */
+    }
+
+    .book-author {
+        color: #555;
+        font-size: 1.1rem;
+    }
+
+    .custom-badge {
+        font-size: 0.9rem;
+        padding: 0.5em 0.75em;
+        border-radius: 50rem;
+    }
+
+    .price-box {
+        background: #f9f9f9;
+        border-left: 4px solid #f4a261; /* Warm gold */
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+
+    /* 🎨 Unified Button Styles */
+    .btn-custom {
+        border-radius: 50px;
+        font-weight: 600;
+        padding: 0.6rem 1.6rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn-back {
+        background: #0d3b66;
+        color: #fff;
+        border: none;
+    }
+
+        .btn-back:hover {
+            background: #093157;
+            transform: translateY(-2px);
+            color: #fff;
+        }
+
+    .btn-cart {
+        background: #2a9d8f;
+        color: #fff;
+        border: none;
+    }
+
+        .btn-cart:hover {
+            background: #21867a;
+            transform: translateY(-2px);
+            color: #fff;
+        }
+</style>
+
+<div class="container my-5">
+    <div class="row g-5">
+        <!-- Left: Book Cover -->
+        <div class="col-lg-4">
+            <div class="p-4 border rounded-4 shadow-sm bg-white text-center">
+                <img src="~/@Model.Book.ImageBookCoverPath"
+                     alt="Book Cover"
+                     class="img-fluid rounded-3"
+                     style="max-height: 450px; object-fit: contain;" />
+            </div>
+        </div>
+
+        <!-- Center: Book Info -->
+        <div class="col-lg-5">
+            <h1 class="book-title">@Model.Book.Title</h1>
+            <p class="book-author">by <strong>@Model.Book.Author</strong></p>
+
+            <div class="mb-3">
+                <span class="badge bg-warning text-dark custom-badge me-2">
+                    @Model.Book.Category?.CategoryName
+                </span>
+                <span class="badge @(Model.Book.Stock > 0 ? "bg-success" : "bg-danger") custom-badge">
+                    @(Model.Book.Stock > 0 ? "In Stock" : "Out of Stock")
+                </span>
+            </div>
+
+            <hr />
+
+            <!-- Pricing -->
+            <h4 class="fw-semibold mb-3 text-dark">💲 Pricing</h4>
+            <div class="d-flex flex-column gap-2 mb-4">
+                <div class="price-box d-flex justify-content-between">
+                    <span>Physical Copy</span>
+                    <strong>$@Model.Book.PricePhysical</strong>
+                </div>
+                @if (Model.Book.HasPDF)
+                {
+                    <div class="price-box d-flex justify-content-between">
+                        <span>PDF</span>
+                        <strong>$@Model.Book.PricePdf</strong>
+                    </div>
+                    @if (Model.Book.IsBorrowable)
+                    {
+                        <div class="price-box d-flex justify-content-between">
+                            <span>Borrow / Day</span>
+                            <strong>$@Model.Book.PricePDFPerDay</strong>
+                        </div>
+                    }
+                }
+            </div>
+
+            <!-- Description -->
+            <h4 class="fw-semibold mb-2 text-dark">📖 Description</h4>
+            <p style="color:#0d3b66;">@Model.Book.Description</p>
+
+
+            <!-- Actions -->
+            <div class="mt-4 d-flex flex-wrap gap-3">
+                <a asp-action="allbooks" class="btn btn-custom btn-back">
+                    ⬅ Back
+                </a>
+                <button type="button" class="btn btn-custom btn-cart" data-bs-toggle="modal" data-bs-target="#addToCartModal">
+                    🛒 Add to Cart
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Right: Related Books -->
+        <div class="col-lg-3">
+            <div class="p-4 border rounded-4 shadow-sm bg-white">
+                <h5 class="fw-bold mb-3 text-dark">📚 Related Books</h5>
+
+                @if (Model.RelatedBooks.Any())
+                {
+                    @foreach (var related in Model.RelatedBooks)
+                    {
+                        <div class="d-flex mb-3">
+                            <img src="~/@related.ImageBookCoverPath" alt="@related.Title"
+                                 class="rounded me-3"
+                                 style="width:60px; height:80px; object-fit:cover;" />
+                            <div>
+                                <p class="mb-1 fw-semibold text-dark">@related.Title</p>
+                                <small class="text-muted">by @related.Author</small><br />
+                                <span class="text-primary fw-bold">$@related.PricePhysical</span><br />
+                                <a asp-action="Details" asp-route-id="@related.Id" class="small text-decoration-none">
+                                    View →
+                                </a>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted">No related books found.</p>
+                }
+            </div>
+        </div>
     </div>
-   </div>
-  </div>
- </div>
 </div>
+
+<!-- Add to Cart Modal -->
+<div class="modal fade" id="addToCartModal" tabindex="-1" aria-labelledby="addToCartLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-3 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="addToCartLabel">Choose Options</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="addToCartMessage" class="mt-2"></div>
+
+                <form asp-controller="Cart" asp-action="AddItem" id="addToCartForm">
+                    <input type="hidden" name="BookId" value="@Model.Book.Id" />
+
+                    <!-- Format Selection -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Format</label>
+                        <select id="formatType" name="FormatType" class="form-select" required>
+                            <option value="Physical">📘 Physical</option>
+                            @if (Model.Book.HasPDF)
+                            {
+                                <option value="Pdf">💻 PDF</option>
+                                @if (Model.Book.IsBorrowable)
+                                {
+                                    <option value="Borrow">📖 Borrow PDF</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Borrow Days (only shows if Borrow selected) -->
+                    <div class="mb-3 d-none" id="borrowDaysWrapper">
+                        <label class="form-label fw-bold">Days to Borrow</label>
+                        <input type="number" id="borrowDays" name="Days" class="form-control" min="1" max="30" />
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Quantity</label>
+                        <input type="number" id="quantity" name="Quantity" class="form-control" min="1" value="1" required />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmAddToCart" class="btn btn-success">Add to Cart</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    @* <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const formatSelect = document.getElementById("formatType"); // your dropdown/radio for format
+            const borrowDaysWrapper = document.getElementById("borrowDaysWrapper");
+
+            if (formatSelect) {
+                formatSelect.addEventListener("change", function () {
+                    if (this.value.toLowerCase() === "borrow") {
+                        borrowDaysWrapper.classList.remove("d-none");
+                    } else {
+                        borrowDaysWrapper.classList.add("d-none");
+                    }
+                });
+            }
+        });
+    </script> *@
+
+
+    <script>
+        document.getElementById("confirmAddToCart").addEventListener("click", function () {
+            const form = document.getElementById("addToCartForm");
+            const messageBox = document.getElementById("addToCartMessage");
+
+            const formatType = form.querySelector("[name='FormatType']").value;
+
+                   const request = {
+            BookId: form.querySelector("[name='BookId']").value,
+            Quantity: parseInt(form.querySelector("[name='Quantity']").value),
+            FormatType: formatType,
+            Days: formatType.toLowerCase() === "borrow"
+                ? parseInt(form.querySelector("[name='Days']").value) || 0
+                : null
+        };
+
+
+            fetch('/Cart/AddItem', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(request)
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log("Response:", data);
+
+                if (data.success) {
+                    messageBox.innerHTML = `<div class="alert alert-success">✅ ${data.message}</div>`;
+
+                    setTimeout(() => {
+                        bootstrap.Modal.getInstance(document.getElementById("addToCartModal")).hide();
+                        messageBox.innerHTML = "";
+                    }, 1500);
+                } else {
+                    messageBox.innerHTML = `<div class="alert alert-danger">❌ ${data.message}</div>`;
+                }
+            })
+            .catch(err => {
+                console.error("Error:", err);
+                messageBox.innerHTML = `<div class="alert alert-danger">⚠ Something went wrong</div>`;
+            });
+        });
+
+
+
+    </script>
+}
+

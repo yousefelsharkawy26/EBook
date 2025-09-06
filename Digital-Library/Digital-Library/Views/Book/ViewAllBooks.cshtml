@@ -101,7 +101,7 @@
 
                 </div>
                 <div class="row product-content product-store">
-                    @foreach(var book in Model)
+                    @foreach (var book in Model)
                     {
                         <div class="col-lg-3 col-md-4 mb-4">
                             <div class="card position-relative p-4 border rounded-3">
@@ -109,7 +109,8 @@
                                     <p class="bg-primary py-1 px-3 fs-6 text-white rounded-2">10% off</p>
                                 </div>
                                 <img src="~/@book.ImageBookCoverPath" class="img-fluid shadow-sm" alt="product item">
-                                <h6 class="mt-4 mb-0 fw-bold"><a href="details.html">@book.Title</a></h6>
+                                <h6 class="mt-4 mb-0 fw-bold"><a asp-action="Details" asp-route-id="@book.Id">@book.Title</a></h6>
+
                                 <div class="review-content d-flex">
                                     <p class="my-2 me-2 fs-6 text-black-50">@book.Author</p>
 
@@ -133,7 +134,7 @@
                                 </div>
 
                                 <span class="price text-primary fw-bold mb-2 fs-5">Physical : $@book.PricePhysical</span>
-                                @if(book.PricePdf != null)
+                                @if (book.PricePdf != null)
                                 {
                                     <span class="price text-primary fw-bold mb-2 fs-5">PDF : $@book.PricePdf</span>
 

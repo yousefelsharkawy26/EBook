@@ -5,6 +5,7 @@ using Digital_Library.Service.Implementation;
 using Digital_Library.Service.Interface;
 using Digital_Library.Service.Seed;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace Digital_Library
 {
@@ -20,11 +21,20 @@ namespace Digital_Library
 			{
 				option.UseSqlServer(builder.Configuration.GetConnectionString("DevConn"));
 			});
-			#endregion
+            #endregion
 
-			#region Dependency injections
+            //add on detail cart
+            builder.Services.AddControllersWithViews()
+                    .AddJsonOptions(options =>
+                    {
+                        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                    });
 
-			builder.Services.Add_Module_Infrastructure_Dependencies()
+
+            #region Dependency injections
+
+            builder.Services.Add_Module_Infrastructure_Dependencies()
 .Add_Module_Service_Dependencies()
 .Add_Module_Configuration_Services(builder.Configuration);
 
