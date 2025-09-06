@@ -1,0 +1,173 @@
+﻿@model Digital_Library.Core.ViewModels.BookDetailsViewModel
+
+@{
+    ViewData["Title"] = "My Book Details";
+}
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .book-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #0d3b66; /* Deep navy */
+    }
+
+    .book-author {
+        color: #555;
+        font-size: 1.1rem;
+    }
+
+    .custom-badge {
+        font-size: 0.9rem;
+        padding: 0.5em 0.75em;
+        border-radius: 50rem;
+    }
+
+    .price-box {
+        background: #f9f9f9;
+        border-left: 4px solid #f4a261; /* Warm gold */
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+
+    /* 🎨 Button Styles */
+    .btn-custom {
+        border-radius: 50px;
+        font-weight: 600;
+        padding: 0.6rem 1.6rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn-outline-dark {
+        color: #0d3b66;
+        border: 2px solid #0d3b66;
+        background: transparent;
+    }
+
+        .btn-outline-dark:hover {
+            background: #0d3b66;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .btn-success {
+        background-color: #2a9d8f;
+        border-color: #2a9d8f;
+    }
+
+        .btn-success:hover {
+            background-color: #21867a;
+            border-color: #21867a;
+            transform: translateY(-2px);
+        }
+</style>
+
+
+<div class="container my-5">
+    <div class="row g-5">
+        <!-- Left: Book Cover -->
+        <div class="col-lg-4">
+            <div class="p-4 border rounded-4 shadow-sm bg-white text-center">
+                <img src="~/@Model.Book.ImageBookCoverPath"
+                     alt="Book Cover"
+                     class="img-fluid rounded-3"
+                     style="max-height: 450px; object-fit: contain;" />
+            </div>
+        </div>
+
+        <!-- Center: Book Info -->
+        <div class="col-lg-5">
+            <h1 class="book-title">@Model.Book.Title</h1>
+            <p class="book-author">by <strong>@Model.Book.Author</strong></p>
+
+            <div class="mb-3">
+                <span class="badge bg-warning text-dark custom-badge me-2">
+                    @Model.Book.Category?.CategoryName
+                </span>
+                <span class="badge @(Model.Book.Stock > 0 ? "bg-success" : "bg-danger") custom-badge">
+                    @(Model.Book.Stock > 0 ? "In Stock" : "Out of Stock")
+                </span>
+            </div>
+
+            <hr />
+
+            <!-- Pricing -->
+            <h4 class="fw-semibold mb-3 text-dark">💲 Pricing</h4>
+            <div class="d-flex flex-column gap-2 mb-4">
+                <div class="price-box d-flex justify-content-between">
+                    <span>Physical Copy</span>
+                    <strong>$@Model.Book.PricePhysical</strong>
+                </div>
+                @if (Model.Book.HasPDF)
+                {
+                    <div class="price-box d-flex justify-content-between">
+                        <span>PDF</span>
+                        <strong>$@Model.Book.PricePdf</strong>
+                    </div>
+                    @if (Model.Book.IsBorrowable)
+                    {
+                        <div class="price-box d-flex justify-content-between">
+                            <span>Borrow / Day</span>
+                            <strong>$@Model.Book.PricePDFPerDay</strong>
+                        </div>
+                    }
+                }
+            </div>
+
+            <!-- Description -->
+            <h4 class="fw-semibold mb-2 text-dark">📖 Description</h4>
+            <p style="color:#0d3b66;">@Model.Book.Description</p>
+
+
+            <!-- Actions -->
+            <div class="mt-4 d-flex flex-wrap gap-3">
+                <a asp-action="Index" class="btn btn-outline-dark btn-custom">
+                    ⬅ Back
+                </a>
+                
+            </div>
+
+        </div>
+
+        <!-- Right: Related Books -->
+        <div class="col-lg-3">
+            <div class="p-4 border rounded-4 shadow-sm bg-white">
+                <h5 class="fw-bold mb-3 text-dark">📚 Related Books</h5>
+
+                @if (Model.RelatedBooks.Any())
+                {
+                    @foreach (var related in Model.RelatedBooks)
+                    {
+                        <div class="d-flex mb-3">
+                            <img src="~/@related.ImageBookCoverPath" alt="@related.Title"
+                                 class="rounded me-3"
+                                 style="width:60px; height:80px; object-fit:cover;" />
+                            <div>
+                                <p class="mb-1 fw-semibold text-dark">@related.Title</p>
+                                <p class="book-author">by @related.Author</p><br />
+                                <span class="text-primary fw-bold">$@related.PricePhysical</span><br />
+                                <a asp-action="MyDetails" asp-route-id="@related.Id" class="small text-decoration-none">
+                                    View →
+                                </a>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted">No related books found.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+

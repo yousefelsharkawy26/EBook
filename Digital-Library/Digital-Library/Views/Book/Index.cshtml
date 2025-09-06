@@ -1,174 +1,174 @@
 ﻿@model IEnumerable<Digital_Library.Core.Models.Book>
 
 @{
- ViewData["Title"] = "My Books";
+    ViewData["Title"] = "My Books";
 }
 
 <style>
- .table thead th {
-  background: #f8f9fa;
-  font-weight: 600;
-  color: #495057;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  text-align: center;
-  vertical-align: middle;
- }
+    .table thead th {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        text-align: center;
+        vertical-align: middle;
+    }
 
- .table tbody td {
-  vertical-align: middle;
-  text-align: center;
- }
+    .table tbody td {
+        vertical-align: middle;
+        text-align: center;
+    }
 
-  .table tbody td:first-child {
-   text-align: left;
-  }
+        .table tbody td:first-child {
+            text-align: left;
+        }
 
- .book-img {
-  width: 45px;
-  height: 45px;
-  object-fit: cover;
-  border-radius: 50%;
-  margin-right: 10px;
- }
+    .book-img {
+        width: 45px;
+        height: 45px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
 
- .dropdown-toggle::after {
-  display: none;
- }
+    .dropdown-toggle::after {
+        display: none;
+    }
 
- .action-btn {
-  background: none;
-  border: none;
-  color: #6c757d;
-  font-size: 1.4rem;
- }
+    .action-btn {
+        background: none;
+        border: none;
+        color: #6c757d;
+        font-size: 1.4rem;
+    }
 
-  .action-btn:hover {
-   color: #000;
-  }
+        .action-btn:hover {
+            color: #000;
+        }
 
- .dropdown-menu {
-  min-width: 160px;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
- }
+    .dropdown-menu {
+        min-width: 160px;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
 
- .dropdown-item i {
-  font-size: 1rem;
- }
+    .dropdown-item i {
+        font-size: 1rem;
+    }
 </style>
 
 <div class="container mt-4">
- <div class="d-flex justify-content-between align-items-center mb-4">
-  <h2 class="fw-bold">📚 My Books</h2>
-  <a asp-action="AddBook" class="btn btn-primary">
-   <i class="bi bi-plus-circle me-1"></i> Add New Book
-  </a>
- </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">📚 My Books</h2>
+        <a asp-action="AddBook" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> Add New Book
+        </a>
+    </div>
 
- <!-- Alerts -->
- @if (TempData["SuccessMessage"] != null)
- {
-  <div class="alert alert-success">@TempData["SuccessMessage"]</div>
- }
- @if (TempData["ErrorMessage"] != null)
- {
-  <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
- }
-
- <div class="table-responsive">
-  <table class="table align-middle table-hover shadow-sm bg-white">
-   <thead>
-    <tr>
-     <th>Book</th>
-     <th>Category</th>
-     <th>Prices</th>
-     <th>Stock</th>
-     <th>Actions</th>
-    </tr>
-   </thead>
-   <tbody>
-    @foreach (var book in Model)
+    <!-- Alerts -->
+    @if (TempData["SuccessMessage"] != null)
     {
-     <tr>
-      <!-- Book with Image + Title + Author -->
-      <td>
-       <div class="d-flex align-items-center">
-        <img src="~/@book.ImageBookCoverPath"
-             alt="@book.Title"
-             class="book-img" />
-        <div>
-         <p class="fw-bold mb-0">@book.Title</p>
-         <p class="text-muted mb-0 small">by @book.Author</p>
-        </div>
-       </div>
-      </td>
-
-      <!-- Category -->
-      <td>
-       <span class="badge bg-light text-dark">
-        @book.Category?.CategoryName
-       </span>
-      </td>
-
-      <!-- Prices -->
-      <td>
-       <span class="badge bg-dark me-1">Physical: @book.PricePhysical.ToString("C")</span>
-       @if (book.HasPDF)
-       {
-        <span class="badge bg-info text-dark me-1">PDF: @book.PricePdf?.ToString("C")</span>
-        @if (book.IsBorrowable)
-        {
-         <span class="badge bg-warning text-dark">Borrow/Day: @book.PricePDFPerDay?.ToString("C")</span>
-        }
-       }
-      </td>
-
-      <!-- Stock -->
-      <td>
-       <span class="fw-bold">@book.Stock</span>
-      </td>
-
-      <!-- Actions Dropdown -->
-      <td>
-       <div class="dropdown text-center">
-        <button class="action-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-         <i class="bi bi-three-dots-vertical"></i>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end">
-         @* Show PDF if available *@
-         @if (book.HasPDF)
-         {
-          <li>
-           <a class="dropdown-item" asp-action="ShowPdf" asp-route-id="@book.Id" target="_blank">
-            <i class="bi bi-file-earmark-pdf me-2 text-danger"></i> Show PDF
-           </a>
-          </li>
-         }
-
-         <li>
-          <a class="dropdown-item" asp-action="EditBook" asp-route-id="@book.Id">
-           <i class="bi bi-pencil-square me-2 text-warning"></i> Edit
-          </a>
-         </li>
-         <li>
-          <a class="dropdown-item" asp-action="Details" asp-route-id="@book.Id">
-           <i class="bi bi-info-circle me-2 text-info"></i> Details
-          </a>
-         </li>
-         <li>
-          <form asp-action="DeleteBook" asp-route-id="@book.Id" method="post" onsubmit="return confirm('Are you sure you want to delete this book?');">
-           <button type="submit" class="dropdown-item text-danger">
-            <i class="bi bi-trash me-2"></i> Delete
-           </button>
-          </form>
-         </li>
-        </ul>
-       </div>
-      </td>
-     </tr>
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
     }
-   </tbody>
-  </table>
- </div>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="table-responsive">
+        <table class="table align-middle table-hover shadow-sm bg-white">
+            <thead>
+                <tr>
+                    <th>Book</th>
+                    <th>Category</th>
+                    <th>Prices</th>
+                    <th>Stock</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var book in Model)
+                {
+                    <tr>
+                        <!-- Book with Image + Title + Author -->
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="~/@book.ImageBookCoverPath"
+                                     alt="@book.Title"
+                                     class="book-img" />
+                                <div>
+                                    <p class="fw-bold mb-0">@book.Title</p>
+                                    <p class="text-muted mb-0 small">by @book.Author</p>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Category -->
+                        <td>
+                            <span class="badge bg-light text-dark">
+                                @book.Category?.CategoryName
+                            </span>
+                        </td>
+
+                        <!-- Prices -->
+                        <td>
+                            <span class="badge bg-dark me-1">Physical: @book.PricePhysical.ToString("C")</span>
+                            @if (book.HasPDF)
+                            {
+                                <span class="badge bg-info text-dark me-1">PDF: @book.PricePdf?.ToString("C")</span>
+                                @if (book.IsBorrowable)
+                                {
+                                    <span class="badge bg-warning text-dark">Borrow/Day: @book.PricePDFPerDay?.ToString("C")</span>
+                                }
+                            }
+                        </td>
+
+                        <!-- Stock -->
+                        <td>
+                            <span class="fw-bold">@book.Stock</span>
+                        </td>
+
+                        <!-- Actions Dropdown -->
+                        <td>
+                            <div class="dropdown text-center">
+                                <button class="action-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    @* Show PDF if available *@
+                                    @if (book.HasPDF)
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-action="ShowPdf" asp-route-id="@book.Id" target="_blank">
+                                                <i class="bi bi-file-earmark-pdf me-2 text-danger"></i> Show PDF
+                                            </a>
+                                        </li>
+                                    }
+
+                                    <li>
+                                        <a class="dropdown-item" asp-action="EditBook" asp-route-id="@book.Id">
+                                            <i class="bi bi-pencil-square me-2 text-warning"></i> Edit
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-action="MyDetails" asp-route-id="@book.Id">
+                                            <i class="bi bi-info-circle me-2 text-info"></i> Details
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <form asp-action="DeleteBook" asp-route-id="@book.Id" method="post" onsubmit="return confirm('Are you sure you want to delete this book?');">
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="bi bi-trash me-2"></i> Delete
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
