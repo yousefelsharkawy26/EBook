@@ -6,14 +6,14 @@
 @model IEnumerable<Digital_Library.Core.Models.OrderHeader>
 
 @{
- ViewData["Title"] = "Vendor Orders";
+ ViewData["Title"] = "My Orders";
 
  var headers = (Model ?? Enumerable.Empty<Digital_Library.Core.Models.OrderHeader>()).ToList();
 
- Func<Digital_Library.Core.Models.OrderHeader, decimal> VendorTotal = h =>
+ Func<Digital_Library.Core.Models.OrderHeader, decimal> HeaderTotal = h =>
      h?.OrderDetails?.Sum(d => d.Price * d.Quantity) ?? 0m;
 
- var totalRevenue = headers.Sum(VendorTotal);
+ var totalSpent = headers.Sum(HeaderTotal);
  var statusGroups = headers
      .GroupBy(h => h.Status)
      .Select(g => new { Status = g.Key, Count = g.Count() })
@@ -21,7 +21,6 @@
      .ToList();
 
  string FormatCurrency(decimal amount) => amount.ToString("C");
- var currencySymbol = CultureInfo.CurrentCulture.NumberFormat.CurrencySymbol;
 }
 
 <style>
@@ -182,6 +181,51 @@
    background: #f3f4f6;
   }
 
+ .btn-toggle {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+ }
+
+ .btn-view {
+  background: #fff;
+ }
+
+ .items-container {
+  padding: 12px 12px 0;
+  background: #fafafa;
+  border: 1px dashed #e5e7eb;
+  border-radius: 8px;
+ }
+
+ .item {
+  display: grid;
+  grid-template-columns: 56px 2fr 1fr 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+ }
+
+  .item:last-child {
+   border-bottom: none;
+  }
+
+  .item img {
+   width: 56px;
+   height: 56px;
+   object-fit: cover;
+   border-radius: 6px;
+  }
+
+  .item .title {
+   font-weight: 600;
+  }
+
+  .item .meta {
+   color: #6b7280;
+   font-size: 12px;
+  }
+
  @@media (max-width: 900px) {
   .filters {
    grid-template-columns: 1fr 1fr;
@@ -191,20 +235,25 @@
    flex-direction: column;
    align-items: flex-start;
   }
+
+  .item {
+   grid-template-columns: 56px 1fr;
+   grid-auto-rows: auto;
+  }
  }
 </style>
 
 <div class="orders-page">
  <div class="orders-header">
-  <div class="orders-title">📦 My Library Orders</div>
+  <div class="orders-title">🧾 My Orders</div>
   <div class="summary">
    <div class="summary-card">
-    <span>Orders:</span>
+    <span>Shipments:</span>
     <strong id="orders-count">@headers.Count</strong>
    </div>
    <div class="summary-card">
-    <span>Revenue:</span>
-    <strong id="orders-revenue" data-curr="@currencySymbol">@FormatCurrency(totalRevenue)</strong>
+    <span>Total spent (by shipments):</span>
+    <strong id="orders-revenue">@FormatCurrency(totalSpent)</strong>
    </div>
    <div class="status-chips">
     @foreach (var g in statusGroups)
@@ -216,7 +265,7 @@
  </div>
 
  <div class="filters">
-  <input type="text" id="searchInput" placeholder="Search by Order ID or Customer..." />
+  <input type="text" id="searchInput" placeholder="Search by Order ID or Vendor..." />
   <select id="statusFilter">
    <option value="">All Statuses</option>
    @foreach (var s in Enum.GetValues(typeof(Status)).Cast<Status>())
@@ -235,7 +284,7 @@
  @if (!headers.Any())
  {
   <div class="text-center py-4" style="padding: 24px; text-align:center;">
-   <div>There are no orders yet.</div>
+   <div>You have no orders yet.</div>
   </div>
  }
  else
@@ -245,7 +294,7 @@
     <tr>
      <th>Order</th>
      <th>Date</th>
-     <th>Customer</th>
+     <th>Vendor</th>
      <th>Status</th>
      <th class="text-end" style="text-align:right;">Items</th>
      <th class="text-end" style="text-align:right;">Total</th>
@@ -256,18 +305,18 @@
     @foreach (var h in headers.OrderByDescending(h => h.Order?.OrderDate))
     {
      var order = h.Order;
-     var buyer = order?.User?.UserName ?? order?.User?.Email ?? "N/A";
+     var vendorName = h.Vendor?.User.FullName ?? "N/A";
      var statusText = h.Status.ToString();
      var statusCss = $"status-{statusText.ToLower()}";
      var itemsCount = h.OrderDetails?.Sum(d => d.Quantity) ?? (h.OrderDetails?.Count ?? 0);
      var dateIso = order?.OrderDate.ToString("s", CultureInfo.InvariantCulture) ?? "";
-     var vendorTotal = VendorTotal(h);
-     var totalInvariant = vendorTotal.ToString(CultureInfo.InvariantCulture);
+     var headerTotal = HeaderTotal(h);
+     var totalInvariant = headerTotal.ToString(CultureInfo.InvariantCulture);
 
      <tr class="order-row"
          data-orderid="@h.OrderId"
-         data-hid="@h.Id"
-         data-buyer="@buyer"
+         data-oid="@h.Id"
+         data-vendor="@vendorName"
          data-status="@statusText"
          data-date="@dateIso"
          data-total="@totalInvariant">
@@ -275,9 +324,9 @@
        <div style="display:flex; flex-direction:column;">
         <div style="display:flex; align-items:center; gap:8px;">
          <code>@h.OrderId</code>
-         <button class="btn btn-copy" data-copy="@h.OrderId" title="Copy ID">Copy</button>
+         <button class="btn btn-copy" data-copy="@h.OrderId" title="Copy Order ID">Copy</button>
         </div>
-        <span class="muted">Header #@h.Id</span>
+        <span class="muted">Shipment: @h.Id</span>
        </div>
       </td>
       <td>
@@ -291,15 +340,61 @@
         <div>N/A</div>
        }
       </td>
-      <td>@buyer</td>
-      <td>
-       <span class="status-badge @statusCss">@statusText</span>
-      </td>
+      <td>@vendorName</td>
+      <td><span class="status-badge @statusCss">@statusText</span></td>
       <td style="text-align:right;">@itemsCount</td>
-      <td style="text-align:right;"><strong>@FormatCurrency(vendorTotal)</strong></td>
-      <td class="actions">
-       <!-- Adjust action name/route as needed -->
-       <button class="btn btn-view" onclick="location.href='@Url.Action("VendorOrderDetails", "Order", new { id = h.Id })'">Details</button>
+      <td style="text-align:right;"><strong>@FormatCurrency(headerTotal)</strong></td>
+      <td class="actions" style="display:flex; gap:6px;">
+       <button class="btn btn-toggle" type="button">Items</button>
+       <button class="btn btn-view" onclick="location.href='@Url.Action("MyOrderDetails", "Order", new { id = h.Id })'">Details</button>
+      </td>
+     </tr>
+
+     <tr class="order-items" style="display:none;">
+      <td colspan="7">
+       <div class="items-container">
+        @if (h.OrderDetails != null && h.OrderDetails.Any())
+        {
+         foreach (var d in h.OrderDetails)
+         {
+          var book = d.Book;
+          var cover = book?.ImageBookCoverPath ?? "";
+          var title = book?.Title ?? "Unknown Book";
+          var format = d.FormatType.ToString();
+          var lineTotal = d.Price * d.Quantity;
+
+          <div class="item">
+           <div>
+            @if (!string.IsNullOrWhiteSpace(cover))
+            {
+             <img src="~/@cover" alt="@title" />
+            }
+           </div>
+           <div>
+            <div class="title">@title</div>
+            <div class="meta">Format: @format</div>
+           </div>
+           <div class="meta">Qty: @d.Quantity</div>
+           <div style="text-align:right;">
+            <div>@FormatCurrency(d.Price)</div>
+            <div class="meta">Total: @FormatCurrency(lineTotal)</div>
+           </div>
+          </div>
+         }
+        }
+        else
+        {
+         <div class="muted">No items found for this shipment.</div>
+        }
+
+        @if (order != null)
+        {
+         <div style="margin-top:12px; display:flex; gap:24px; flex-wrap:wrap;" class="muted">
+          <div>Ship to: @order.Address</div>
+          <div>Phone: @order.PhoneNumber</div>
+         </div>
+        }
+       </div>
       </td>
      </tr>
     }
@@ -311,13 +406,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
  (function(){
-     const $rows = $('#ordersTable .order-row');
-
-     function toNumber(val){
-         const n = parseFloat(val);
-         return isNaN(n) ? 0 : n;
-     }
-
+     function toNumber(val){ const n = parseFloat(val); return isNaN(n) ? 0 : n; }
      function inRange(date, start, end){
          if(!start && !end) return true;
          if(start && date < start) return false;
@@ -326,6 +415,7 @@
      }
 
      function applyFilters(){
+         const $rows = $('#ordersTable .order-row');
          const q = ($('#searchInput').val() || '').toString().trim().toLowerCase();
          const status = ($('#statusFilter').val() || '').toString();
          const startStr = $('#startDate').val();
@@ -340,28 +430,25 @@
          $rows.each(function(){
              const $r = $(this);
              const orderId = ($r.data('orderid') || '').toString().toLowerCase();
-             const buyer = ($r.data('buyer') || '').toString().toLowerCase();
+             const vendor = ($r.data('vendor') || '').toString().toLowerCase();
              const st = ($r.data('status') || '').toString();
              const dtStr = ($r.data('date') || '').toString();
              const dt = dtStr ? new Date(dtStr) : null;
              const total = toNumber($r.data('total'));
 
-             const matchesSearch = !q || orderId.includes(q) || buyer.includes(q);
+             const matchesSearch = !q || orderId.includes(q) || vendor.includes(q);
              const matchesStatus = !status || st === status;
-             const matchesDate = !dt || inRange(dt, start, end); // if missing date, don't filter it out
+             const matchesDate = !dt || inRange(dt, start, end);
 
              const show = matchesSearch && matchesStatus && matchesDate;
              $r.toggle(show);
+             $r.next('.order-items').toggle(show && $r.next('.order-items').data('expanded') === true);
 
-             if(show){
-                 visible++;
-                 sum += total;
-             }
+             if(show){ visible++; sum += total; }
          });
 
          $('#orders-count').text(visible);
-         const currency = $('#orders-revenue').data('curr') || '';
-         $('#orders-revenue').text(currency + sum.toFixed(2));
+         $('#orders-revenue').text(new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(sum));
      }
 
      $('#applyFilters').on('click', applyFilters);
@@ -374,8 +461,17 @@
      });
 
      $('#searchInput, #statusFilter, #startDate, #endDate').on('change keyup', function(e){
-         if(e.type === 'keyup' && e.key !== 'Enter') return; // apply on Enter for typing
+         if(e.type === 'keyup' && e.key !== 'Enter') return;
          applyFilters();
+     });
+
+     // Toggle items row
+     $(document).on('click', '.btn-toggle', function(){
+         const $row = $(this).closest('tr');
+         const $items = $row.next('.order-items');
+         const isVisible = $items.is(':visible');
+         $items.data('expanded', !isVisible);
+         $items.toggle(!isVisible);
      });
 
      // Copy Order ID

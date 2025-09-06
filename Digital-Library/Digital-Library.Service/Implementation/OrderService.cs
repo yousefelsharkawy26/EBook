@@ -24,7 +24,7 @@ namespace Digital_Library.Service.Services
 			_logger = logger;
 		}
 
-		public async Task<Response> CreateOrderAsync(string userId, List<OrderDetailRequest> items,string address,string phoneNumber)
+		public async Task<Response> CreateOrderAsync(string userId, List<OrderDetailRequest> items,PlaceOrderRequest request)
 		{
 			if (string.IsNullOrEmpty(userId) || items == null || !items.Any())
 			{
@@ -36,8 +36,8 @@ namespace Digital_Library.Service.Services
 				UserId = userId,
 				TotalAmount = items.Sum(i => i.Price * i.Quantity),
 				OrderHeaders = new List<OrderHeader>(),
-				Address= address,
-				PhoneNumber= phoneNumber
+				Address=request.Address,
+				PhoneNumber=request.PhoneNumber
 			};
 			foreach (var item in items)
 			{
@@ -72,6 +72,7 @@ namespace Digital_Library.Service.Services
 			{
 				await _unitOfWork.Orders.AddAsync(order);
 				await _unitOfWork.SaveChangesAsync();
+				await	MakeTransation(order.Id);
 				_logger.LogInformation("CreateOrderAsync: Order {OrderId} created successfully.", order.Id);
 				return Response.Ok("Order created successfully.");
 			}
@@ -154,6 +155,26 @@ namespace Digital_Library.Service.Services
 			_logger.LogInformation("Updated status of OrderHeader {OrderHeaderId} to {Status}", orderHeaderId, status);
 
 			return Response.Ok("OrderHeader status updated successfully", orderHeader);
+		}
+
+		private async Task<bool> MakeTransation(string orderId)
+		{
+			var transaction = new Transaction
+			{
+				OrderId = orderId,
+				TransactionDate = DateTime.UtcNow,
+				TransactionStatus=Status.Complete
+			};
+			try
+			{
+				await _unitOfWork.Transactions.AddAsync(transaction);
+				await _unitOfWork.SaveChangesAsync();
+				return	true;
+			}
+			catch (Exception)
+			{
+				return	false;
+			}
 		}
 	}
 }

@@ -19,7 +19,7 @@ namespace Digital_Library.Core.Models
 		public decimal Amount { get; set; }
 		public PaymentMethod PaymentMethod { get; set; }
 		public DateTime TransactionDate { get; set; }=	DateTime.Now;
-		public string ReferenceCode { get; set; }
+		public string ReferenceCode { get; set; }=	Guid.NewGuid().ToString().Replace("-", "").Substring(0, 10).ToUpper();
 		[ForeignKey(nameof(Order))]
 		[Required]
 		public string OrderId { get; set; }
