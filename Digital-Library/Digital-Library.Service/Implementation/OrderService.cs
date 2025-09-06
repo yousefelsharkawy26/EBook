@@ -24,52 +24,59 @@ namespace Digital_Library.Service.Services
 			_logger = logger;
 		}
 
-		public async Task<Response> CreateOrderAsync(string userId, List<OrderDetailRequest> items,PlaceOrderRequest request)
+		public async Task<Response> CreateOrderAsync(string userId, List<OrderDetailRequest> items, PlaceOrderRequest request)
 		{
 			if (string.IsNullOrEmpty(userId) || items == null || !items.Any())
 			{
 				_logger.LogWarning("CreateOrderAsync: Invalid userId or empty items list.");
-				return Response.Fail("Invalid  items list.");
+				return Response.Fail("Invalid items list.");
 			}
+
 			var order = new Order
 			{
 				UserId = userId,
 				TotalAmount = items.Sum(i => i.Price * i.Quantity),
 				OrderHeaders = new List<OrderHeader>(),
-				Address=request.Address,
-				PhoneNumber=request.PhoneNumber
+				Address = request.Address,
+				PhoneNumber = request.PhoneNumber
 			};
-			foreach (var item in items.GroupBy(s=>s.VendorId))
-			{
 
-				if (item.Quantity <= 0 || item.Price < 0)
-				{
-					_logger.LogWarning("CreateOrderAsync: Invalid item quantity or price.");
-					return Response.Fail("Invalid item quantity or price.");
-				}
-				var book = await _unitOfWork.Books.GetSingleAsync(b => b.Id == item.BookId);
-				if (book == null)
-				{
-					_logger.LogWarning("CreateOrderAsync: Book with ID {BookId} not found.", item.BookId);
-					return Response.Fail($"Book with ID {item.BookId} not found.");
-				}
-				order.OrderHeaders.Add(new OrderHeader
+			// نجمع الكتب حسب Vendor
+			foreach (var vendorGroup in items.GroupBy(s => s.VendorId))
+			{
+				var orderHeader = new OrderHeader
 				{
 					OrderId = order.Id,
-					VendorId = book.VendorId,
-					OrderDetails = new List<OrderDetail>
+					VendorId = vendorGroup.Key,
+					OrderDetails = new List<OrderDetail>()
+				};
+
+				foreach (var item in vendorGroup)
+				{
+					if (item.Quantity <= 0 || item.Price < 0)
 					{
-						new OrderDetail
-						{
-							BookId=item.BookId,
-							Quantity=item.Quantity,
-							Price=item.Price
-						}
+						_logger.LogWarning("CreateOrderAsync: Invalid item quantity or price.");
+						return Response.Fail("Invalid item quantity or price.");
 					}
-				});
 
+					var book = await _unitOfWork.Books.GetSingleAsync(b => b.Id == item.BookId);
+					if (book == null)
+					{
+						_logger.LogWarning("CreateOrderAsync: Book with ID {BookId} not found.", item.BookId);
+						return Response.Fail($"Book with ID {item.BookId} not found.");
+					}
 
+					orderHeader.OrderDetails.Add(new OrderDetail
+					{
+						BookId = item.BookId,
+						Quantity = item.Quantity,
+						Price = item.Price
+					});
+				}
+
+				order.OrderHeaders.Add(orderHeader);
 			}
+
 			try
 			{
 				await _unitOfWork.Orders.AddAsync(order);
@@ -83,6 +90,7 @@ namespace Digital_Library.Service.Services
 				return Response.Fail("Error creating order.");
 			}
 		}
+
 
 		public async Task<Response> GetOrderHeaderDetailsByIdAsync(string orderHeaderId)
 		{
