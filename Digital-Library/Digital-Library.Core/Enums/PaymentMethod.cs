@@ -9,6 +9,8 @@ namespace Digital_Library.Core.Enums
     public enum PaymentMethod
     {
         Paypal ,
-        Credit
+        CreditCard,
+        MasterCard,
+
     }
 }
