@@ -8,14 +8,17 @@ using System.Threading.Tasks;
 
 namespace Digital_Library.Core.ViewModels.Requests
 {
-	public class CartDetailRequest
-	{
-		[Required]
-		public int Quantity { get; set; }
-		[Required]
-		public FormatType FormatType { get; set; }
+    public class CartDetailRequest
+    {
+        [Required]
+        public int Quantity { get; set; }
+        [Required]
+        public FormatType FormatType { get; set; }
 
-		[Required]
-		public string BookId { get; set; }
-	}
+        [Required]
+        public string BookId { get; set; }
+
+        // Optional (only for borrow)
+        public int? Days { get; set; }
+    }
 }

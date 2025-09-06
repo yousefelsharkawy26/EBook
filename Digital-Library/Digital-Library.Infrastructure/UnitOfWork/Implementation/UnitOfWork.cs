@@ -17,6 +17,7 @@ namespace Digital_Library.Infrastructure.UnitOfWork.Implementation
 		public IBaseRepository<Category> Categories { get; }
 		public IBaseRepository<Order> Orders { get; }
 		public IBaseRepository<OrderDetail> OrderDetails { get; }
+		public IBaseRepository<OrderHeader> OrderHeaders { get; }
 		public IBaseRepository<Transaction> Transactions { get; }
 		public IBaseRepository<Vendor> Vendors { get; }
 
@@ -33,6 +34,7 @@ namespace Digital_Library.Infrastructure.UnitOfWork.Implementation
 			Transactions = new BaseRepository<Transaction>(_context);
 			Vendors = new BaseRepository<Vendor>(_context);
 			CartDetails = new BaseRepository<CartDetail>(_context);
+			OrderHeaders = new BaseRepository<OrderHeader>(_context);
 
 		}
 		public void Dispose()

@@ -7,12 +7,13 @@ namespace Digital_Library.Service.Interface;
 
 public interface IOrderService
 {
-	//Task<Response> CreateOrderAsync(string userId, List<OrderDetailRequest> items);
+	Task<Response> CreateOrderAsync(string userId, List<OrderDetailRequest> items, PlaceOrderRequest request);
 
-	//Task<IEnumerable<Order>> GetUserOrdersAsync(string userId);
+	Task<IQueryable<OrderHeader>> GetVendorOrders(string vendorId);
 
-	//Task<Response> GetOrderByIdAsync(string orderId);
+	Task<IQueryable<OrderHeader>> GetUserOrders(string UserId);
 
-	//Task<Response> UpdateOrderStatusAsync(string orderId, Status status);
+	Task<Response> GetOrderHeaderDetailsByIdAsync(string orderHeaderId);
 
+	Task<Response> UpdateOrderStatusAsync(string orderHeaderId, Status status);
 }

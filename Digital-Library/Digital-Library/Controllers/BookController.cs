@@ -1,213 +1,262 @@
 ﻿using Digital_Library.Core.Constant;
 using Digital_Library.Core.Filters;
 using Digital_Library.Core.Models;
+using Digital_Library.Core.ViewModels;
 using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Service.Implementation;
 using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 
 namespace Digital_Library.Controllers
 {
-	[Route("Book")]
-	public class BookController : Controller
-	{
-		private readonly IBookService bookService;
-		private readonly ICategoryService categoryService;
-		private readonly IVendorService vendorService;
-		private readonly IFileService fileService;
+    [Route("Book")]
+    public class BookController : Controller
+    {
+        private readonly IBookService bookService;
+        private readonly ICategoryService categoryService;
+        private readonly IVendorService vendorService;
+        private readonly ICartService cartService;
+        private readonly IFileService fileService;
 
-		public BookController(IBookService bookService, ICategoryService categoryService, IVendorService vendorService , IFileService fileService)
-		{
-			this.bookService = bookService;
-			this.categoryService = categoryService;
-			this.vendorService = vendorService;
-			this.fileService = fileService;
-		}
-		[HttpGet("Index")]
-		[Authorize(Roles = Roles.Vendor)]
-		public async Task<IActionResult> Index()
-		{
-			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			var vendorId = await vendorService.ReturnVendorIdFromUserId(userId);
-			if (!vendorId.Success)
-			{
-				return BadRequest();
-			}
-			var books = await bookService.GetAllBooks(new BookFilter { VendorId = (string)vendorId.Data });
+        public BookController(IBookService bookService, ICategoryService categoryService, IVendorService vendorService, IFileService fileService, ICartService cartService)
+        {
+            this.bookService = bookService;
+            this.categoryService = categoryService;
+            this.vendorService = vendorService;
+            this.fileService = fileService;
+            this.cartService = cartService;
+        }
+        [HttpGet("Index")]
+        [Authorize(Roles = Roles.Vendor)]
+        public async Task<IActionResult> Index()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var vendorId = await vendorService.ReturnVendorIdFromUserId(userId);
+            if (!vendorId.Success)
+            {
+                return BadRequest();
+            }
+            var books = await bookService.GetAllBooks(new BookFilter { VendorId = (string)vendorId.Data });
 
-			return View(books);
-		}
+            return View(books);
+        }
 
-		[HttpGet("AddBook")]
-		[Authorize(Roles = Roles.Vendor)]
-		public async Task<IActionResult> AddBook()
-		{
-			var categories = await categoryService.GetAllCategories();
-			ViewBag.Categories = categories.Select(c => new SelectListItem
-			{
-				Value = c.Id,
-				Text = c.CategoryName
-			}).ToList();
-			return View();
-		}
+        [HttpGet("AddBook")]
+        [Authorize(Roles = Roles.Vendor)]
+        public async Task<IActionResult> AddBook()
+        {
+            var categories = await categoryService.GetAllCategories();
+            ViewBag.Categories = categories.Select(c => new SelectListItem
+            {
+                Value = c.Id,
+                Text = c.CategoryName
+            }).ToList();
+            return View();
+        }
 
-		[HttpPost("AddBook")]
-		[ValidateAntiForgeryToken]
-		[Authorize(Roles = Roles.Vendor)]
-		public async Task<IActionResult> AddBook(BookRequest request)
-		{
-			if (!ModelState.IsValid)
-			{
-				var categories = await categoryService.GetAllCategories();
-				ViewBag.Categories = categories.Select(c => new SelectListItem
-				{
-					Value = c.Id,
-					Text = c.CategoryName
-				}).ToList();
+        [HttpPost("AddBook")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = Roles.Vendor)]
+        public async Task<IActionResult> AddBook(BookRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                var categories = await categoryService.GetAllCategories();
+                ViewBag.Categories = categories.Select(c => new SelectListItem
+                {
+                    Value = c.Id,
+                    Text = c.CategoryName
+                }).ToList();
 
-				return View(request);
-			}
+                return View(request);
+            }
 
-			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-			var vendorId = await vendorService.ReturnVendorIdFromUserId(userId);
-			if (!vendorId.Success)
-			{
-				return BadRequest();
-			}
-			var response = await bookService.AddBook(request, vendorId.Data.ToString());
+            var vendorId = await vendorService.ReturnVendorIdFromUserId(userId);
+            if (!vendorId.Success)
+            {
+                return BadRequest();
+            }
+            var response = await bookService.AddBook(request, vendorId.Data.ToString());
 
-			if (!response.Success)
-			{
-				ModelState.AddModelError("", response.Message);
-				var categories = await categoryService.GetAllCategories();
-				ViewBag.Categories = categories.Select(c => new SelectListItem
-				{
-					Value = c.Id,
-					Text = c.CategoryName
-				}).ToList();
+            if (!response.Success)
+            {
+                ModelState.AddModelError("", response.Message);
+                var categories = await categoryService.GetAllCategories();
+                ViewBag.Categories = categories.Select(c => new SelectListItem
+                {
+                    Value = c.Id,
+                    Text = c.CategoryName
+                }).ToList();
 
-				return View(request);
-			}
+                return View(request);
+            }
 
-			return RedirectToAction("Index", "Book");
-		}
+            return RedirectToAction("Index", "Book");
+        }
 
-		[HttpGet("Edit/{id}")]
-		[Authorize(Roles = Roles.Vendor)]
-		public async Task<IActionResult> EditBook(string id)
-		{
-			var response = await bookService.GetBookById(id);
-			if (!response.Success || response.Data == null)
-				return NotFound(response.Message);
+        [HttpGet("Edit/{id}")]
+        [Authorize(Roles = Roles.Vendor)]
+        public async Task<IActionResult> EditBook(string id)
+        {
+            var response = await bookService.GetBookById(id);
+            if (!response.Success || response.Data == null)
+                return NotFound(response.Message);
 
-			var book = response.Data as Book;
+            var book = response.Data as Book;
 
-			if (book == null)
-				return NotFound("Book data not found");
+            if (book == null)
+                return NotFound("Book data not found");
 
 
-			var request = new UpdateBookRequest
-			{
-				BookID = book.Id,
-				Title = book.Title,
-				Author = book.Author,
-				PricePhysical = book.PricePhysical,
-				PricePDF = book.PricePdf,
-				PricePDFPerDay = book.PricePDFPerDay,
-				Description = book.Description,
-				Stock = book.Stock,
-				HasPDF = book.HasPDF,
-				IsBorrowable = book.IsBorrowable,
-				CategoryID = book.CategoryID
-			};
+            var request = new UpdateBookRequest
+            {
+                BookID = book.Id,
+                Title = book.Title,
+                Author = book.Author,
+                PricePhysical = book.PricePhysical,
+                PricePDF = book.PricePdf,
+                PricePDFPerDay = book.PricePDFPerDay,
+                Description = book.Description,
+                Stock = book.Stock,
+                HasPDF = book.HasPDF,
+                IsBorrowable = book.IsBorrowable,
+                CategoryID = book.CategoryID
+            };
 
-			var categories = await categoryService.GetAllCategories();
-			ViewBag.Categories = categories.Select(c => new SelectListItem
-			{
-				Value = c.Id,
-				Text = c.CategoryName
-			}).ToList();
+            var categories = await categoryService.GetAllCategories();
+            ViewBag.Categories = categories.Select(c => new SelectListItem
+            {
+                Value = c.Id,
+                Text = c.CategoryName
+            }).ToList();
 
-			return View(request);
-		}
+            return View(request);
+        }
 
-		[HttpPost("Edit/{id}")]
-		[ValidateAntiForgeryToken]
-		[Authorize(Roles = Roles.Vendor)]
-		public async Task<IActionResult> EditBook(UpdateBookRequest request)
-		{
-			if (!ModelState.IsValid)
-			{
-				var categories = await categoryService.GetAllCategories();
-				ViewBag.Categories = categories.Select(c => new SelectListItem
-				{
-					Value = c.Id,
-					Text = c.CategoryName
-				}).ToList();
-				return View(request);
-			}
-			var response = await bookService.UpdateBook(request.BookID, request);
-			if (!response.Success)
-			{
-				ModelState.AddModelError("", response.Message);
-				var categories = await categoryService.GetAllCategories();
-				ViewBag.Categories = categories.Select(c => new SelectListItem
-				{
-					Value = c.Id,
-					Text = c.CategoryName
-				}).ToList();
-				return View(request);
-			}
-			return RedirectToAction("Index", "Book");
-		}
+        [HttpPost("Edit/{id}")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = Roles.Vendor)]
+        public async Task<IActionResult> EditBook(UpdateBookRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                var categories = await categoryService.GetAllCategories();
+                ViewBag.Categories = categories.Select(c => new SelectListItem
+                {
+                    Value = c.Id,
+                    Text = c.CategoryName
+                }).ToList();
+                return View(request);
+            }
+            var response = await bookService.UpdateBook(request.BookID, request);
+            if (!response.Success)
+            {
+                ModelState.AddModelError("", response.Message);
+                var categories = await categoryService.GetAllCategories();
+                ViewBag.Categories = categories.Select(c => new SelectListItem
+                {
+                    Value = c.Id,
+                    Text = c.CategoryName
+                }).ToList();
+                return View(request);
+            }
+            return RedirectToAction("Index", "Book");
+        }
 
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		[Authorize(Roles = Roles.Vendor)]
-		public async Task<IActionResult> DeleteBook(string id)
-		{
-			var response = await bookService.DeleteBook(id);
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = Roles.Vendor)]
+        public async Task<IActionResult> DeleteBook(string id)
+        {
+            var response = await bookService.DeleteBook(id);
 
-			if (!response.Success)
-			{
-				TempData["ErrorMessage"] = response.Message;
-				return RedirectToAction("Index", "Books");
-			}
+            if (!response.Success)
+            {
+                TempData["ErrorMessage"] = response.Message;
+                return RedirectToAction("Index", "Books");
+            }
 
-			TempData["SuccessMessage"] = "Book deleted successfully.";
-			return RedirectToAction("Index", "Book");
-		}
+            TempData["SuccessMessage"] = "Book deleted successfully.";
+            return RedirectToAction("Index", "Book");
+        }
 
-		[HttpGet("Details/{id}")]
-		public async Task<IActionResult> Details(string id)
-		{
-			var bookResponse = await bookService.GetBookById(id);
-			if (!bookResponse.Success)
-			{
-				return NotFound();
-			}
-			return View(bookResponse.Data as Book);
-		}
+        [HttpGet("MyDetails/{id}")]
+        [Authorize(Roles = Roles.Vendor)]
+        public async Task<IActionResult> MyDetails(string id)
+        {
+            var bookResponse = await bookService.GetBookById(id);
+            if (!bookResponse.Success || bookResponse.Data is not Book book)
+            {
+                return NotFound();
+            }
 
-		[HttpGet("ShowPdf/{id}")]
-		[Authorize(Roles = Roles.Vendor)]
-		public async Task<IActionResult> ShowPdf(string id)
-		{
-			if (string.IsNullOrEmpty(id))
-				return NotFound();
+            // Fetch related books (same category, excluding current)
+            var response = await bookService.GetAllBooks();
+            var relatedBooks = response
+                .Where(b => b.CategoryID == book.CategoryID && b.Id != book.Id)
+                .Take(3)
+                .ToList();
 
-			var res = await bookService.GetBookById(id);
-			var book = res.Data as Book;
-			if (book == null || !book.HasPDF || string.IsNullOrEmpty(book.PDFFilePath))
-				return NotFound("PDF not available");
+            var viewModel = new BookDetailsViewModel
+            {
+                Book = book,
+                RelatedBooks = relatedBooks
+            };
 
-			ViewBag.PdfPath = book.PDFFilePath;
-			return View();
-		}
+            return View(viewModel);
+        }
+
+
+        [HttpGet("Details/{id}")]
+        public async Task<IActionResult> Details(string id)
+        {
+            var bookResponse = await bookService.GetBookById(id);
+            if (!bookResponse.Success || bookResponse.Data is not Book book)
+            {
+                return NotFound();
+            }
+
+            // Fetch related books (same category, excluding current)
+            var response = await bookService.GetAllBooks();
+            var relatedBooks = response
+                .Where(b => b.CategoryID == book.CategoryID && b.Id != book.Id)
+                .Take(3)
+                .ToList();
+
+            var viewModel = new BookDetailsViewModel
+            {
+                Book = book,
+                RelatedBooks = relatedBooks
+            };
+
+            return View(viewModel);
+        }
+
+
+
+
+
+        [HttpGet("ShowPdf/{id}")]
+        [Authorize(Roles = Roles.Vendor)]
+        public async Task<IActionResult> ShowPdf(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return NotFound();
+
+            var res = await bookService.GetBookById(id);
+            var book = res.Data as Book;
+            if (book == null || !book.HasPDF || string.IsNullOrEmpty(book.PDFFilePath))
+                return NotFound("PDF not available");
+
+            ViewBag.PdfPath = book.PDFFilePath;
+            return View();
+        }
 
         [HttpGet("allbooks")]
         public async Task<IActionResult> ViewAllBooks(string category, string author, string priceRange, string sort)

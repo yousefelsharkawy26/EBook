@@ -1,4 +1,14 @@
 ﻿/* nav tabs */
+.logo {
+    max-height: 50px;
+}
+
+.navbar-icon, .search, .user, .cart {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
 .nav-tabs .nav-link {
     color: var(--black-color);
 }

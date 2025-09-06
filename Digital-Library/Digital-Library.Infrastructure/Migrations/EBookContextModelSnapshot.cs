@@ -186,8 +186,16 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
@@ -215,8 +223,9 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.Property<int>("FormatType")
                         .HasColumnType("int");
 
-                    b.Property<int>("OrderHeaderId")
-                        .HasColumnType("int");
+                    b.Property<string>("OrderHeaderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -235,11 +244,8 @@ namespace Digital_Library.Infrastructure.Migrations
 
             modelBuilder.Entity("Digital_Library.Core.Models.OrderHeader", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("OrderId")
                         .IsRequired()
@@ -269,7 +275,7 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("OrderId")
+                    b.Property<string>("OrderHeaderId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
@@ -288,7 +294,7 @@ namespace Digital_Library.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderId");
+                    b.HasIndex("OrderHeaderId");
 
                     b.ToTable("Transactions");
                 });
@@ -709,13 +715,13 @@ namespace Digital_Library.Infrastructure.Migrations
 
             modelBuilder.Entity("Digital_Library.Core.Models.Transaction", b =>
                 {
-                    b.HasOne("Digital_Library.Core.Models.Order", "Order")
+                    b.HasOne("Digital_Library.Core.Models.OrderHeader", "OrderHeader")
                         .WithMany("Transactions")
-                        .HasForeignKey("OrderId")
+                        .HasForeignKey("OrderHeaderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Order");
+                    b.Navigation("OrderHeader");
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.Vendor", b =>
@@ -813,13 +819,13 @@ namespace Digital_Library.Infrastructure.Migrations
             modelBuilder.Entity("Digital_Library.Core.Models.Order", b =>
                 {
                     b.Navigation("OrderHeaders");
-
-                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.OrderHeader", b =>
                 {
                     b.Navigation("OrderDetails");
+
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.Vendor", b =>

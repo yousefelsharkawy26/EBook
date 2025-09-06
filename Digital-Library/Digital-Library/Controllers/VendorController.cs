@@ -1,4 +1,6 @@
 ﻿using Digital_Library.Core.Constant;
+using Digital_Library.Core.Enum;
+using Digital_Library.Core.Models;
 using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
@@ -111,9 +113,9 @@ namespace Digital_Library.Controllers
 			return RedirectToAction(nameof(Dashboard));
 		}
 
-		[HttpGet("VendorOrders")]
+		[HttpGet("MyLibraryOrders")]
 		[Authorize(Roles = Roles.Vendor)]
-		public async Task<IActionResult> VendorOrders()
+		public async Task<IActionResult> MyLibraryOrders()
 		{
 			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			if (userId == null)
@@ -121,11 +123,41 @@ namespace Digital_Library.Controllers
 			var vendorIdResponse = await vendorService.ReturnVendorIdFromUserId(userId);
 			if (!vendorIdResponse.Success || vendorIdResponse.Data == null)
 				return NotFound("Vendor profile not found");
-			//var orders = await orderService.GetUserOrdersAsync(vendorIdResponse.Data as string);
+			var orders = await orderService.GetVendorOrders(vendorIdResponse.Data as string);
 
-			return View(); 
+			return View(orders); 
 		}
+		[HttpPost("ChangeStatus")]
+		[Authorize(Roles = Roles.Vendor)]
+		public async Task<IActionResult> ChangeStatus(string orderHeaderId, Status status)
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if (userId == null)
+				return Forbid();
 
+			var vendorIdResponse = await vendorService.ReturnVendorIdFromUserId(userId);
+			if (!vendorIdResponse.Success || vendorIdResponse.Data == null)
+				return NotFound("Vendor profile not found");
 
+			var vendorId = vendorIdResponse.Data as string;
+
+			var orderHeaderResponse = await orderService.GetOrderHeaderDetailsByIdAsync(orderHeaderId);
+			if (!orderHeaderResponse.Success || orderHeaderResponse.Data == null)
+				return NotFound("Order not found");
+
+			var orderHeader = orderHeaderResponse.Data as OrderHeader;
+			if (orderHeader == null || orderHeader.VendorId != vendorId)
+				return Forbid("You are not authorized to change this order's status.");
+
+			var updateResponse = await orderService.UpdateOrderStatusAsync(orderHeaderId, status);
+			if (!updateResponse.Success)
+			{
+				TempData["ErrorMessage"] = updateResponse.Message ?? "Failed to update order status.";
+				return RedirectToAction(nameof(MyLibraryOrders));
+			}
+
+			TempData["SuccessMessage"] = "Order status updated successfully.";
+			return RedirectToAction(nameof(MyLibraryOrders));
+		}
 	}
 }

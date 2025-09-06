@@ -17,12 +17,18 @@ namespace Digital_Library.Core.Models
 		[Required]
 		public decimal TotalAmount { get; set; }
 
-		public ICollection<Transaction>? Transactions { get; set; }
+
 		public ICollection<OrderHeader>? OrderHeaders { get; set; }
 		public User? User { get; set; }
 		[ForeignKey(nameof(User))]
 		[Required]
 		public string UserId { get; set; }
+		[Required]
+		[Phone]
+		public string PhoneNumber { get; set; }
+
+		[Required]
+		public string Address { get; set; }
 
 	}
 }

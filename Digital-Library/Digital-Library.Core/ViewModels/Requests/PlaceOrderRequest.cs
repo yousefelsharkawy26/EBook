@@ -8,17 +8,14 @@ using System.Threading.Tasks;
 
 namespace Digital_Library.Core.ViewModels.Requests
 {
-	public class OrderDetailRequest
+	public class PlaceOrderRequest
 	{
 		[Required]
-		public FormatType FormatType { get; set; }
+		public string Address { get; set; }
 		[Required]
-		public decimal Price { get; set; }
+		public string PhoneNumber { get; set; }
+
 		[Required]
-		public int Quantity { get; set; }
-		[Required]
-		public string BookId { get; set; }
-		[Required]
-		public string VendorId { get; set; }
+		public PaymentMethod PaymentMethod { get; set; }
 	}
 }

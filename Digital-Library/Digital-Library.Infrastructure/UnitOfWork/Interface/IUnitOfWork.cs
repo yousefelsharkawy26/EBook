@@ -12,6 +12,7 @@ public interface IUnitOfWork : IDisposable
 	IBaseRepository<Category> Categories {  get; }
 	IBaseRepository<Order> Orders {  get; }
 	IBaseRepository<OrderDetail> OrderDetails {  get; }
+	IBaseRepository<OrderHeader> OrderHeaders {  get; }
 	IBaseRepository<Transaction> Transactions {  get; }
 	IBaseRepository<Vendor> Vendors {  get; }
 

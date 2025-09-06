@@ -5,6 +5,7 @@ using Digital_Library.Service.Implementation;
 using Digital_Library.Service.Interface;
 using Digital_Library.Service.Seed;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace Digital_Library
 {
@@ -22,12 +23,21 @@ namespace Digital_Library
 			});
             #endregion
 
+            //add on detail cart
+            builder.Services.AddControllersWithViews()
+                    .AddJsonOptions(options =>
+                    {
+                        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                    });
+
+
             #region Dependency injections
 
             builder.Services.Add_Module_Infrastructure_Dependencies()
-							.Add_Module_Service_Dependencies()
-       .Add_Module_Configuration_Services(builder.Configuration);
-																				
+.Add_Module_Service_Dependencies()
+.Add_Module_Configuration_Services(builder.Configuration);
+
 			#endregion
 
 			var app = builder.Build();
@@ -52,12 +62,12 @@ namespace Digital_Library
 							.WithStaticAssets();
 			using (var scope = app.Services.CreateScope())
 			{
-				var services =  scope.ServiceProvider;
+				var services = scope.ServiceProvider;
 				var context = services.GetRequiredService<EBookContext>();
 				//context.Database.Migrate();
 				RoleSeeder.SeedRolesAsync(services).Wait();
-            }
-            
+			}
+
 			app.Run();
 		}
 	}

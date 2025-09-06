@@ -19,6 +19,18 @@ namespace Digital_Library.Controllers
 
         public async Task<IActionResult> Index()
         {
+            await Task.CompletedTask;
+
+            return View();
+        }
+
+        public IActionResult About()
+        {
+            return View();
+        }
+
+        public IActionResult Contact()
+        {
             return View();
         }
 
