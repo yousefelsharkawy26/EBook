@@ -121,9 +121,9 @@ namespace Digital_Library.Controllers
 			var vendorIdResponse = await vendorService.ReturnVendorIdFromUserId(userId);
 			if (!vendorIdResponse.Success || vendorIdResponse.Data == null)
 				return NotFound("Vendor profile not found");
-			var orders = await orderService.GetUserOrdersAsync(vendorIdResponse.Data as string);
+			//var orders = await orderService.GetUserOrdersAsync(vendorIdResponse.Data as string);
 
-			return View(orders); 
+			return View(); 
 		}
 
 

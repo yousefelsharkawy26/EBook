@@ -19,17 +19,13 @@ namespace Digital_Library.Core.Models
 		public decimal Price { get; set; }
 		[Required]
 		public int Quantity { get; set; }
-		public Order? Order { get; set; }
-		[ForeignKey(nameof(Order))]
-		[Required]
-		public string OrderId { get; set; }
 		public Book? Book { get; set; }
 		[ForeignKey(nameof(Book))]
 		[Required]
 		public string BookId { get; set; }
-		public Vendor? Vendor { get; set; }
-		[ForeignKey(nameof(Vendor))]
+		public OrderHeader? OrderHeader { get; set; }
+		[ForeignKey(nameof(OrderHeader))]
 		[Required]
-		public string VendorId { get; set; }
+		public int OrderHeaderId { get; set; }
 	}
 }

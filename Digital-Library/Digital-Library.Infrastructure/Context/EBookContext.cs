@@ -27,14 +27,14 @@ namespace Digital_Library.Infrastructure.Context
 						.OnDelete(DeleteBehavior.Restrict);
 
 			modelBuilder.Entity<OrderDetail>()
-				.HasOne(od => od.Order)
+				.HasOne(od => od.OrderHeader)
 				.WithMany(o => o.OrderDetails)
-				.HasForeignKey(od => od.OrderId)
+				.HasForeignKey(od => od.OrderHeaderId)
 				.OnDelete(DeleteBehavior.Restrict);
 
-			modelBuilder.Entity<OrderDetail>()
+			modelBuilder.Entity<OrderHeader>()
 				.HasOne(od => od.Vendor)
-				.WithMany(b => b.OrderDetails)
+				.WithMany(b => b.OrderHeaders)
 				.HasForeignKey(od => od.VendorId)
 				.OnDelete(DeleteBehavior.Restrict);
 		}

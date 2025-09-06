@@ -36,9 +36,7 @@ namespace Digital_Library.Core.Models
 
 		public ICollection<Book>? Books { get; set; }
 		public ICollection<VendorIdentityImagesUrl>? VendorIdentityImagesUrls { get; set; }
-		public ICollection<OrderDetail>? OrderDetails { get; set; }
-
-
+		public ICollection<OrderHeader>? OrderHeaders { get; set; }
 		public User? User { get; set; }
 
 		[ForeignKey(nameof(User))]

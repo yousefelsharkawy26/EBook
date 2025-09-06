@@ -16,12 +16,9 @@ namespace Digital_Library.Core.Models
 		public DateTime OrderDate { get; set; }=	DateTime.Now;
 		[Required]
 		public decimal TotalAmount { get; set; }
-		public Status Status { get; set; }=Status.Pending;
 
 		public ICollection<Transaction>? Transactions { get; set; }
-
-		public ICollection<OrderDetail>? OrderDetails { get; set; }
-
+		public ICollection<OrderHeader>? OrderHeaders { get; set; }
 		public User? User { get; set; }
 		[ForeignKey(nameof(User))]
 		[Required]
