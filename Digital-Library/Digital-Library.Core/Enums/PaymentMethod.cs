@@ -10,6 +10,8 @@ namespace Digital_Library.Core.Enums
     {
         Cash ,
         Paypal ,
-        Credit
+        CreditCard,
+        MasterCard,
+
     }
 }
