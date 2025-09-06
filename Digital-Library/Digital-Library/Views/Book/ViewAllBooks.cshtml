@@ -5,16 +5,11 @@
 
 @{
     ViewData["Title"] = "ViewAllBooks";
-    // var img = string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Url.Authority, Url.Content("~"));
+    var url = Url.Content("~/images/banner-image-bg-1.jpg");
 }
-<style>
 
-    .hero-section {
-        background-image: url('https://localhost:7254/images/banner-image-bg-1.jpg')
-    }
-</style>
 
-<section class="hero-section position-relative padding-large" style="background-size: cover; background-repeat: no-repeat; background-position: center; height: 400px;">
+<section class="hero-section position-relative padding-large" style="background-image: url(@url) ;background-size: cover; background-repeat: no-repeat; background-position: center; height: 400px;">
     <div class="hero-content">
         <div class="container">
             <div class="row">
