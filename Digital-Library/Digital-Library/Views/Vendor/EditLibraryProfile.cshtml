@@ -1,0 +1,125 @@
+﻿@model Digital_Library.Core.ViewModels.Requests.VendorUpdateRequest
+
+@{
+ ViewData["Title"] = "Edit Library Profile";
+}
+
+<div class="vendor-edit-container">
+ <h2>Edit Library Profile</h2>
+
+ @if (!string.IsNullOrEmpty(@ViewBag.ExistingLogoPath))
+ {
+  <div class="current-logo">
+   <img src="~/@ViewBag.ExistingLogoPath" alt="Library Logo" />
+  </div>
+ }
+
+ <form asp-action="EditLibraryProfile" asp-controller="Vendor" method="post" enctype="multipart/form-data">
+  <label asp-for="LibraryName">Library Name</label>
+  <input asp-for="LibraryName" type="text" placeholder="Enter Library Name" />
+  <span asp-validation-for="LibraryName" class="validation-message"></span>
+
+  <label asp-for="City">City</label>
+  <input asp-for="City" type="text" placeholder="Enter City" />
+  <span asp-validation-for="City" class="validation-message"></span>
+
+  <label asp-for="State">State</label>
+  <input asp-for="State" type="text" placeholder="Enter State" />
+  <span asp-validation-for="State" class="validation-message"></span>
+
+  <label asp-for="ZipCode">Zip Code</label>
+  <input asp-for="ZipCode" type="text" placeholder="Enter Zip Code" />
+  <span asp-validation-for="ZipCode" class="validation-message"></span>
+
+  <label asp-for="ContactNumber">Contact Number</label>
+  <input asp-for="ContactNumber" type="tel" placeholder="Enter Contact Number" />
+  <span asp-validation-for="ContactNumber" class="validation-message"></span>
+
+  <label asp-for="LibraryLogo">Library Logo</label>
+  <input asp-for="LibraryLogo" type="file" accept="image/*" />
+  <span asp-validation-for="LibraryLogo" class="validation-message"></span>
+
+  <button type="submit" class="btn-submit">Save Changes</button>
+ </form>
+</div>
+
+@section Styles {
+ <style>
+  .vendor-edit-container {
+   max-width: 600px;
+   margin: 50px auto;
+   background-color: #fff;
+   padding: 30px;
+   border-radius: 15px;
+   box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  h2 {
+   text-align: center;
+   margin-bottom: 25px;
+   font-weight: bold;
+  }
+
+  label {
+   display: block;
+   font-weight: bold;
+   margin-bottom: 5px;
+   font-size: 14px;
+  }
+
+  input[type="text"],
+  input[type="file"],
+  input[type="tel"] {
+   width: 100%;
+   padding: 10px 12px;
+   margin-bottom: 15px;
+   border-radius: 8px;
+   border: 1px solid #ced4da;
+   font-size: 14px;
+  }
+
+  .current-logo {
+   display: flex;
+   justify-content: center;
+   margin-bottom: 20px;
+  }
+
+   .current-logo img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+   }
+
+  .btn-submit {
+   width: 100%;
+   padding: 12px;
+   background-color: #0d6efd;
+   color: white;
+   border: none;
+   border-radius: 10px;
+   font-size: 16px;
+   font-weight: bold;
+   cursor: pointer;
+   transition: all 0.2s ease;
+  }
+
+   .btn-submit:hover {
+    background-color: #0b5ed7;
+    transform: scale(1.02);
+   }
+
+  .validation-message {
+   color: red;
+   font-size: 12px;
+   margin-top: -10px;
+   margin-bottom: 10px;
+  }
+ </style>
+}
+
+@section Scripts {
+ <partial name="_ValidationScriptsPartial" />
+}
