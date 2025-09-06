@@ -23,6 +23,12 @@ namespace Digital_Library.Core.Models
 		[ForeignKey(nameof(User))]
 		[Required]
 		public string UserId { get; set; }
+		[Required]
+		[Phone]
+		public string PhoneNumber { get; set; }
+
+		[Required]
+		public string Address { get; set; }
 
 	}
 }

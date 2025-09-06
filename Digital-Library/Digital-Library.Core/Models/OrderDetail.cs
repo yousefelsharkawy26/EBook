@@ -26,6 +26,6 @@ namespace Digital_Library.Core.Models
 		public OrderHeader? OrderHeader { get; set; }
 		[ForeignKey(nameof(OrderHeader))]
 		[Required]
-		public int OrderHeaderId { get; set; }
+		public string OrderHeaderId { get; set; }
 	}
 }

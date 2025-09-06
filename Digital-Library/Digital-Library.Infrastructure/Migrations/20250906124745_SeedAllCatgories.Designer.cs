@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Digital_Library.Infrastructure.Migrations
 {
     [DbContext(typeof(EBookContext))]
-    [Migration("20250905113725_SeedAllCategory")]
-    partial class SeedAllCategory
+    [Migration("20250906124745_SeedAllCatgories")]
+    partial class SeedAllCatgories
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,7 +55,10 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.Property<string>("PDFFilePath")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("PricePDFPerDay")
+                    b.Property<decimal?>("PricePDFPerDay")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PricePdf")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("PricePhysical")
@@ -186,11 +189,16 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
@@ -218,7 +226,7 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.Property<int>("FormatType")
                         .HasColumnType("int");
 
-                    b.Property<string>("OrderId")
+                    b.Property<string>("OrderHeaderId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
@@ -232,9 +240,34 @@ namespace Digital_Library.Infrastructure.Migrations
 
                     b.HasIndex("BookId");
 
-                    b.HasIndex("OrderId");
+                    b.HasIndex("OrderHeaderId");
 
                     b.ToTable("OrderDetails");
+                });
+
+            modelBuilder.Entity("Digital_Library.Core.Models.OrderHeader", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("OrderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("VendorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("VendorId");
+
+                    b.ToTable("OrderHeader");
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.Transaction", b =>
@@ -653,15 +686,34 @@ namespace Digital_Library.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Digital_Library.Core.Models.Order", "Order")
+                    b.HasOne("Digital_Library.Core.Models.OrderHeader", "OrderHeader")
                         .WithMany("OrderDetails")
-                        .HasForeignKey("OrderId")
+                        .HasForeignKey("OrderHeaderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Book");
 
+                    b.Navigation("OrderHeader");
+                });
+
+            modelBuilder.Entity("Digital_Library.Core.Models.OrderHeader", b =>
+                {
+                    b.HasOne("Digital_Library.Core.Models.Order", "Order")
+                        .WithMany("OrderHeaders")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Digital_Library.Core.Models.Vendor", "Vendor")
+                        .WithMany("OrderHeaders")
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Order");
+
+                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.Transaction", b =>
@@ -769,14 +821,21 @@ namespace Digital_Library.Infrastructure.Migrations
 
             modelBuilder.Entity("Digital_Library.Core.Models.Order", b =>
                 {
-                    b.Navigation("OrderDetails");
+                    b.Navigation("OrderHeaders");
 
                     b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("Digital_Library.Core.Models.OrderHeader", b =>
+                {
+                    b.Navigation("OrderDetails");
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.Vendor", b =>
                 {
                     b.Navigation("Books");
+
+                    b.Navigation("OrderHeaders");
 
                     b.Navigation("VendorIdentityImagesUrls");
                 });

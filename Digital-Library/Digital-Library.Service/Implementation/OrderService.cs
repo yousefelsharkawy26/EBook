@@ -24,6 +24,136 @@ namespace Digital_Library.Service.Services
 			_logger = logger;
 		}
 
+		public async Task<Response> CreateOrderAsync(string userId, List<OrderDetailRequest> items,string address,string phoneNumber)
+		{
+			if (string.IsNullOrEmpty(userId) || items == null || !items.Any())
+			{
+				_logger.LogWarning("CreateOrderAsync: Invalid userId or empty items list.");
+				return Response.Fail("Invalid  items list.");
+			}
+			var order = new Order
+			{
+				UserId = userId,
+				TotalAmount = items.Sum(i => i.Price * i.Quantity),
+				OrderHeaders = new List<OrderHeader>(),
+				Address= address,
+				PhoneNumber= phoneNumber
+			};
+			foreach (var item in items)
+			{
+				if (item.Quantity <= 0 || item.Price < 0)
+				{
+					_logger.LogWarning("CreateOrderAsync: Invalid item quantity or price.");
+					return Response.Fail("Invalid item quantity or price.");
+				}
+				var book = await _unitOfWork.Books.GetSingleAsync(b => b.Id == item.BookId);
+				if (book == null)
+				{
+					_logger.LogWarning("CreateOrderAsync: Book with ID {BookId} not found.", item.BookId);
+					return Response.Fail($"Book with ID {item.BookId} not found.");
+				}
+				order.OrderHeaders.Add(new OrderHeader
+				{
+					OrderId = order.Id,
+					VendorId = book.VendorId,
+					OrderDetails = new List<OrderDetail>
+					{
+						new OrderDetail
+						{
+							BookId=item.BookId,
+							Quantity=item.Quantity,
+							Price=item.Price
+						}
+					}
+				});
 
+			}
+			try
+			{
+				await _unitOfWork.Orders.AddAsync(order);
+				await _unitOfWork.SaveChangesAsync();
+				_logger.LogInformation("CreateOrderAsync: Order {OrderId} created successfully.", order.Id);
+				return Response.Ok("Order created successfully.");
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "CreateOrderAsync: Error creating order.");
+				return Response.Fail("Error creating order.");
+			}
+		}
+
+		public async Task<Response> GetOrderHeaderDetailsByIdAsync(string orderHeaderId)
+		{
+			if (string.IsNullOrEmpty(orderHeaderId))
+				return Response.Fail("OrderHeaderId is required");
+			var orderHeader = await _unitOfWork.OrderHeaders.GetSingleWithIncludeAsync(
+							oh => oh.Id.ToString() == orderHeaderId,
+							q => q.Include(oh => oh.Order)
+													.ThenInclude(o => o.User)
+													.Include(oh => oh.Vendor)
+													.Include(oh => oh.OrderDetails)
+													.ThenInclude(od => od.Book)
+			);
+
+			if (orderHeader == null)
+				return Response.Fail("OrderHeader not found");
+
+			return Response.Ok("OrderHeader details retrieved successfully", orderHeader);
+		}
+
+		public async Task< IQueryable<OrderHeader>> GetUserOrders(string userId)
+		{
+			if (string.IsNullOrEmpty(userId))
+				return Enumerable.Empty<OrderHeader>().AsQueryable();
+
+			var query = _unitOfWork.OrderHeaders.GetManyQuery(
+							predicate: oh => oh.Order != null && oh.Order.UserId == userId,
+							includes: new Expression<Func<OrderHeader, object>>[]
+							{
+												oh => oh.Order,
+												oh => oh.Order.User,
+												oh => oh.Vendor,
+												oh => oh.OrderDetails
+							},
+							thenIncludes: new Func<IQueryable<OrderHeader>, IIncludableQueryable<OrderHeader, object>>[]
+							{
+												q => q.Include(oh => oh.OrderDetails).ThenInclude(od => od.Book)
+							}
+			);
+
+			return query;
+		}
+
+		public async Task<IQueryable<OrderHeader>> GetVendorOrders(string vendorId)
+		{
+			var query = _unitOfWork.OrderHeaders.GetManyQuery(
+							predicate: oh => oh.VendorId == vendorId,
+							includes: new Expression<Func<OrderHeader, object>>[]
+							{
+												oh => oh.Order,             
+            oh => oh.Order.User        
+							}
+			);
+
+			return query;
+		}
+
+		public async Task<Response> UpdateOrderStatusAsync(string orderHeaderId, Status status)
+		{
+			var orderHeader = await _unitOfWork.OrderHeaders
+							.GetSingleAsync(oh => oh.Id == orderHeaderId);
+
+			if (orderHeader == null)
+				return Response.Fail("Order header not found");
+
+			orderHeader.Status = status;
+
+			_unitOfWork.OrderHeaders.Update(orderHeader);
+			await _unitOfWork.SaveChangesAsync();
+
+			_logger.LogInformation("Updated status of OrderHeader {OrderHeaderId} to {Status}", orderHeaderId, status);
+
+			return Response.Ok("OrderHeader status updated successfully", orderHeader);
+		}
 	}
 }

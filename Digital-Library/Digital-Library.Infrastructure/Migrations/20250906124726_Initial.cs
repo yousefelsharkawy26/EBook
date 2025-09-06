@@ -199,8 +199,9 @@ namespace Digital_Library.Infrastructure.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -274,7 +275,8 @@ namespace Digital_Library.Infrastructure.Migrations
                     Author = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ImageBookCoverPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PricePhysical = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PricePDFPerDay = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PricePdf = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    PricePDFPerDay = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Stock = table.Column<int>(type: "int", nullable: false),
                     HasPDF = table.Column<bool>(type: "bit", nullable: false),
@@ -299,6 +301,32 @@ namespace Digital_Library.Infrastructure.Migrations
                         principalTable: "Vendors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderHeader",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    OrderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    VendorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderHeader", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderHeader_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderHeader_Vendors_VendorId",
+                        column: x => x.VendorId,
+                        principalTable: "Vendors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -382,8 +410,8 @@ namespace Digital_Library.Infrastructure.Migrations
                     FormatType = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    OrderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    BookId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    BookId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    OrderHeaderId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -395,9 +423,9 @@ namespace Digital_Library.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrderDetails_Orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "Orders",
+                        name: "FK_OrderDetails_OrderHeader_OrderHeaderId",
+                        column: x => x.OrderHeaderId,
+                        principalTable: "OrderHeader",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -483,9 +511,19 @@ namespace Digital_Library.Infrastructure.Migrations
                 column: "BookId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderDetails_OrderId",
+                name: "IX_OrderDetails_OrderHeaderId",
                 table: "OrderDetails",
+                column: "OrderHeaderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderHeader_OrderId",
+                table: "OrderHeader",
                 column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderHeader_VendorId",
+                table: "OrderHeader",
+                column: "VendorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_UserId",
@@ -552,10 +590,13 @@ namespace Digital_Library.Infrastructure.Migrations
                 name: "Books");
 
             migrationBuilder.DropTable(
-                name: "Orders");
+                name: "OrderHeader");
 
             migrationBuilder.DropTable(
                 name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "Vendors");

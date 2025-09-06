@@ -12,7 +12,7 @@ namespace Digital_Library.Core.Models
 	public class OrderHeader
 	{
 		[Key]
-		public int Id { get; set; }
+		public string Id { get; set; }=	Guid.NewGuid().ToString();
 		public Order? Order { get; set; }
 		[ForeignKey(nameof(Order))]
 		[Required]

@@ -20,14 +20,14 @@ namespace Digital_Library
 			{
 				option.UseSqlServer(builder.Configuration.GetConnectionString("DevConn"));
 			});
-            #endregion
+			#endregion
 
-            #region Dependency injections
+			#region Dependency injections
 
-            builder.Services.Add_Module_Infrastructure_Dependencies()
-							.Add_Module_Service_Dependencies()
-       .Add_Module_Configuration_Services(builder.Configuration);
-																				
+			builder.Services.Add_Module_Infrastructure_Dependencies()
+.Add_Module_Service_Dependencies()
+.Add_Module_Configuration_Services(builder.Configuration);
+
 			#endregion
 
 			var app = builder.Build();
@@ -52,12 +52,12 @@ namespace Digital_Library
 							.WithStaticAssets();
 			using (var scope = app.Services.CreateScope())
 			{
-				var services =  scope.ServiceProvider;
+				var services = scope.ServiceProvider;
 				var context = services.GetRequiredService<EBookContext>();
 				//context.Database.Migrate();
 				RoleSeeder.SeedRolesAsync(services).Wait();
-            }
-            
+			}
+
 			app.Run();
 		}
 	}
