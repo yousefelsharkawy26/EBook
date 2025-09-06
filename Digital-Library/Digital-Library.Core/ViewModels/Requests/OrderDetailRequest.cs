@@ -18,5 +18,7 @@ namespace Digital_Library.Core.ViewModels.Requests
 		public int Quantity { get; set; }
 		[Required]
 		public string BookId { get; set; }
+		[Required]
+		public string VendorId { get; set; }
 	}
 }

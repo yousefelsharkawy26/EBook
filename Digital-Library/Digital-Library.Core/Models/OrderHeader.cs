@@ -27,6 +27,7 @@ namespace Digital_Library.Core.Models
 		public Status Status { get; set; } = Status.Pending;
 
 		public ICollection<OrderDetail>? OrderDetails { get; set; }
+		public ICollection<Transaction>? Transactions { get; set; }
 
 	}
 }

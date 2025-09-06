@@ -39,8 +39,9 @@ namespace Digital_Library.Service.Services
 				Address=request.Address,
 				PhoneNumber=request.PhoneNumber
 			};
-			foreach (var item in items)
+			foreach (var item in items.GroupBy(s=>s.VendorId))
 			{
+
 				if (item.Quantity <= 0 || item.Price < 0)
 				{
 					_logger.LogWarning("CreateOrderAsync: Invalid item quantity or price.");
@@ -67,12 +68,12 @@ namespace Digital_Library.Service.Services
 					}
 				});
 
+
 			}
 			try
 			{
 				await _unitOfWork.Orders.AddAsync(order);
 				await _unitOfWork.SaveChangesAsync();
-				await	MakeTransation(order.Id);
 				_logger.LogInformation("CreateOrderAsync: Order {OrderId} created successfully.", order.Id);
 				return Response.Ok("Order created successfully.");
 			}
@@ -157,11 +158,11 @@ namespace Digital_Library.Service.Services
 			return Response.Ok("OrderHeader status updated successfully", orderHeader);
 		}
 
-		private async Task<bool> MakeTransation(string orderId)
+		private async Task<bool> MakeTransation(string ordeHeaderId,decimal amount)
 		{
 			var transaction = new Transaction
 			{
-				OrderId = orderId,
+				OrderHeaderId = ordeHeaderId,
 				TransactionDate = DateTime.UtcNow,
 				TransactionStatus=Status.Complete
 			};

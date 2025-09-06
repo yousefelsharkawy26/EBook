@@ -17,7 +17,7 @@ namespace Digital_Library.Core.Models
 		[Required]
 		public decimal TotalAmount { get; set; }
 
-		public ICollection<Transaction>? Transactions { get; set; }
+
 		public ICollection<OrderHeader>? OrderHeaders { get; set; }
 		public User? User { get; set; }
 		[ForeignKey(nameof(User))]
