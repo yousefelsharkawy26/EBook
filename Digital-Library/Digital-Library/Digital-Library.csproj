@@ -34,4 +34,9 @@
     <Folder Include="wwwroot\VendorLibraryLogo\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\css\_HeaderView.css" />
+    <None Include="wwwroot\css\_SearchBarView.css" />
+  </ItemGroup>
+
 </Project>
