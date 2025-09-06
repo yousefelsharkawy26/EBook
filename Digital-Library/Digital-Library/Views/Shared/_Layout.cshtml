@@ -291,12 +291,11 @@
 								<partial name="_LoginLayout" />
         <!-- Cart -->
         <li class="cart-dropdown dropdown">
-         <a href="index.html" class="dropdown-toggle" data-bs-toggle="dropdown" role="button"
-            aria-expanded="false">
+         <a class="dropdown-toggle"
+            aria-expanded="false" asp-controller="Cart" asp-action="Index">
           <svg class="cart">
            <use xlink:href="#cart"></use>
           </svg>
-          <span class="fs-6 fw-light">(02)</span>
          </a>
         </li>
        </ul>
@@ -314,7 +313,6 @@
 			@RenderBody()
 		</main>
 	</div>
-
 
 	<script src="~/js/jquery-1.11.0.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
