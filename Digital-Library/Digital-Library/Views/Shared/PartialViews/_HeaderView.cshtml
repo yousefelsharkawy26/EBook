@@ -13,7 +13,7 @@
                 <div class="col-md-4 border-start border-end">
                     <p class="fs-6 my-2 text-center">
                         Summer sale discount off 60% off!
-                        <a class="text-decoration-underline" href="index.html">Shop Now</a>
+                        <a class="text-decoration-underline" asp-controller="book" asp-action="allbooks">Shop Now</a>
                     </p>
                 </div>
                 <div class="col-md-4">
@@ -59,27 +59,10 @@
                             <a class="nav-link me-4" asp-controller="home" asp-action="about">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link me-4" href="index.html">Shop</a>
+                            <a class="nav-link me-4" asp-controller="book" asp-action="allbooks">Shop</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link me-4" href="index.html">Blogs</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link me-4 dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
-                               aria-expanded="false">Pages</a>
-                            <ul class="dropdown-menu animate slide border">
-                                <li><a href="index.html" class="dropdown-item fw-light">About</a></li>
-                                <li><a href="index.html" class="dropdown-item fw-light">Shop</a></li>
-                                <li><a href="index.html" class="dropdown-item fw-light">Single Product</a></li>
-                                <li><a href="index.html" class="dropdown-item fw-light">Cart</a></li>
-                                <li><a href="index.html" class="dropdown-item fw-light">Checkout</a></li>
-                                <li><a href="index.html" class="dropdown-item fw-light">Blog</a></li>
-                                <li><a href="index.html" class="dropdown-item fw-light">Single Post</a></li>
-                                <li><a href="index.html" class="dropdown-item fw-light">Contact</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link me-4" href="index.html">Contact</a>
+                            <a class="nav-link me-4" asp-controller="home" asp-action="contact">Contact</a>
                         </li>
                     </ul>
 
@@ -88,7 +71,7 @@
                         <ul class="d-flex justify-content-end list-unstyled mb-0">
                             <!-- Search -->
                             <li class="search-item pe-3">
-                                <a href="#" class="search-button">
+                                <a class="search-button">
                                     <svg class="search">
                                         <use xlink:href="#search"></use>
                                     </svg>
@@ -98,12 +81,12 @@
                             <partial name="PartialViews/_LoginLayout" />
                             <!-- Cart -->
                             <li class="cart-dropdown dropdown">
-                                <a href="index.html" class="dropdown-toggle" data-bs-toggle="dropdown" role="button"
+                                <a asp-controller="cart"
+                                   asp-action="index"
                                    aria-expanded="false">
                                     <svg class="cart">
                                         <use xlink:href="#cart"></use>
                                     </svg>
-                                    <span class="fs-6 fw-light">(02)</span>
                                 </a>
                             </li>
                         </ul>
