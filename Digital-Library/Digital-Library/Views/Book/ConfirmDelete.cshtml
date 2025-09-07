@@ -1,0 +1,28 @@
+﻿@model Digital_Library.Core.Models.Book
+
+@{
+    ViewData["Title"] = "Confirm Delete";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-danger text-white">
+            <h4>⚠️ Confirm Delete</h4>
+        </div>
+        <div class="card-body">
+            <p>Are you sure you want to delete the book:</p>
+            <h5 class="fw-bold">@Model.Title</h5>
+            <p class="fw-semibold text-dark">by @Model.Author</p>
+
+
+            <form asp-action="DeleteBook" asp-route-id="@Model.Id" method="post">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Yes, Delete
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>

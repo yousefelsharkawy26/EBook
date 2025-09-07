@@ -152,11 +152,8 @@ namespace Digital_Library.Controllers
 			var updateResponse = await orderService.UpdateOrderStatusAsync(orderHeaderId, status);
 			if (!updateResponse.Success)
 			{
-				TempData["ErrorMessage"] = updateResponse.Message ?? "Failed to update order status.";
 				return RedirectToAction(nameof(MyLibraryOrders));
 			}
-
-			TempData["SuccessMessage"] = "Order status updated successfully.";
 			return RedirectToAction(nameof(MyLibraryOrders));
 		}
 	}
