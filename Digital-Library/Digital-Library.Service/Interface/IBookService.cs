@@ -18,5 +18,8 @@ namespace Digital_Library.Service.Interface
 		Task<IEnumerable<Book>> GetAllBooks(BookFilter? filter = null);
 
 		Task<IEnumerable<Book>> GetBestTenSellingBook();
-	}
+
+		Task<(IEnumerable<Book> Books, int TotalCount)> GetPagedBooksAsync(int page, int pageSize, BookFilter? filter = null);
+
+    }
 }

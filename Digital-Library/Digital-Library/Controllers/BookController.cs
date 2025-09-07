@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace Digital_Library.Controllers
@@ -30,20 +31,35 @@ namespace Digital_Library.Controllers
             this.fileService = fileService;
             this.cartService = cartService;
         }
+        //[HttpGet("Index")]
+        //[Authorize(Roles = Roles.Vendor)]
+        //public async Task<IActionResult> Index()
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    var vendorId = await vendorService.ReturnVendorIdFromUserId(userId);
+        //    if (!vendorId.Success)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    var books = await bookService.GetAllBooks(new BookFilter { VendorId = (string)vendorId.Data });
+
+        //    return View(books);
+        //}
         [HttpGet("Index")]
         [Authorize(Roles = Roles.Vendor)]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var vendorId = await vendorService.ReturnVendorIdFromUserId(userId);
-            if (!vendorId.Success)
-            {
-                return BadRequest();
-            }
-            var books = await bookService.GetAllBooks(new BookFilter { VendorId = (string)vendorId.Data });
+            var (books, totalCount) = await bookService.GetPagedBooksAsync(page, pageSize);
+
+            int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
 
             return View(books);
         }
+
 
         [HttpGet("ConfirmDelete/{id}")]
         [Authorize(Roles = Roles.Vendor)]

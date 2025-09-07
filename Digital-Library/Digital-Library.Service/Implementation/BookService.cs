@@ -238,6 +238,47 @@ namespace Digital_Library.Service.Implementation
             return await bestFiveSales.ToListAsync();
         }
 
+        public async Task<(IEnumerable<Book> Books, int TotalCount)> GetPagedBooksAsync(int page, int pageSize, BookFilter? filter = null)
+        {
+            _logger.LogInformation("Start GetPagedBooks with page={Page}, pageSize={PageSize}, filter={@Filter}", page, pageSize, filter);
+
+            IQueryable<Book> query = _unitOfWork.Books.GetAllQuery(
+                includes: new Expression<Func<Book, object>>[] { b => b.Category, b => b.Vendor }
+            );
+
+            // Apply filters (reuse same logic from GetAllBooks)
+            if (filter != null)
+            {
+                if (!string.IsNullOrEmpty(filter.VendorId))
+                    query = query.Where(b => b.VendorId == filter.VendorId);
+
+                if (!string.IsNullOrEmpty(filter.CategoryId))
+                    query = query.Where(b => b.CategoryID == filter.CategoryId);
+
+                if (filter.HasPDF.HasValue)
+                    query = query.Where(b => b.HasPDF == filter.HasPDF.Value);
+
+                if (filter.IsBorrowable.HasValue)
+                    query = query.Where(b => b.IsBorrowable == filter.IsBorrowable.Value);
+
+                if (!string.IsNullOrEmpty(filter.Keyword))
+                    query = query.Where(b => b.Title.Contains(filter.Keyword) || b.Author.Contains(filter.Keyword));
+            }
+
+            int totalCount = await query.CountAsync();
+
+            var books = await query
+                .OrderBy(b => b.Title)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            _logger.LogInformation("GetPagedBooks returned {Count} records out of {TotalCount}", books.Count, totalCount);
+
+            return (books, totalCount);
+        }
+
+
     }
 }
 

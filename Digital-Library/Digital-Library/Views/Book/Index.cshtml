@@ -1,11 +1,50 @@
-﻿
-@model IEnumerable<Digital_Library.Core.Models.Book>
+﻿@model IEnumerable<Digital_Library.Core.Models.Book>
 
 @{
     ViewData["Title"] = "My Books";
 }
 
 <style>
+    
+    /* Modern Pagination Styling */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+    }
+
+        .pagination .page-link {
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #0d6efd;
+            background-color: #f8f9fa;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            transition: all 0.25s ease;
+        }
+
+            .pagination .page-link:hover {
+                background-color: #0d6efd;
+                color: #fff;
+            }
+
+        .pagination .page-item.active .page-link {
+            background-color: #0d6efd;
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 3px 8px rgba(13, 110, 253, 0.3);
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #e9ecef;
+            color: #adb5bd;
+            box-shadow: none;
+            pointer-events: none;
+        }
+
+
     .table thead th {
         background: #f8f9fa;
         font-weight: 600;
@@ -56,6 +95,17 @@
 
     .dropdown-item i {
         font-size: 1rem;
+    }
+
+    /* Pagination */
+    .pagination .page-link {
+        color: #0d6efd;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: #fff;
     }
 </style>
 
@@ -137,7 +187,6 @@
                                     <i class="bi bi-three-dots-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    @* Show PDF if available *@
                                     @if (book.HasPDF)
                                     {
                                         <li>
@@ -170,4 +219,79 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination -->
+    <!-- Pagination -->
+    <!-- Pagination -->
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center pagination-lg">
+            <!-- Previous button -->
+            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link d-flex align-items-center justify-content-center"
+                   asp-action="Index"
+                   asp-route-page="@(ViewBag.CurrentPage - 1)">
+                    «
+                </a>
+            </li>
+
+            @{
+                int totalPages = ViewBag.TotalPages;
+                int currentPage = ViewBag.CurrentPage;
+                int maxPagesToShow = 5;
+
+                int startPage = Math.Max(1, currentPage - 2);
+                int endPage = Math.Min(totalPages, startPage + maxPagesToShow - 1);
+
+                if (endPage - startPage + 1 < maxPagesToShow && startPage > 1)
+                {
+                    startPage = Math.Max(1, endPage - maxPagesToShow + 1);
+                }
+            }
+
+            <!-- First page + dots -->
+            @if (startPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-page="1">1</a>
+                </li>
+                @if (startPage > 2)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
+            }
+
+            <!-- Page numbers -->
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                </li>
+            }
+
+            <!-- Last page + dots -->
+            @if (endPage < totalPages)
+            {
+                @if (endPage < totalPages - 1)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-page="@totalPages">@totalPages</a>
+                </li>
+            }
+
+            <!-- Next button -->
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link d-flex align-items-center justify-content-center"
+                   asp-action="Index"
+                   asp-route-page="@(currentPage + 1)">
+                    »
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+
+
+    
 </div>
