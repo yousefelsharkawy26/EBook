@@ -45,6 +45,20 @@ namespace Digital_Library.Controllers
             return View(books);
         }
 
+        [HttpGet("ConfirmDelete/{id}")]
+        [Authorize(Roles = Roles.Vendor)]
+        public async Task<IActionResult> ConfirmDelete(string id)
+        {
+            var response = await bookService.GetBookById(id);
+            if (!response.Success || response.Data is not Book book)
+            {
+                return NotFound();
+            }
+
+            return View(book);
+        }
+
+
         [HttpGet("AddBook")]
         [Authorize(Roles = Roles.Vendor)]
         public async Task<IActionResult> AddBook()
