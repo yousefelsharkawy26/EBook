@@ -1,4 +1,10 @@
-﻿<link rel="stylesheet" href="~/css/_HeaderView.css" />
+﻿@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+
+
+<link rel="stylesheet" href="~/css/_HeaderView.css" />
 
 
 <header id="header" class="site-header">
@@ -27,7 +33,7 @@
     <nav id="header-nav" class="navbar navbar-expand-lg py-3">
         <div class="container">
             <!-- Brand -->
-            <a class="navbar-brand" href="index.html">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">
                 <img src="~/images/main-logo.png" class="logo">
             </a>
 
@@ -42,7 +48,7 @@
             <!-- Offcanvas Menu -->
             <div class="offcanvas offcanvas-end" tabindex="-1" id="bdNavbar" aria-labelledby="bdNavbarOffcanvasLabel">
                 <div class="offcanvas-header px-4 pb-0">
-                    <a class="navbar-brand" href="index.cshtml">
+                    <a class="navbar-brand" asp-controller="Home" asp-action="Index">
                         <img src="images/main-logo.png" class="logo">
                     </a>
                     <button type="button" class="btn-close btn-close-black" data-bs-dismiss="offcanvas" aria-label="Close"
@@ -52,19 +58,28 @@
                     <!-- Navbar Links -->
                     <ul id="navbar"
                         class="navbar-nav text-uppercase justify-content-start justify-content-lg-center align-items-start align-items-lg-center flex-grow-1">
+
                         <li class="nav-item">
-                            <a class="nav-link me-4 active" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link me-4 @(currentController == "Home" && currentAction == "Index" ? "active" : "")"
+                               asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link me-4" asp-controller="home" asp-action="about">About</a>
+                            <a class="nav-link me-4 @(currentController == "Home" && currentAction == "About" ? "active" : "")"
+                               asp-controller="Home" asp-action="About">About</a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link me-4" asp-controller="book" asp-action="allbooks">Shop</a>
+                            <a class="nav-link me-4 @(currentController == "Book" ? "active" : "")"
+                               asp-controller="Book" asp-action="AllBooks">Shop</a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link me-4" asp-controller="home" asp-action="contact">Contact</a>
+                            <a class="nav-link me-4 @(currentController == "Home" && currentAction == "Contact" ? "active" : "")"
+                               asp-controller="Home" asp-action="Contact">Contact</a>
                         </li>
                     </ul>
+
 
                     <!-- Right Side Icons -->
                     <div class="user-items d-flex">
