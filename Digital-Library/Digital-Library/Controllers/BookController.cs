@@ -273,8 +273,15 @@ namespace Digital_Library.Controllers
         }
 
         [HttpGet("allbooks")]
-        public async Task<IActionResult> ViewAllBooks(string category, string author, string priceRange, string sort)
+        public async Task<IActionResult> ViewAllBooks(
+    string category,
+    string author,
+    string priceRange,
+    string sort,
+    int page = 1)
         {
+            int pageSize = 8;
+
             var books = await bookService.GetAllBooks();
 
             // Filter by category
@@ -293,11 +300,13 @@ namespace Digital_Library.Controllers
                     decimal.TryParse(parts[0], out decimal minPrice) &&
                     decimal.TryParse(parts[1], out decimal maxPrice))
                 {
-                    books = books.Where(b => b.PricePhysical >= minPrice && b.PricePhysical <= maxPrice).ToList();
+                    books = books
+                        .Where(b => b.PricePhysical >= minPrice && b.PricePhysical <= maxPrice)
+                        .ToList();
                 }
             }
 
-            // Sorting (optional)
+            // Sorting
             books = sort switch
             {
                 "NameAsc" => books.OrderBy(b => b.Title).ToList(),
@@ -307,12 +316,19 @@ namespace Digital_Library.Controllers
                 _ => books
             };
 
-            // Populate viewbags
+            // Pagination
+            var totalItems = books.Count();
+            var items = books.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            // ViewBags
             ViewBag.Categories = await categoryService.GetAllCategories();
             ViewBag.Authors = books.Select(b => b.Author).Distinct().ToList();
 
+            // Pass pagination info
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-            return View(books);
+            return View(items);
         }
 
 
