@@ -216,5 +216,33 @@ namespace Digital_Library.Service.Implementation
 				return Response.Fail("An error occurred while updating the book.");
 			}
 		}
-	}
+
+		public async Task<IEnumerable<Book>> GetBestTenSellingBook()
+		{
+			var orders = _unitOfWork.OrderDetails.GetAllQuery(
+				includes: new Expression<Func<OrderDetail, object>>[] { o => o.Book }
+				);
+
+			var ordersGroup = orders.GroupBy(oi => oi.Book ) // GroupBy على BookId + Book
+									.Select(g => new BookGroupViewModel
+									{
+										Book = g.Key,
+										TotalSold = g.Sum(x => x.Quantity),
+									})
+									.OrderByDescending(x => x.TotalSold)
+									.Take(10);
+
+            var bestFiveSales = ordersGroup.Select(o => o.Book);
+
+
+            return await bestFiveSales.ToListAsync();
+        }
+
+    }
+}
+
+public class BookGroupViewModel
+{
+	public decimal TotalSold { get; set; }
+	public Book Book { get; set; }
 }

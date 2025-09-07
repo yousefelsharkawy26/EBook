@@ -17,5 +17,6 @@ namespace Digital_Library.Service.Interface
 
 		Task<IEnumerable<Book>> GetAllBooks(BookFilter? filter = null);
 
+		Task<IEnumerable<Book>> GetBestTenSellingBook();
 	}
 }
