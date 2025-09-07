@@ -13,7 +13,7 @@ namespace Digital_Library.Core.Models
 	{
 		[Key]
 		public string Id { get; set; }=	Guid.NewGuid().ToString();
-		public DateTime OrderDate { get; set; }=	DateTime.Now;
+		public DateTime OrderDate { get; set; }=	DateTime.UtcNow;
 		[Required]
 		public decimal TotalAmount { get; set; }
 

@@ -13,6 +13,7 @@ namespace Digital_Library.Core.ViewModels.Requests
 		[Required]
 		public string Address { get; set; }
 		[Required]
+		[Phone]
 		public string PhoneNumber { get; set; }
 
 		[Required]

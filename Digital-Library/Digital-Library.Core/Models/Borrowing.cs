@@ -7,7 +7,7 @@ public class Borrowing
 {
 	[Key]
 	public string Id { get; set; } = Guid.NewGuid().ToString();
-	public DateTime BorrowDate { get; set; }=	DateTime.Now;
+	public DateTime BorrowDate { get; set; }=	DateTime.UtcNow;
 	[Required]
 	public DateTime DueDate { get; set; }
 	public Book? Book { get; set; }

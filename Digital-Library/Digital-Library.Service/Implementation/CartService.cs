@@ -25,7 +25,8 @@ namespace Digital_Library.Service.Implementation
 			var cart = await _unitOfWork.Carts
 							.GetSingleWithIncludeAsync(
 											c => c.UserId == userId,
-											q => q.Include(c => c.CartDetails).ThenInclude(cd => cd.Book)
+											q => q.Include(c => c.CartDetails).ThenInclude(cd => cd.Book).ThenInclude(b => b.Vendor)
+
 							);
 
 			if (cart == null)

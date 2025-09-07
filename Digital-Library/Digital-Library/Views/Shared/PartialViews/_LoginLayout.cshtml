@@ -41,6 +41,11 @@
      <i class="bi bi-bag-check me-2"></i> My Orders
     </a>
    </li>
+   <li>
+    <a class="dropdown-item d-flex align-items-center" asp-controller="Orders" asp-action="MyOrders">
+     <i class="bi bi-bag-check me-2"></i> My Pdf Books
+    </a>
+   </li>
 
    @if (roles.Contains(Digital_Library.Core.Constant.Roles.Vendor))
    {
@@ -52,7 +57,7 @@
 
     <li>
      <a class="dropdown-item d-flex align-items-center" asp-controller="Book" asp-action="Index">
-      <i class="bi bi-book me-2"></i> My Books
+      <i class="bi bi-book me-2"></i> My Library Books
      </a>
     </li>
    }
