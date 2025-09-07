@@ -17,8 +17,5 @@ namespace Digital_Library.Core.ViewModels.Requests
 
         [Required]
         public string BookId { get; set; }
-
-        // Optional (only for borrow)
-        public int? Days { get; set; }
     }
 }
