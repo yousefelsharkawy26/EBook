@@ -45,7 +45,7 @@ namespace Digital_Library.Controllers
 
 			var cart = await GetUserCart(userId);
 			if (cart == null)
-				return View("Index", null);
+				return RedirectToAction("Index", "Cart");
 
 			var validationResult = ValidateCart(cart, userId);
 			if (validationResult != null)
@@ -58,14 +58,14 @@ namespace Digital_Library.Controllers
 			var response = await _orderService.CreateOrderAsync(userId, items, request);
 			if (!response.Success)
 			{
-				ModelState.AddModelError(string.Empty, response.Message);
-				return View("Index", cart);
+				TempData["Error"] = response.Message;
+				return RedirectToAction("Index", "Cart");
 			}
 
 			await cartService.ClearCartAsync(userId);
 
 			TempData["Success"] = "Your order has been placed successfully!";
-			return RedirectToAction("MyOrders");
+			return RedirectToAction(nameof(MyOrders));
 		}
 
 		private string? GetUserId()
@@ -105,9 +105,9 @@ namespace Digital_Library.Controllers
 
 				if (hasPdf && hasBorrowing)
 				{
-					ModelState.AddModelError(string.Empty,
-									$"You cannot order the same book '{group.First().Book.Title}' as both PDF and Borrowing.");
-					return View("Index", cart);
+					TempData["Error"] = $"You cannot order the same book '{group.First().Book.Title}' as both PDF and Borrowing.";
+					return RedirectToAction("Index", "Cart");
+
 				}
 			}
 
@@ -135,7 +135,7 @@ namespace Digital_Library.Controllers
 						break;
 
 					case Core.Enums.FormatType.Borrowing:
-						price = (cd.Book.PricePDFPerDay ?? 0) * 1;
+						price = (cd.Book.PricePDFPerDay ?? 0) * cd.Quantity;
 
 						var borrowing = new Borrowing
 						{
