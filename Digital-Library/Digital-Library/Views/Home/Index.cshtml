@@ -1,4 +1,91 @@
-﻿    <section id="billboard" class="position-relative d-flex align-items-center py-5 bg-light-gray"
+﻿@using Digital_Library.Service.Interface
+@inject IBookService bookService
+
+@{
+    var books = await bookService.GetAllBooks();
+    
+    var categories = books
+       .Where(b => b.Category != null)
+       .Select(b => b.Category!)
+       .GroupBy(c => c.Id)
+       .Select(g => g.First())
+       .OrderBy(_ => Guid.NewGuid())
+       .Take(4)
+       .ToList();
+}
+
+<style>
+    /* Category wrapper */
+    .category-card {
+        background: #fff;
+        border: 1px solid #eee;
+        transition: box-shadow 0.3s ease;
+    }
+
+        .category-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+    /* Book card */
+    .book-card {
+        background: #fdfdfd;
+        border-radius: 1rem;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+        .book-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+
+    /* Book cover */
+    .book-cover {
+        height: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+        .book-cover img {
+            max-height: 100%;
+            max-width: 100%;
+            border-radius: 0.75rem;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+    .book-card:hover .book-cover img {
+        transform: scale(1.05);
+    }
+
+    /* Book text */
+    .book-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        line-height: 1.3;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+        .book-title a {
+            color: #333;
+            text-decoration: none;
+        }
+
+            .book-title a:hover {
+                color: #0d6efd;
+            }
+
+    .book-author {
+        font-size: 0.85rem;
+        color: #666;
+    }
+
+</style>
+
+<section id="billboard" class="position-relative d-flex align-items-center py-5 bg-light-gray"
          style="background-image: url(@Url.Content("~/images/banner-image-bg.jpg")); background-size: cover; background-repeat: no-repeat; background-position: center; height: 800px;">
       <div class="position-absolute end-0 pe-0 pe-xxl-5 me-0 me-xxl-5 swiper-next main-slider-button-next">
         <svg class="chevron-forward-circle d-flex justify-content-center align-items-center p-2" width="80" height="80">
@@ -417,423 +504,66 @@
       </div>
     </section>
 
-    <section id="items-listing" class="padding-large">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-6 mb-4 mb-lg-0 col-lg-3">
-            <div class="featured border rounded-3 p-4">
-              <div class="section-title overflow-hidden mb-5 mt-2">
-                <h3 class="d-flex flex-column mb-0">Featured</h3>
-              </div>
-              <div class="items-lists">
-                <div class="item d-flex">
-                  <img src="~/images/product-item2.png" class="img-fluid shadow-sm" alt="product item">
-                  <div class="item-content ms-3">
-                    <h6 class="mb-0 fw-bold"><a href="index.html">Echoes of the Ancients</a></h6>
-                    <div class="review-content d-flex">
-                      <p class="my-2 me-2 fs-6 text-black-50">Lauren Asher</p>
+<section id="random-categories-slider" class="position-relative padding-large bg-light">
+    <div class="container position-relative">
 
-                      <div class="rating text-warning d-flex align-items-center">
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                      </div>
-                    </div>
-                    <span class="price text-primary fw-bold mb-2 fs-5">$870</span>
-                  </div>
-                </div>
-                <hr class="gray-400">
-                <div class="item d-flex">
-                  <img src="~/images/product-item1.png" class="img-fluid shadow-sm" alt="product item">
-                  <div class="item-content ms-3">
-                    <h6 class="mb-0 fw-bold"><a href="index.html">The Midnight Garden</a></h6>
-                    <div class="review-content d-flex">
-                      <p class="my-2 me-2 fs-6 text-black-50">Lauren Asher</p>
-                      <div class="rating text-warning d-flex align-items-center">
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                      </div>
-                    </div>
-                    <span class="price text-primary fw-bold mb-2 fs-5">$870</span>
-                  </div>
-                </div>
-                <hr>
-                <div class="item d-flex">
-                  <img src="~/images/product-item3.png" class="img-fluid shadow-sm" alt="product item">
-                  <div class="item-content ms-3">
-                    <h6 class="mb-0 fw-bold"><a href="index.html">Shadow of the Serpent</a></h6>
-                    <div class="review-content d-flex">
-                      <p class="my-2 me-2 fs-6 text-black-50">Lauren Asher</p>
-
-                      <div class="rating text-warning d-flex align-items-center">
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                      </div>
-                    </div>
-                    <span class="price text-primary fw-bold mb-2 fs-5">$870</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 mb-4 mb-lg-0 col-lg-3">
-            <div class="latest-items border rounded-3 p-4">
-              <div class="section-title overflow-hidden mb-5 mt-2">
-                <h3 class="d-flex flex-column mb-0">Latest items</h3>
-              </div>
-              <div class="items-lists">
-                <div class="item d-flex">
-                  <img src="~/images/product-item4.png" class="img-fluid shadow-sm" alt="product item">
-                  <div class="item-content ms-3">
-                    <h6 class="mb-0 fw-bold"><a href="index.html">Whispering Winds</a></h6>
-                    <div class="review-content d-flex">
-                      <p class="my-2 me-2 fs-6 text-black-50">Lauren Asher</p>
-                      <div class="rating text-warning d-flex align-items-center">
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                      </div>
-                    </div>
-                    <span class="price text-primary fw-bold mb-2 fs-5">$870</span>
-                  </div>
-                </div>
-                <hr class="gray-400">
-                <div class="item d-flex">
-                  <img src="~/images/product-item5.png" class="img-fluid shadow-sm" alt="product item">
-                  <div class="item-content ms-3">
-                    <h6 class="mb-0 fw-bold"><a href="index.html">The Forgotten Realm</a></h6>
-                    <div class="review-content d-flex">
-                      <p class="my-2 me-2 fs-6 text-black-50">Lauren Asher</p>
-                      <div class="rating text-warning d-flex align-items-center">
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                      </div>
-                    </div>
-                    <span class="price text-primary fw-bold mb-2 fs-5">$870</span>
-                  </div>
-                </div>
-                <hr>
-                <div class="item d-flex">
-                  <img src="~/images/product-item6.png" class="img-fluid shadow-sm" alt="product item">
-                  <div class="item-content ms-3">
-                    <h6 class="mb-0 fw-bold"><a href="index.html">Moonlit Secrets</a></h6>
-                    <div class="review-content d-flex">
-                      <p class="my-2 me-2 fs-6 text-black-50">Lauren Asher</p>
-                      <div class="rating text-warning d-flex align-items-center">
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                      </div>
-                    </div>
-                    <span class="price text-primary fw-bold mb-2 fs-5">$870</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 mb-4 mb-lg-0 col-lg-3">
-            <div class="best-reviewed border rounded-3 p-4">
-              <div class="section-title overflow-hidden mb-5 mt-2">
-                <h3 class="d-flex flex-column mb-0">Best reviewed</h3>
-              </div>
-              <div class="items-lists">
-                <div class="item d-flex">
-                  <img src="~/images/product-item7.png" class="img-fluid shadow-sm" alt="product item">
-                  <div class="item-content ms-3">
-                    <h6 class="mb-0 fw-bold"><a href="index.html">The Crystal Key</a></h6>
-                    <div class="review-content d-flex">
-                      <p class="my-2 me-2 fs-6 text-black-50">Lauren Asher</p>
-                      <div class="rating text-warning d-flex align-items-center">
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                      </div>
-                    </div>
-                    <span class="price text-primary fw-bold mb-2 fs-5">$870</span>
-                  </div>
-                </div>
-                <hr class="gray-400">
-                <div class="item d-flex">
-                  <img src="~/images/product-item8.png" class="img-fluid shadow-sm" alt="product item">
-                  <div class="item-content ms-3">
-                    <h6 class="mb-0 fw-bold"><a href="index.html">Starlight Sonata</a></h6>
-                    <div class="review-content d-flex">
-                      <p class="my-2 me-2 fs-6 text-black-50">Lauren Asher</p>
-                      <div class="rating text-warning d-flex align-items-center">
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                      </div>
-                    </div>
-                    <span class="price text-primary fw-bold mb-2 fs-5">$870</span>
-                  </div>
-                </div>
-                <hr>
-                <div class="item d-flex">
-                  <img src="~/images/product-item9.png" class="img-fluid shadow-sm" alt="product item">
-                  <div class="item-content ms-3">
-                    <h6 class="mb-0 fw-bold"><a href="index.html">Tales of the Enchanted Forest</a></h6>
-                    <div class="review-content d-flex">
-                      <p class="my-2 me-2 fs-6 text-black-50">Lauren Asher</p>
-                      <div class="rating text-warning d-flex align-items-center">
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                      </div>
-                    </div>
-                    <span class="price text-primary fw-bold mb-2 fs-5">$870</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 mb-4 mb-lg-0 col-lg-3">
-            <div class="on-sale border rounded-3 p-4">
-              <div class="section-title overflow-hidden mb-5 mt-2">
-                <h3 class="d-flex flex-column mb-0">On sale</h3>
-              </div>
-              <div class="items-lists">
-                <div class="item d-flex">
-                  <img src="~/images/product-item10.png" class="img-fluid shadow-sm" alt="product item">
-                  <div class="item-content ms-3">
-                    <h6 class="mb-0 fw-bold"><a href="index.html">The Phoenix Chronicles</a></h6>
-                    <div class="review-content d-flex">
-                      <p class="my-2 me-2 fs-6 text-black-50">Lauren Asher</p>
-                      <div class="rating text-warning d-flex align-items-center">
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                      </div>
-                    </div>
-                    <span class="price text-primary fw-bold mb-2 fs-5"><s class="text-black-50">$1666</s>
-                      $999</span>
-                  </div>
-                </div>
-                <hr class="gray-400">
-                <div class="item d-flex">
-                  <img src="~/images/product-item11.png" class="img-fluid shadow-sm" alt="product item">
-                  <div class="item-content ms-3">
-                    <h6 class="mb-0 fw-bold"><a href="index.html">Dreams of Avalon</a></h6>
-                    <div class="review-content d-flex">
-                      <p class="my-2 me-2 fs-6 text-black-50">Lauren Asher</p>
-                      <div class="rating text-warning d-flex align-items-center">
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                      </div>
-                    </div>
-                    <span class="price text-primary fw-bold mb-2 fs-5"><s class="text-black-50">$500</s>
-                      $410</span>
-                  </div>
-                </div>
-                <hr>
-                <div class="item d-flex">
-                  <img src="~/images/product-item12.png" class="img-fluid shadow-sm" alt="product item">
-                  <div class="item-content ms-3">
-                    <h6 class="mb-0 fw-bold"><a href="index.html">Legends of the Dragon Isles</a></h6>
-                    <div class="review-content d-flex">
-                      <p class="my-2 me-2 fs-6 text-black-50">Lauren Asher</p>
-                      <div class="rating text-warning d-flex align-items-center">
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                        <svg class="star star-fill">
-                          <use xlink:href="#star-fill"></use>
-                        </svg>
-                      </div>
-                    </div>
-                    <span class="price text-primary fw-bold mb-2 fs-5"><s class="text-black-50">$600</s>
-                      $500</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="section-title d-md-flex justify-content-between align-items-center mb-4">
+            <h3 class="d-flex align-items-center">Discover by Categories</h3>
         </div>
-      </div>
-    </section>
 
-    <section id="categories" class="padding-large pt-0">
-      <div class="container">
-        <div class="section-title overflow-hidden mb-4">
-          <h3 class="d-flex align-items-center">Categories</h3>
+        <!-- Custom nav buttons -->
+        <div class="position-absolute top-50 end-0 translate-middle-y random-next" style="z-index:30; cursor:pointer;">
+            <svg width="48" height="48" aria-hidden="true"><use xlink:href="#alt-arrow-right-outline"></use></svg>
         </div>
-        <div class="row">
-          <div class="col-md-4">
-            <div class="card mb-4 border-0 rounded-3 position-relative">
-              <a href="index.html">
-                <img src="~/images/category1.jpg" class="img-fluid rounded-3" alt="cart item">
-                <h6 class=" position-absolute bottom-0 bg-primary m-4 py-2 px-3 rounded-3"><a href="index.html"
-                    class="text-white">Romance</a></h6>
-              </a>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card text-center mb-4 border-0 rounded-3">
-              <a href="index.html">
-                <img src="~/images/category2.jpg" class="img-fluid rounded-3" alt="cart item">
-                <h6 class=" position-absolute bottom-0 bg-primary m-4 py-2 px-3 rounded-3"><a href="index.html"
-                    class="text-white">Lifestyle</a></h6>
-              </a>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card text-center mb-4 border-0 rounded-3">
-              <a href="index.html">
-                <img src="~/images/category3.jpg" class="img-fluid rounded-3" alt="cart item">
-                <h6 class=" position-absolute bottom-0 bg-primary m-4 py-2 px-3 rounded-3"><a href="index.html"
-                    class="text-white">Recipe</a></h6>
-              </a>
-            </div>
-          </div>
+        <div class="position-absolute top-50 start-0 translate-middle-y random-prev" style="z-index:30; cursor:pointer;">
+            <svg width="48" height="48" aria-hidden="true"><use xlink:href="#alt-arrow-left-outline"></use></svg>
         </div>
-      </div>
-    </section>
 
+        <div class="swiper random-category-swiper">
+            <div class="swiper-wrapper">
+                @foreach (var category in categories)
+                {
+                    var categoryBooks = books
+                    .Where(b => b.Category != null && b.Category.Id == category.Id)
+                    .OrderBy(_ => Guid.NewGuid())
+                    .Take(4)
+                    .ToList();
+
+                    <div class="swiper-slide">
+                        <div class="category-card p-4 rounded-4 shadow-sm h-100">
+                            <h5 class="text-center mb-4 fw-bold">
+                                <a class="text-primary text-decoration-none"
+                                   asp-controller="Book"
+                                   asp-action="ViewAllBooks"
+                                   asp-route-category="@category.Id">
+                                    @category.CategoryName
+                                </a>
+                            </h5>
+                            <div class="row g-4 justify-content-center">
+                                @foreach (var book in categoryBooks)
+                                {
+                                    <div class="col-6 col-md-4 col-lg-3">
+                                        <div class="book-card text-center p-3 h-100">
+                                            <div class="book-cover mb-3">
+                                                <img src="@book.ImageBookCoverPath" alt="@book.Title" />
+                                            </div>
+                                            <h6 class="book-title mb-1">
+                                                <a asp-controller="Book" asp-action="Details" asp-route-id="@book.Id">
+                                                    @book.Title
+                                                </a>
+                                            </h6>
+                                            <p class="book-author text-primary mb-0">@book.Author</p>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
     <section id="customers-reviews" class="position-relative padding-large"
       style="background-image: url(images/banner-image-bg.jpg); background-size: cover; background-repeat: no-repeat; background-position: center; height: 600px;">
       <div class="container offset-md-3 col-md-6 ">
@@ -1099,3 +829,32 @@
         </div>
       </div>
     </section>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof Swiper === 'undefined') {
+            console.error('Swiper is not loaded.');
+            return;
+        }
+
+        const container = document.querySelector('.random-category-swiper');
+        const parent = container.closest('.container');
+        const nextEl = parent.querySelector('.random-next');
+        const prevEl = parent.querySelector('.random-prev');
+
+        const randomSwiper = new Swiper(container, {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            loop: true,
+            navigation: {
+                nextEl: nextEl,
+                prevEl: prevEl,
+            }
+        });
+
+        // fallback if nav fails
+        nextEl?.addEventListener('click', () => randomSwiper.slideNext());
+        prevEl?.addEventListener('click', () => randomSwiper.slidePrev());
+    });
+</script>
