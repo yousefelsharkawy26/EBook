@@ -169,16 +169,18 @@
  }
 
  .actions .btn {
-  padding: 6px 10px;
+  padding: 20px 15px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
-  background: #fff;
+        background: #0d6efd;
   cursor: pointer;
   font-size: 13px;
+  color:aliceblue;
  }
 
   .actions .btn:hover {
-   background: #f3f4f6;
+            background: #6c757d;
+            color:black;
   }
 
  .btn-toggle {
@@ -344,8 +346,8 @@
       <td><span class="status-badge @statusCss">@statusText</span></td>
       <td style="text-align:right;">@itemsCount</td>
       <td style="text-align:right;"><strong>@FormatCurrency(headerTotal)</strong></td>
-      <td class="actions" style="display:flex; gap:6px;">
-       <button class="btn btn-toggle" type="button">Items</button>      </td>
+      <td class="actions" style="display:flex; gap:6px; justify-content:center;">
+       <button class="btn btn-toggle bg" type="button">Items</button>      </td>
      </tr>
 
      <tr class="order-items" style="display:none;">
