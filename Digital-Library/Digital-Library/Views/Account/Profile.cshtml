@@ -1,5 +1,4 @@
-﻿@using Digital_Library.Core.Models
-@model User
+﻿@model UserProfileViewModel
 
 @{
     var image = ((Model.ImageUrl != null) ? Model.ImageUrl : "images/avatar.png");
@@ -25,6 +24,32 @@
     }
 </style>
 
+@if (ViewBag.IsSucess != null && ViewBag.IsSucess)
+{
+    <div class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                Email Updated Sucessfully
+            </div>
+        
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+@if (ViewBag.IsFaild != null && ViewBag.IsFaild)
+{
+    <div class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                There is some errors, please try in another time.
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+
 <section class="padding-large">
     <div class="container">
         <div class="row justify-content-center">
@@ -42,10 +67,12 @@
                     <p class="mb-4">@Model.Email</p>
 
                     <form id="profileForm"
-                          action="/profile"
+                          asp-action="profile"
+                          asp-controller="account"
                           method="post"
                           enctype="multipart/form-data"
                           autocomplete="on">
+                          <input type="hidden" asp-for="Id"/>
                         <div class="mb-3 text-start">
                             <label for="fullname" class="form-label">Full Name</label>
                             <input type="text"
@@ -74,8 +101,9 @@
                             <label for="profileImage" class="form-label">Profile Image</label>
                             <input type="file"
                                    class="form-control"
-                                   id="profileImage"
-                                   name="profileImage"
+                                   id="file"
+                                   name="file"
+                                   for="file"
                                    accept="image/jpeg,image/png,image/webp,image/gif">
                             <small id="imageHelp" class="form-text text-muted" aria-live="polite">
                                 Upload JPG, PNG, WEBP, or GIF (max 2 MB).
@@ -109,7 +137,7 @@
       // Update avatar alt text as the name changes
       const updateAlt = () => {
         const name = nameInput.value.trim() || 'your profile';
-        img.alt = `Profile picture of ${name}`;
+        img.alt = Profile picture of ${name};
       };
       nameInput.addEventListener('input', updateAlt);
       updateAlt();
