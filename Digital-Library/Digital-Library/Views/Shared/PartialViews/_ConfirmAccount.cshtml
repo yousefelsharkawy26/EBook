@@ -1,0 +1,19 @@
+﻿@using Digital_Library.Core.Models
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<User> UserManager
+@inject SignInManager<User> SignInManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    var currentUser = await UserManager.GetUserAsync(User);
+    if (currentUser != null && !await UserManager.IsEmailConfirmedAsync(currentUser))
+    {
+        <div class="alert alert-warning text-center mb-0">
+            <strong>Notice:</strong> Your email is not verified yet.
+            Please confirm your email to enjoy full access.
+            <a href="https://mail.google.com" target="_blank" class="alert-link">
+                Open Gmail
+            </a>
+        </div>
+    }
+}
