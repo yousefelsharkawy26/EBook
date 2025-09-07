@@ -1,0 +1,52 @@
+﻿@using Digital_Library.Core.Models
+@model IEnumerable<Book>
+
+@foreach (var item in Model)
+{
+    <div class="swiper-slide">
+        <div class="card position-relative p-4 border rounded-3">
+            <div class="position-absolute">
+                <p class="bg-primary py-1 px-3 fs-6 text-white rounded-2">10% off</p>
+            </div>
+            <img src="~/@item.ImageBookCoverPath" class="img-fluid shadow-sm" alt="product item">
+            <h6 class="mt-4 mb-0 fw-bold"><a href="index.html">@item.Title</a></h6>
+            <div class="review-content d-flex">
+                <p class="my-2 me-2 fs-6 text-black-50">@item.Author</p>
+
+                <div class="rating text-warning d-flex align-items-center">
+                    <svg class="star star-fill">
+                        <use xlink:href="#star-fill"></use>
+                    </svg>
+                    <svg class="star star-fill">
+                        <use xlink:href="#star-fill"></use>
+                    </svg>
+                    <svg class="star star-fill">
+                        <use xlink:href="#star-fill"></use>
+                    </svg>
+                    <svg class="star star-fill">
+                        <use xlink:href="#star-fill"></use>
+                    </svg>
+                    <svg class="star star-fill">
+                        <use xlink:href="#star-fill"></use>
+                    </svg>
+                </div>
+            </div>
+            <span class="price text-primary fw-bold mb-2 fs-5">$@item.PricePhysical</span>
+            <div class="card-concern position-absolute start-0 end-0 d-flex gap-2">
+                <button type="button" href="#" class="btn btn-dark" data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-title="Tooltip on top">
+                    <svg class="cart">
+                        <use xlink:href="#cart"></use>
+                    </svg>
+                </button>
+                <a href="#" class="btn btn-dark">
+                    <span>
+                        <svg class="wishlist">
+                            <use xlink:href="#heart"></use>
+                        </svg>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>
+}

@@ -41,8 +41,8 @@ namespace Digital_Library.Service.Implementation
 				{
 					BookId = request.BookId,
 					UserId = userId,
-					BorrowDate = DateTime.Now,
-					DueDate = DateTime.Now.AddDays(request.Days)
+					BorrowDate = DateTime.UtcNow,
+					DueDate = DateTime.UtcNow.AddDays(request.Days)
 				};
 
 				await _unitOfWork.Borrowings.AddAsync(borrowing);

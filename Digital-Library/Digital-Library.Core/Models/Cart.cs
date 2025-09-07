@@ -12,7 +12,7 @@ namespace Digital_Library.Core.Models
 	{
 		[Key]
 		public string Id { get; set; } = Guid.NewGuid().ToString();
-		public DateTime CreatedDate { get; set; } = DateTime.Now;
+		public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 		public ICollection<CartDetail>? CartDetails { get; set; }
 		public User? User { get; set; }
 		[ForeignKey(nameof(User))]

@@ -29,5 +29,8 @@ namespace Digital_Library.Core.Models
 		public ICollection<OrderDetail>? OrderDetails { get; set; }
 		public ICollection<Transaction>? Transactions { get; set; }
 
+		[Required]
+		public decimal TotalAmount { get; set; }
+
 	}
 }

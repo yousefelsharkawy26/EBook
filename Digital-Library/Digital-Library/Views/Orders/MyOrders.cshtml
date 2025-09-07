@@ -308,7 +308,7 @@
      var vendorName = h.Vendor?.User.FullName ?? "N/A";
      var statusText = h.Status.ToString();
      var statusCss = $"status-{statusText.ToLower()}";
-     var itemsCount = h.OrderDetails?.Sum(d => d.Quantity) ?? (h.OrderDetails?.Count ?? 0);
+     var itemsCount = (h.OrderDetails?.Count ?? 0);
      var dateIso = order?.OrderDate.ToString("s", CultureInfo.InvariantCulture) ?? "";
      var headerTotal = HeaderTotal(h);
      var totalInvariant = headerTotal.ToString(CultureInfo.InvariantCulture);
@@ -345,9 +345,7 @@
       <td style="text-align:right;">@itemsCount</td>
       <td style="text-align:right;"><strong>@FormatCurrency(headerTotal)</strong></td>
       <td class="actions" style="display:flex; gap:6px;">
-       <button class="btn btn-toggle" type="button">Items</button>
-       <button class="btn btn-view" onclick="location.href='@Url.Action("MyOrderDetails", "Order", new { id = h.Id })'">Details</button>
-      </td>
+       <button class="btn btn-toggle" type="button">Items</button>      </td>
      </tr>
 
      <tr class="order-items" style="display:none;">

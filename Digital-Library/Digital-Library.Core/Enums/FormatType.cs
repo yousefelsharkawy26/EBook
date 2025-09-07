@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Digital_Library.Core.Enums
 {
-    public enum FormatType
-    {
-        PDF,
-        Physical
-    }
+	public enum FormatType
+	{
+		PDF,
+		Physical,
+		Borrowing
+	}
 }

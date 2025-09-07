@@ -26,7 +26,7 @@ public class Book
 	[Required]
 	public bool IsBorrowable { get; set; }
 	public string? PDFFilePath { get; set; }
-	public DateTime UploadDate { get; set; }= DateTime.Now;
+	public DateTime UploadDate { get; set; }= DateTime.UtcNow;
 
 	public Category? Category { get; set; }
 	[ForeignKey(nameof(Category))]

@@ -6,6 +6,7 @@ using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Core.ViewModels.Responses;
 using Digital_Library.Infrastructure.UnitOfWork.Interface;
 using Digital_Library.Service.Interface;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Logging;
@@ -35,22 +36,21 @@ namespace Digital_Library.Service.Services
 			var order = new Order
 			{
 				UserId = userId,
-				TotalAmount = items.Sum(i => i.Price * i.Quantity),
 				OrderHeaders = new List<OrderHeader>(),
 				Address = request.Address,
 				PhoneNumber = request.PhoneNumber
 			};
 
-			// نجمع الكتب حسب Vendor
 			foreach (var vendorGroup in items.GroupBy(s => s.VendorId))
 			{
 				var orderHeader = new OrderHeader
 				{
-					OrderId = order.Id,
 					VendorId = vendorGroup.Key,
 					OrderDetails = new List<OrderDetail>()
 				};
+
 				decimal orderHeaderAmount = 0;
+
 				foreach (var item in vendorGroup)
 				{
 					if (item.Quantity <= 0 || item.Price < 0)
@@ -66,22 +66,55 @@ namespace Digital_Library.Service.Services
 						return Response.Fail($"Book with ID {item.BookId} not found.");
 					}
 
-					orderHeader.OrderDetails.Add(new OrderDetail
+					if (book.Stock < item.Quantity)
+					{
+						return Response.Fail($"Not enough stock for {book.Title}. Available: {book.Stock}");
+					}
+					book.Stock -= item.Quantity;
+					_unitOfWork.Books.Update(book);
+
+					var orderDetail = new OrderDetail
 					{
 						BookId = item.BookId,
 						Quantity = item.Quantity,
-						Price = item.Price
-					});
-					orderHeaderAmount += item.Price * item.Quantity;
+						FormatType = item.FormatType
+					};
+
+					switch (item.FormatType)
+					{
+						case FormatType.PDF:
+							orderDetail.Price = book.PricePdf ?? 0;
+							break;
+						case FormatType.Physical:
+							orderDetail.Price = book.PricePhysical;
+							break;
+						case FormatType.Borrowing:
+							orderDetail.Price = book.PricePDFPerDay ?? 0;
+							break;
+						default:
+							orderDetail.Price = 0;
+							break;
+					}
+
+					orderHeader.OrderDetails.Add(orderDetail);
+					orderHeaderAmount += orderDetail.Price * orderDetail.Quantity;
 				}
-				await MakeTransation(orderHeader.Id, orderHeaderAmount);
+
+				orderHeader.TotalAmount = orderHeaderAmount;
 				order.OrderHeaders.Add(orderHeader);
 			}
+			order.TotalAmount = order.OrderHeaders.Sum(h => h.TotalAmount);
 
 			try
 			{
 				await _unitOfWork.Orders.AddAsync(order);
 				await _unitOfWork.SaveChangesAsync();
+
+				foreach (var header in order.OrderHeaders)
+				{
+					await MakeTransation(header.Id, header.TotalAmount);
+				}
+
 				_logger.LogInformation("CreateOrderAsync: Order {OrderId} created successfully.", order.Id);
 				return Response.Ok("Order created successfully.");
 			}
@@ -112,7 +145,7 @@ namespace Digital_Library.Service.Services
 			return Response.Ok("OrderHeader details retrieved successfully", orderHeader);
 		}
 
-		public async Task< IQueryable<OrderHeader>> GetUserOrders(string userId)
+		public async Task<IQueryable<OrderHeader>> GetUserOrders(string userId)
 		{
 			if (string.IsNullOrEmpty(userId))
 				return Enumerable.Empty<OrderHeader>().AsQueryable();
@@ -124,6 +157,7 @@ namespace Digital_Library.Service.Services
 												oh => oh.Order,
 												oh => oh.Order.User,
 												oh => oh.Vendor,
+												oh => oh.Vendor.User,
 												oh => oh.OrderDetails
 							},
 							thenIncludes: new Func<IQueryable<OrderHeader>, IIncludableQueryable<OrderHeader, object>>[]
@@ -141,8 +175,15 @@ namespace Digital_Library.Service.Services
 							predicate: oh => oh.VendorId == vendorId,
 							includes: new Expression<Func<OrderHeader, object>>[]
 							{
-												oh => oh.Order,             
-            oh => oh.Order.User        
+												oh => oh.Order,
+												oh => oh.Order.User,
+												oh => oh.Vendor,
+												oh => oh.Vendor.User,
+												oh => oh.OrderDetails
+							},
+							thenIncludes: new Func<IQueryable<OrderHeader>, IIncludableQueryable<OrderHeader, object>>[]
+							{
+												q => q.Include(oh => oh.OrderDetails).ThenInclude(od => od.Book)
 							}
 			);
 
@@ -167,13 +208,13 @@ namespace Digital_Library.Service.Services
 			return Response.Ok("OrderHeader status updated successfully", orderHeader);
 		}
 
-		private async Task<bool> MakeTransation(string ordeHeaderId,decimal amount)
+		private async Task<bool> MakeTransation(string ordeHeaderId, decimal amount)
 		{
 			var transaction = new Transaction
 			{
 				OrderHeaderId = ordeHeaderId,
-				TransactionStatus=Status.Complete,
-				Amount=	amount
+				TransactionStatus = Status.Complete,
+				Amount = amount
 			};
 			try
 			{
@@ -182,11 +223,11 @@ namespace Digital_Library.Service.Services
 				var vendor = await _unitOfWork.Vendors.GetSingleAsync(v => v.Id == orderHeader.VendorId);
 				vendor.WalletBalance += amount;
 				await _unitOfWork.SaveChangesAsync();
-				return	true;
+				return true;
 			}
 			catch (Exception)
 			{
-				return	false;
+				return false;
 			}
 		}
 	}

@@ -254,6 +254,9 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("VendorId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
