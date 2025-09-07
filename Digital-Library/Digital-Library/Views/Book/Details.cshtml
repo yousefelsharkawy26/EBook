@@ -2,73 +2,26 @@
 
 @{
     ViewData["Title"] = "Book Details";
+    var book = Model.Book;
+    var hasPdf = book?.HasPDF == true;
+    var canBorrow = hasPdf && book?.IsBorrowable == true;
+    var physicalDisabled = (book?.Stock ?? 0) <= 0;
 }
 
-<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-    body {
-        font-family: 'Poppins', sans-serif;
-    }
-
-    .book-title {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #0d3b66; /* Deep navy */
-    }
-
-    .book-author {
-        color: #555;
-        font-size: 1.1rem;
-    }
-
-    .custom-badge {
-        font-size: 0.9rem;
-        padding: 0.5em 0.75em;
-        border-radius: 50rem;
-    }
-
-    .price-box {
-        background: #f9f9f9;
-        border-left: 4px solid #f4a261; /* Warm gold */
-        padding: 10px 15px;
-        border-radius: 8px;
-        font-size: 1rem;
-    }
-
-    /* 🎨 Unified Button Styles */
-    .btn-custom {
-        border-radius: 50px;
-        font-weight: 600;
-        padding: 0.6rem 1.6rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-
-    .btn-back {
-        background: #0d3b66;
-        color: #fff;
-        border: none;
-    }
-
-        .btn-back:hover {
-            background: #093157;
-            transform: translateY(-2px);
-            color: #fff;
-        }
-
-    .btn-cart {
-        background: #2a9d8f;
-        color: #fff;
-        border: none;
-    }
-
-        .btn-cart:hover {
-            background: #21867a;
-            transform: translateY(-2px);
-            color: #fff;
-        }
+    body { font-family: 'Poppins', sans-serif; }
+    .book-title { font-size: 2rem; font-weight: 700; color: #0d3b66; }
+    .book-author { color: #555; font-size: 1.1rem; }
+    .custom-badge { font-size: 0.9rem; padding: 0.5em 0.75em; border-radius: 50rem; }
+    .price-box { background: #f9f9f9; border-left: 4px solid #f4a261; padding: 10px 15px; border-radius: 8px; font-size: 1rem; }
+    .btn-custom { border-radius: 50px; font-weight: 600; padding: 0.6rem 1.6rem; transition: all 0.3s ease; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    .btn-back { background: #0d3b66; color: #fff; border: none; }
+    .btn-back:hover { background: #093157; transform: translateY(-2px); color: #fff; }
+    .btn-cart { background: #2a9d8f; color: #fff; border: none; }
+    .btn-cart:hover { background: #21867a; transform: translateY(-2px); color: #fff; }
+    .text-small { font-size: 0.9rem; }
 </style>
 
 <div class="container my-5">
@@ -76,8 +29,8 @@
         <!-- Left: Book Cover -->
         <div class="col-lg-4">
             <div class="p-4 border rounded-4 shadow-sm bg-white text-center">
-                <img src="~/@Model.Book.ImageBookCoverPath"
-                     alt="Book Cover"
+                <img src="~/@book.ImageBookCoverPath"
+                     alt="Book Cover - @book.Title"
                      class="img-fluid rounded-3"
                      style="max-height: 450px; object-fit: contain;" />
             </div>
@@ -85,15 +38,15 @@
 
         <!-- Center: Book Info -->
         <div class="col-lg-5">
-            <h1 class="book-title">@Model.Book.Title</h1>
-            <p class="book-author">by <strong>@Model.Book.Author</strong></p>
+            <h1 class="book-title">@book.Title</h1>
+            <p class="book-author">by <strong>@book.Author</strong></p>
 
             <div class="mb-3">
                 <span class="badge bg-warning text-dark custom-badge me-2">
-                    @Model.Book.Category?.CategoryName
+                    @book.Category?.CategoryName
                 </span>
-                <span class="badge @(Model.Book.Stock > 0 ? "bg-success" : "bg-danger") custom-badge">
-                    @(Model.Book.Stock > 0 ? "In Stock" : "Out of Stock")
+                <span class="badge @(book.Stock > 0 ? "bg-success" : "bg-danger") custom-badge">
+                    @(book.Stock > 0 ? "In Stock" : "Out of Stock")
                 </span>
             </div>
 
@@ -104,19 +57,19 @@
             <div class="d-flex flex-column gap-2 mb-4">
                 <div class="price-box d-flex justify-content-between">
                     <span>Physical Copy</span>
-                    <strong>$@Model.Book.PricePhysical</strong>
+                    <strong>$@book.PricePhysical</strong>
                 </div>
-                @if (Model.Book.HasPDF)
+                @if (hasPdf)
                 {
                     <div class="price-box d-flex justify-content-between">
                         <span>PDF</span>
-                        <strong>$@Model.Book.PricePdf</strong>
+                        <strong>$@book.PricePdf</strong>
                     </div>
-                    @if (Model.Book.IsBorrowable)
+                    @if (canBorrow)
                     {
                         <div class="price-box d-flex justify-content-between">
                             <span>Borrow / Day</span>
-                            <strong>$@Model.Book.PricePDFPerDay</strong>
+                            <strong>$@book.PricePDFPerDay</strong>
                         </div>
                     }
                 }
@@ -124,19 +77,15 @@
 
             <!-- Description -->
             <h4 class="fw-semibold mb-2 text-dark">📖 Description</h4>
-            <p style="color:#0d3b66;">@Model.Book.Description</p>
-
+            <p style="color:#0d3b66;">@book.Description</p>
 
             <!-- Actions -->
             <div class="mt-4 d-flex flex-wrap gap-3">
-                <a asp-action="allbooks" class="btn btn-custom btn-back">
-                    ⬅ Back
-                </a>
+                <a asp-action="allbooks" class="btn btn-custom btn-back">⬅ Back</a>
                 <button type="button" class="btn btn-custom btn-cart" data-bs-toggle="modal" data-bs-target="#addToCartModal">
                     🛒 Add to Cart
                 </button>
             </div>
-
         </div>
 
         <!-- Right: Related Books -->
@@ -144,7 +93,7 @@
             <div class="p-4 border rounded-4 shadow-sm bg-white">
                 <h5 class="fw-bold mb-3 text-dark">📚 Related Books</h5>
 
-                @if (Model.RelatedBooks.Any())
+                @if (Model.RelatedBooks != null && Model.RelatedBooks.Any())
                 {
                     @foreach (var related in Model.RelatedBooks)
                     {
@@ -180,41 +129,46 @@
                 <h5 class="modal-title" id="addToCartLabel">Choose Options</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
             <div class="modal-body">
                 <div id="addToCartMessage" class="mt-2"></div>
 
-                <form asp-controller="Cart" asp-action="AddItem" id="addToCartForm">
-                    <input type="hidden" name="BookId" value="@Model.Book.Id" />
+                <form id="addToCartForm" onsubmit="return false;">
+                    <input type="hidden" name="BookId" value="@book.Id" />
 
                     <!-- Format Selection -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">Format</label>
                         <select id="formatType" name="FormatType" class="form-select" required>
-                            <option value="Physical">📘 Physical</option>
-                            @if (Model.Book.HasPDF)
+                            <option value="1" disabled=@(physicalDisabled ? true : false)>
+                                📘 Physical @(physicalDisabled ? "(Out of stock)" : "")
+                            </option>
+                            @if (hasPdf)
                             {
-                                <option value="Pdf">💻 PDF</option>
-                                @if (Model.Book.IsBorrowable)
+                                <option value="0">💻 PDF</option>
+                                @if (canBorrow)
                                 {
-                                    <option value="Borrow">📖 Borrow PDF</option>
+                                    <option value="2">📖 Borrow PDF</option>
                                 }
                             }
                         </select>
+                        @if (physicalDisabled)
+                        {
+                            <div class="form-text text-danger text-small">
+                                Physical copy is currently out of stock.
+                            </div>
+                        }
                     </div>
 
-                    <!-- Borrow Days (only shows if Borrow selected) -->
-                    <div class="mb-3 d-none" id="borrowDaysWrapper">
-                        <label class="form-label fw-bold">Days to Borrow</label>
-                        <input type="number" id="borrowDays" name="Days" class="form-control" min="1" max="30" />
-                    </div>
-
-                    <!-- Quantity -->
+                    <!-- Quantity (becomes "Days to Borrow" label-wise for Borrowing) -->
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Quantity</label>
-                        <input type="number" id="quantity" name="Quantity" class="form-control" min="1" value="1" required />
+                        <label class="form-label fw-bold" id="qtyLabel" for="qtyInput">Quantity</label>
+                        <input type="number" id="qtyInput" name="Quantity" class="form-control" min="1" value="1" required />
+                        <div class="form-text text-small" id="qtyHelp"></div>
                     </div>
                 </form>
             </div>
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" id="confirmAddToCart" class="btn btn-success">Add to Cart</button>
@@ -223,71 +177,148 @@
     </div>
 </div>
 
-@section Scripts
-{
-    @* <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const formatSelect = document.getElementById("formatType"); // your dropdown/radio for format
-            const borrowDaysWrapper = document.getElementById("borrowDaysWrapper");
+@section Scripts {
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const modalEl = document.getElementById("addToCartModal");
+    const form = document.getElementById("addToCartForm");
+    const messageBox = document.getElementById("addToCartMessage");
+    const formatSelect = document.getElementById("formatType");
+    const qtyInput = document.getElementById("qtyInput");
+    const qtyLabel = document.getElementById("qtyLabel");
+    const qtyHelp = document.getElementById("qtyHelp");
+    const confirmBtn = document.getElementById("confirmAddToCart");
 
-            if (formatSelect) {
-                formatSelect.addEventListener("change", function () {
-                    if (this.value.toLowerCase() === "borrow") {
-                        borrowDaysWrapper.classList.remove("d-none");
-                    } else {
-                        borrowDaysWrapper.classList.add("d-none");
-                    }
-                });
+    const FormatType = { PDF: 0, Physical: 1, Borrowing: 2 };
+    const maxStock = @((book?.Stock ?? 0));
+
+    function applyFormatRules() {
+        const fmt = parseInt(formatSelect.value, 10);
+
+        // Always keep the input name = "Quantity" (we send only Quantity)
+        qtyInput.name = "Quantity";
+
+        if (fmt === FormatType.PDF) {
+            // PDF: Quantity = 1 fixed
+            qtyLabel.textContent = "Quantity";
+            qtyInput.value = 1;
+            qtyInput.min = 1;
+            qtyInput.max = 1;
+            qtyInput.disabled = true;
+            qtyHelp.textContent = "Quantity is fixed to 1 for PDF.";
+        } else if (fmt === FormatType.Borrowing) {
+            // Borrowing: Quantity represents days (no upper limit)
+            qtyLabel.textContent = "Days to Borrow";
+            qtyInput.disabled = false;
+            if (!qtyInput.value || parseInt(qtyInput.value, 10) < 1) qtyInput.value = 1;
+            qtyInput.min = 1;
+            qtyInput.removeAttribute("max"); // No upper limit for days
+            qtyHelp.textContent = "Enter number of days (>= 1).";
+        } else {
+            // Physical
+            qtyLabel.textContent = "Quantity";
+            qtyInput.disabled = false;
+            qtyInput.min = 1;
+            if (maxStock > 0) {
+                qtyInput.max = maxStock;
+                qtyHelp.textContent = `Available: ${maxStock} in stock.`;
+                if (parseInt(qtyInput.value || "1", 10) > maxStock) {
+                    qtyInput.value = maxStock;
+                }
+            } else {
+                qtyInput.removeAttribute("max");
+                qtyHelp.textContent = "";
             }
-        });
-    </script> *@
+            if (!qtyInput.value || parseInt(qtyInput.value, 10) < 1) qtyInput.value = 1;
+        }
+    }
 
+    function resetModalState() {
+        messageBox.innerHTML = "";
+        const firstEnabled = Array.from(formatSelect.options).find(o => !o.disabled);
+        if (firstEnabled) formatSelect.value = firstEnabled.value;
+        qtyInput.value = 1;
+        qtyInput.disabled = false;
+        qtyInput.min = 1;
+        qtyInput.removeAttribute("max");
+        qtyLabel.textContent = "Quantity";
+        qtyHelp.textContent = "";
+    }
 
-    <script>
-        document.getElementById("confirmAddToCart").addEventListener("click", function () {
-            const form = document.getElementById("addToCartForm");
-            const messageBox = document.getElementById("addToCartMessage");
+    modalEl.addEventListener('shown.bs.modal', function () {
+        resetModalState();
+        applyFormatRules();
+    });
 
-            const formatType = form.querySelector("[name='FormatType']").value;
+    formatSelect.addEventListener("change", applyFormatRules);
 
-                   const request = {
+    confirmBtn.addEventListener("click", function () {
+        const fmt = parseInt(formatSelect.value, 10);
+        let val = parseInt(qtyInput.value, 10);
+        if (isNaN(val)) val = 1;
+
+        if (fmt === FormatType.PDF) {
+            val = 1; // always 1 for PDF
+        } else if (fmt === FormatType.Borrowing) {
+            // Quantity represents days; must be >= 1
+            if (val < 1) {
+                messageBox.innerHTML = `<div class="alert alert-warning">Please enter days to borrow (>= 1).</div>`;
+                return;
+            }
+        } else {
+            // Physical
+            if (val < 1) {
+                messageBox.innerHTML = `<div class="alert alert-warning">Please enter a valid quantity (>= 1).</div>`;
+                return;
+            }
+            if (maxStock > 0 && val > maxStock) {
+                messageBox.innerHTML = `<div class="alert alert-warning">Quantity exceeds available stock (${maxStock}).</div>`;
+                return;
+            }
+        }
+
+        const request = {
             BookId: form.querySelector("[name='BookId']").value,
-            Quantity: parseInt(form.querySelector("[name='Quantity']").value),
-            FormatType: formatType,
-            Days: formatType.toLowerCase() === "borrow"
-                ? parseInt(form.querySelector("[name='Days']").value) || 0
-                : null
+            FormatType: fmt,  // 0=PDF, 1=Physical, 2=Borrowing
+            Quantity: val     // Borrowing: days; PDF: 1; Physical: copies
         };
 
+        // Send
+        confirmBtn.disabled = true;
+        const oldBtnHtml = confirmBtn.innerHTML;
+        confirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Adding...';
 
-            fetch('/Cart/AddItem', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(request)
-            })
-            .then(res => res.json())
-            .then(data => {
-                console.log("Response:", data);
-
-                if (data.success) {
-                    messageBox.innerHTML = `<div class="alert alert-success">✅ ${data.message}</div>`;
-
-                    setTimeout(() => {
-                        bootstrap.Modal.getInstance(document.getElementById("addToCartModal")).hide();
-                        messageBox.innerHTML = "";
-                    }, 1500);
-                } else {
-                    messageBox.innerHTML = `<div class="alert alert-danger">❌ ${data.message}</div>`;
-                }
-            })
-            .catch(err => {
-                console.error("Error:", err);
-                messageBox.innerHTML = `<div class="alert alert-danger">⚠ Something went wrong</div>`;
-            });
+        fetch('/Cart/AddItem', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify(request)
+        })
+        .then(async res => {
+            const data = await res.json().catch(() => ({ success: false, message: 'Unexpected response' }));
+            return { ok: res.ok, data };
+        })
+        .then(({ ok, data }) => {
+            if (ok && data.success) {
+                messageBox.innerHTML = `<div class="alert alert-success">✅ ${data.message}</div>`;
+                setTimeout(() => {
+                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    modalInstance && modalInstance.hide();
+                    messageBox.innerHTML = "";
+                }, 1200);
+            } else {
+                messageBox.innerHTML = `<div class="alert alert-danger">❌ ${data?.message || 'Failed to add item.'}</div>`;
+            }
+        })
+        .catch(err => {
+            console.error("Error:", err);
+            messageBox.innerHTML = `<div class="alert alert-danger">⚠️ Unexpected error</div>`;
+        })
+        .finally(() => {
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = oldBtnHtml;
         });
-
-
-
-    </script>
+    });
+});
+</script>
 }
-
