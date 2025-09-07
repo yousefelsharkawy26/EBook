@@ -603,6 +603,9 @@ namespace Digital_Library.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+            /*
+             migrationBuilder.DropTable(
+                name: "AspNetRoleClaims");*/
         }
     }
 }
