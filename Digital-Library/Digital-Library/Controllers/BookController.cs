@@ -49,7 +49,15 @@ namespace Digital_Library.Controllers
         [Authorize(Roles = Roles.Vendor)]
         public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
-            var (books, totalCount) = await bookService.GetPagedBooksAsync(page, pageSize);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var vendorId = await vendorService.ReturnVendorIdFromUserId(userId);
+            if (!vendorId.Success)
+            {
+                return BadRequest();
+            }
+
+            //var books = await bookService.GetAllBooks(new BookFilter { VendorId = (string)vendorId.Data });
+            var (books, totalCount) = await bookService.GetPagedBooksAsync(vendorId.Data.ToString(), page, pageSize);
 
             int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
@@ -357,7 +365,7 @@ namespace Digital_Library.Controllers
             ViewBag.PageSize = pageSize;
             ViewBag.TotalItems = totalItems;
             ViewBag.Categories = await categoryService.GetAllCategories();
-            ViewBag.Authors = books.Select(b => b.Author).Distinct().ToList();
+            ViewBag.Authors = books.OrderBy(o => o.Author).Select(b => b.Author).Distinct().ToList();
 
             return View(items);
         }

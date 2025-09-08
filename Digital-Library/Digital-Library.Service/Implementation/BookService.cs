@@ -240,20 +240,23 @@ namespace Digital_Library.Service.Implementation
             return await bestFiveSales.ToListAsync();
         }
 
-        public async Task<(IEnumerable<Book> Books, int TotalCount)> GetPagedBooksAsync(int page, int pageSize, BookFilter? filter = null)
+        public async Task<(IEnumerable<Book> Books, int TotalCount)> GetPagedBooksAsync(
+     string vendorId, int page, int pageSize, BookFilter? filter = null)
         {
-            _logger.LogInformation("Start GetPagedBooks with page={Page}, pageSize={PageSize}, filter={@Filter}", page, pageSize, filter);
+            _logger.LogInformation(
+                "Start GetPagedBooks with vendorId={VendorId}, page={Page}, pageSize={PageSize}, filter={@Filter}",
+                vendorId, page, pageSize, filter);
 
             IQueryable<Book> query = _unitOfWork.Books.GetAllQuery(
                 includes: new Expression<Func<Book, object>>[] { b => b.Category, b => b.Vendor }
             );
 
-            // Apply filters (reuse same logic from GetAllBooks)
+            // ✅ Always restrict to this vendor
+            query = query.Where(b => b.VendorId == vendorId);
+
+            // ✅ Apply additional filters
             if (filter != null)
             {
-                if (!string.IsNullOrEmpty(filter.VendorId))
-                    query = query.Where(b => b.VendorId == filter.VendorId);
-
                 if (!string.IsNullOrEmpty(filter.CategoryId))
                     query = query.Where(b => b.CategoryID == filter.CategoryId);
 
@@ -279,6 +282,7 @@ namespace Digital_Library.Service.Implementation
 
             return (books, totalCount);
         }
+
 
         public async Task<IEnumerable<MyBookViewModel>> GetMyBook(string userId)
         {
