@@ -31,7 +31,6 @@
     <Folder Include="wwwroot\BooksPdf\" />
     <Folder Include="wwwroot\UserProfileImage\" />
     <Folder Include="wwwroot\VendorIdentification\" />
-    <Folder Include="wwwroot\VendorLibraryLogo\" />
   </ItemGroup>
 
   <ItemGroup>
