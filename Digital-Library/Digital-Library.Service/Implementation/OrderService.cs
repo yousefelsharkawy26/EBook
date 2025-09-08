@@ -110,12 +110,17 @@ namespace Digital_Library.Service.Services
 							if (!res)
 							{
 								await _unitOfWork.RolleBack();
-								return Response.Fail($"Already Own Book{book.Title}");
+								return Response.Fail($"Already Own Book : {book.Title} ");
 							}
 						}
 						else if (orderDetail.FormatType == FormatType.Borrowing)
 						{
-							await AddBorrowPdfBooksToUser(userId, book.Id, item.Quantity);
+						var res=	await AddBorrowPdfBooksToUser(userId, book.Id, item.Quantity);
+							if (!res)
+							{
+								await _unitOfWork.RolleBack();
+								return Response.Fail($"Please Try Later! ");
+							}
 						}
 
 					}
