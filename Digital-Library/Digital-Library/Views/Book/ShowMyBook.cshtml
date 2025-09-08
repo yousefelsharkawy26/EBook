@@ -34,9 +34,10 @@ else
             }
         </div>
     </div> *@
-
-        <!-- PDF Books -->
-        <div class="col-md-12 mb-5">
+        @if ((Model.Where(m => m.FormatType == Digital_Library.Core.Enums.FormatType.PDF)).Any())
+        {
+            <!-- PDF Books -->
+            <div class="col-md-12 mb-5">
             <h3>💻 PDF Books</h3>
             <div class="row">
                 @foreach (var item in Model.Where(m => m.FormatType == Digital_Library.Core.Enums.FormatType.PDF))
@@ -54,9 +55,12 @@ else
                 }
             </div>
         </div>
-
-        <!-- Borrowed Books -->
-        <div class="col-md-12 mb-5">
+            
+        }
+        @if ((Model.Where(m => m.FormatType == Digital_Library.Core.Enums.FormatType.Borrowing)).Any())
+        {
+            <!-- Borrowed Books -->
+            <div class="col-md-12 mb-5">
             <h3>📖 Borrowed Books</h3>
             <div class="row">
                 @foreach (var item in Model.Where(m => m.FormatType == Digital_Library.Core.Enums.FormatType.Borrowing))
@@ -86,6 +90,7 @@ else
                 }
 
             </div>
-        </div>
+        </div>  
+        }
     </div>
 }
