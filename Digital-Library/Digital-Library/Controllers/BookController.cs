@@ -300,21 +300,31 @@ namespace Digital_Library.Controllers
     string author,
     string priceRange,
     string sort,
+    string query,   // 👈 added search term
     int page = 1)
         {
             int pageSize = 8;
 
             var books = await bookService.GetAllBooks();
 
-            // Filter by category
+            // 🔎 Search filter
+            if (!string.IsNullOrEmpty(query))
+            {
+                books = books.Where(b =>
+                    (!string.IsNullOrEmpty(b.Title) && b.Title.Contains(query, StringComparison.OrdinalIgnoreCase)) ||
+                    (!string.IsNullOrEmpty(b.Author) && b.Author.Contains(query, StringComparison.OrdinalIgnoreCase))
+                ).ToList();
+            }
+
+            // Category filter
             if (!string.IsNullOrEmpty(category))
                 books = books.Where(b => b.CategoryID == category).ToList();
 
-            // Filter by author
+            // Author filter
             if (!string.IsNullOrEmpty(author))
                 books = books.Where(b => b.Author == author).ToList();
 
-            // Filter by price range
+            // Price filter
             if (!string.IsNullOrEmpty(priceRange))
             {
                 var parts = priceRange.Split('-');
@@ -338,28 +348,20 @@ namespace Digital_Library.Controllers
                 _ => books
             };
 
-           
-
             // Pagination
             var totalItems = books.Count();
             var items = books.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
-            // Pass pagination info
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
             ViewBag.PageSize = pageSize;
-            ViewBag.TotalItems = totalItems; // 👈 Add this
-
-            // ViewBags
+            ViewBag.TotalItems = totalItems;
             ViewBag.Categories = await categoryService.GetAllCategories();
             ViewBag.Authors = books.Select(b => b.Author).Distinct().ToList();
 
-            // Pass pagination info
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-
             return View(items);
         }
+
 
         [HttpGet("ShowMyBook")]
         [Authorize]
@@ -380,6 +382,37 @@ namespace Digital_Library.Controllers
         }
 
 
+        [HttpGet("Search")]
+        public async Task<IActionResult> Search(string query, int page = 1, int pageSize = 8)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                // If no search keyword, just show all books
+                return RedirectToAction("ViewAllBooks");
+            }
+
+            // Call service with filter
+            var filter = new BookFilter
+            {
+                Keyword = query
+            };
+
+            var allBooks = await bookService.GetAllBooks(filter);
+
+            // Pagination
+            var totalItems = allBooks.Count();
+            var items = allBooks
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            ViewBag.Query = query;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            ViewBag.TotalItems = totalItems;
+
+            return View("SearchResults", items); // 👈 Create a SearchResults.cshtml
+        }
 
 
     }

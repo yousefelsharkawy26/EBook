@@ -325,14 +325,17 @@
                 <div class="sidebar ps-lg-5">
                     <div class="widget-menu">
                         <div class="widget-search-bar">
-                            <form class="d-flex border rounded-3 p-2" role="search">
-                                <input class="form-control border-0 me-2 py-2" type="search" placeholder="Search" aria-label="Search">
+                            <form class="d-flex border rounded-3 p-2" role="search"
+                                  asp-controller="Book" asp-action="ViewAllBooks" method="get">
+                                <input class="form-control border-0 me-2 py-2" type="search" placeholder="Search"
+                                       name="query" value="@Context.Request.Query["query"]" />
                                 <button class="btn rounded-3 p-3 d-flex align-items-center" type="submit">
                                     <svg class="search text-light" width="18" height="18">
                                         <use xlink:href="#search"></use>
                                     </svg>
                                 </button>
                             </form>
+
                         </div>
                     </div>
                     <div class="widget-product-categories pt-5">
