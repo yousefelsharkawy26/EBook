@@ -603,9 +603,7 @@ namespace Digital_Library.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
-            /*
-             * 2025/9
-            */
+         
         }
     }
 }
