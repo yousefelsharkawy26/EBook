@@ -382,37 +382,7 @@ namespace Digital_Library.Controllers
         }
 
 
-        [HttpGet("Search")]
-        public async Task<IActionResult> Search(string query, int page = 1, int pageSize = 8)
-        {
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                // If no search keyword, just show all books
-                return RedirectToAction("ViewAllBooks");
-            }
-
-            // Call service with filter
-            var filter = new BookFilter
-            {
-                Keyword = query
-            };
-
-            var allBooks = await bookService.GetAllBooks(filter);
-
-            // Pagination
-            var totalItems = allBooks.Count();
-            var items = allBooks
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            ViewBag.Query = query;
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-            ViewBag.TotalItems = totalItems;
-
-            return View("SearchResults", items); // 👈 Create a SearchResults.cshtml
-        }
+        
 
 
     }
