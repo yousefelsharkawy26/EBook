@@ -248,7 +248,6 @@ namespace Digital_Library.Service.Implementation
                 includes: new Expression<Func<Book, object>>[] { b => b.Category, b => b.Vendor }
             );
 
-            // Apply filters (reuse same logic from GetAllBooks)
             if (filter != null)
             {
                 if (!string.IsNullOrEmpty(filter.VendorId))
