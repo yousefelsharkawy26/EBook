@@ -14,5 +14,7 @@ public class User: IdentityUser
 
     public ICollection<Borrowing>? borrowings { get; set; }
     public ICollection<Order>? Orders { get; set; }
+    public ICollection<UserPdfBook>? userPdfBooks { get; set; }
+
 }
 

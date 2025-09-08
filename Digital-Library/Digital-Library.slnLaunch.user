@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "Digital-Library\\Digital-Library.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Digital-Library.AdminPanel\\Digital-Library.AdminPanel.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
