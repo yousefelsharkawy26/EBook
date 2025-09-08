@@ -114,7 +114,7 @@ namespace Digital_Library.Service.Implementation
 		{
 			var categories =  _unitOfWork.Categories.GetAllQuery();
 			_logger.LogInformation("Retrieved {Count} categories", categories.Count());
-			return await categories.ToListAsync();
+			return await categories.OrderBy(o => o.CategoryName).ToListAsync();
 		}
 
 	}
