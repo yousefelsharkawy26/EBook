@@ -20,6 +20,8 @@ namespace Digital_Library.Infrastructure.UnitOfWork.Implementation
 		public IBaseRepository<OrderHeader> OrderHeaders { get; }
 		public IBaseRepository<Transaction> Transactions { get; }
 		public IBaseRepository<Vendor> Vendors { get; }
+		public IBaseRepository<UserPdfBook> UserPdfBooks { get; }
+
 
 		public UnitOfWork(EBookContext context)
 		{
@@ -35,6 +37,7 @@ namespace Digital_Library.Infrastructure.UnitOfWork.Implementation
 			Vendors = new BaseRepository<Vendor>(_context);
 			CartDetails = new BaseRepository<CartDetail>(_context);
 			OrderHeaders = new BaseRepository<OrderHeader>(_context);
+			UserPdfBooks= new BaseRepository<UserPdfBook>(_context);
 
 		}
 		public void Dispose()
