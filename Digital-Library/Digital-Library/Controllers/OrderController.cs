@@ -124,30 +124,6 @@ namespace Digital_Library.Controllers
 
 				decimal price = 0;
 
-				switch (cd.FormatType)
-				{
-					case Core.Enums.FormatType.Physical:
-						price = cd.Book.PricePhysical * cd.Quantity;
-						break;
-
-					case Core.Enums.FormatType.PDF:
-						price = (cd.Book.PricePdf ?? 0) * 1;
-						break;
-
-					case Core.Enums.FormatType.Borrowing:
-						price = (cd.Book.PricePDFPerDay ?? 0) * cd.Quantity;
-
-						var borrowing = new Borrowing
-						{
-							BookId = cd.BookId,
-							UserId = userId,
-							BorrowDate = DateTime.UtcNow,
-							DueDate = DateTime.UtcNow.AddDays(cd.Quantity)
-						};
-						await unitOfWork.Borrowings.AddAsync(borrowing);
-						break;
-				}
-
 				items.Add(new OrderDetailRequest
 				{
 					BookId = cd.BookId,

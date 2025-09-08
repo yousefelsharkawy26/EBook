@@ -302,6 +302,21 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.ToTable("Transactions");
                 });
 
+            modelBuilder.Entity("Digital_Library.Core.Models.UserPdfBook", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("BookId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "BookId");
+
+                    b.HasIndex("BookId");
+
+                    b.ToTable("userPdfBooks");
+                });
+
             modelBuilder.Entity("Digital_Library.Core.Models.Vendor", b =>
                 {
                     b.Property<string>("Id")
@@ -727,6 +742,25 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.Navigation("OrderHeader");
                 });
 
+            modelBuilder.Entity("Digital_Library.Core.Models.UserPdfBook", b =>
+                {
+                    b.HasOne("Digital_Library.Core.Models.Book", "Book")
+                        .WithMany("userPdfBooks")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Digital_Library.Core.Models.User", "User")
+                        .WithMany("userPdfBooks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Digital_Library.Core.Models.Vendor", b =>
                 {
                     b.HasOne("Digital_Library.Core.Models.User", "User")
@@ -807,6 +841,8 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.Navigation("CartDetails");
 
                     b.Navigation("OrderDetails");
+
+                    b.Navigation("userPdfBooks");
                 });
 
             modelBuilder.Entity("Digital_Library.Core.Models.Cart", b =>
@@ -849,6 +885,8 @@ namespace Digital_Library.Infrastructure.Migrations
                     b.Navigation("Vendor");
 
                     b.Navigation("borrowings");
+
+                    b.Navigation("userPdfBooks");
                 });
 #pragma warning restore 612, 618
         }

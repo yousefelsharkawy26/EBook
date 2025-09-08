@@ -33,6 +33,8 @@ namespace Digital_Library.Service.Services
 				return Response.Fail("Invalid items list.");
 			}
 
+			await _unitOfWork.BeginTransactionAsync();
+
 			var order = new Order
 			{
 				UserId = userId,
@@ -41,79 +43,103 @@ namespace Digital_Library.Service.Services
 				PhoneNumber = request.PhoneNumber
 			};
 
-			foreach (var vendorGroup in items.GroupBy(s => s.VendorId))
-			{
-				var orderHeader = new OrderHeader
-				{
-					VendorId = vendorGroup.Key,
-					OrderDetails = new List<OrderDetail>()
-				};
-
-				decimal orderHeaderAmount = 0;
-
-				foreach (var item in vendorGroup)
-				{
-					if (item.Quantity <= 0 || item.Price < 0)
-					{
-						_logger.LogWarning("CreateOrderAsync: Invalid item quantity or price.");
-						return Response.Fail("Invalid item quantity or price.");
-					}
-
-					var book = await _unitOfWork.Books.GetSingleAsync(b => b.Id == item.BookId);
-					if (book == null)
-					{
-						_logger.LogWarning("CreateOrderAsync: Book with ID {BookId} not found.", item.BookId);
-						return Response.Fail($"Book with ID {item.BookId} not found.");
-					}
-
-					if (book.Stock < item.Quantity)
-					{
-						return Response.Fail($"Not enough stock for {book.Title}. Available: {book.Stock}");
-					}
-					book.Stock -= item.Quantity;
-					_unitOfWork.Books.Update(book);
-
-					var orderDetail = new OrderDetail
-					{
-						BookId = item.BookId,
-						Quantity = item.Quantity,
-						FormatType = item.FormatType
-					};
-
-					switch (item.FormatType)
-					{
-						case FormatType.PDF:
-							orderDetail.Price = book.PricePdf ?? 0;
-							break;
-						case FormatType.Physical:
-							orderDetail.Price = book.PricePhysical;
-							break;
-						case FormatType.Borrowing:
-							orderDetail.Price = book.PricePDFPerDay ?? 0;
-							break;
-						default:
-							orderDetail.Price = 0;
-							break;
-					}
-
-					orderHeader.OrderDetails.Add(orderDetail);
-					orderHeaderAmount += orderDetail.Price * orderDetail.Quantity;
-				}
-
-				orderHeader.TotalAmount = orderHeaderAmount;
-				order.OrderHeaders.Add(orderHeader);
-			}
-			order.TotalAmount = order.OrderHeaders.Sum(h => h.TotalAmount);
-
 			try
 			{
+				foreach (var vendorGroup in items.GroupBy(s => s.VendorId))
+				{
+					var orderHeader = new OrderHeader
+					{
+						VendorId = vendorGroup.Key,
+						OrderDetails = new List<OrderDetail>()
+					};
+
+					decimal orderHeaderAmount = 0;
+
+					foreach (var item in vendorGroup)
+					{
+						if (item.Quantity <= 0 || item.Price < 0)
+						{
+							_logger.LogWarning("CreateOrderAsync: Invalid item quantity or price.");
+							return Response.Fail("Invalid item quantity or price.");
+						}
+
+						var book = await _unitOfWork.Books.GetSingleAsync(b => b.Id == item.BookId);
+						if (book == null)
+						{
+							_logger.LogWarning("CreateOrderAsync: Book with ID {BookId} not found.", item.BookId);
+							return Response.Fail($"Book  not found.");
+						}
+
+						if (book.Stock < item.Quantity)
+						{
+							return Response.Fail($"Not enough stock for {book.Title}. Available: {book.Stock}");
+						}
+
+						book.Stock -= item.Quantity;
+						_unitOfWork.Books.Update(book);
+
+						var orderDetail = new OrderDetail
+						{
+							BookId = item.BookId,
+							Quantity = item.Quantity,
+							FormatType = item.FormatType
+						};
+
+						switch (item.FormatType)
+						{
+							case FormatType.PDF:
+								orderDetail.Price = book.PricePdf ?? 0;
+								break;
+							case FormatType.Physical:
+								orderDetail.Price = book.PricePhysical;
+								break;
+							case FormatType.Borrowing:
+								orderDetail.Price = book.PricePDFPerDay ?? 0;
+								break;
+							default:
+								orderDetail.Price = 0;
+								break;
+						}
+
+						orderHeader.OrderDetails.Add(orderDetail);
+						orderHeaderAmount += orderDetail.Price * orderDetail.Quantity;
+
+						if (orderDetail.FormatType == FormatType.PDF)
+						{
+						var res=	await AddPdfBooksToUser(userId, book.Id);
+							if (!res)
+							{
+								await _unitOfWork.RolleBack();
+								return Response.Fail($"Already Own Book : {book.Title} ");
+							}
+						}
+						else if (orderDetail.FormatType == FormatType.Borrowing)
+						{
+						var res=	await AddBorrowPdfBooksToUser(userId, book.Id, item.Quantity);
+							if (!res)
+							{
+								await _unitOfWork.RolleBack();
+								return Response.Fail($"Please Try Later! ");
+							}
+						}
+
+					}
+
+					orderHeader.TotalAmount = orderHeaderAmount;
+					order.OrderHeaders.Add(orderHeader);
+				}
+
+				order.TotalAmount = order.OrderHeaders.Sum(h => h.TotalAmount);
+
 				await _unitOfWork.Orders.AddAsync(order);
 				await _unitOfWork.SaveChangesAsync();
 
 				foreach (var header in order.OrderHeaders)
 				{
-					await MakeTransation(header.Id, header.TotalAmount);
+					await MakeTransaction(header.Id, header.TotalAmount);
 				}
+
+				await _unitOfWork.Commit();
 
 				_logger.LogInformation("CreateOrderAsync: Order {OrderId} created successfully.", order.Id);
 				return Response.Ok("Order created successfully.");
@@ -121,10 +147,93 @@ namespace Digital_Library.Service.Services
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "CreateOrderAsync: Error creating order.");
+				await _unitOfWork.RolleBack();
 				return Response.Fail("Error creating order.");
 			}
 		}
 
+		private async Task<bool> MakeTransaction(string ordeHeaderId, decimal amount)
+		{
+			var transaction = new Transaction
+			{
+				OrderHeaderId = ordeHeaderId,
+				TransactionStatus = Status.Complete,
+				Amount = amount
+			};
+
+			try
+			{
+				await _unitOfWork.Transactions.AddAsync(transaction);
+
+				var orderHeader = await _unitOfWork.OrderHeaders.GetSingleAsync(t => t.Id == ordeHeaderId);
+				var vendor = await _unitOfWork.Vendors.GetSingleAsync(v => v.Id == orderHeader.VendorId);
+
+				vendor.WalletBalance += amount;
+
+				await _unitOfWork.SaveChangesAsync();
+				return true;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "MakeTransaction: Error while creating transaction.");
+				return false;
+			}
+		}
+
+		private async Task<bool> AddPdfBooksToUser(string userId, string bookId)
+		{
+			var res=await _unitOfWork.UserPdfBooks.GetSingleAsync(upb => upb.BookId == bookId && upb.UserId == userId);
+			if (res != null)
+			{
+				return false;
+			}
+			var userPdfBook = new UserPdfBook
+			{
+				BookId = bookId,
+				UserId = userId
+			};
+
+			try
+			{
+				await _unitOfWork.UserPdfBooks.AddAsync(userPdfBook);
+				await _unitOfWork.SaveChangesAsync();
+				return true;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "AddPdfBooksToUser: Error while adding book {BookId} to user {UserId}.", bookId, userId);
+				return	false;
+			}
+		}
+
+		private async Task<bool> AddBorrowPdfBooksToUser(string userId, string bookId,int days)
+		{
+			var res = await _unitOfWork.Borrowings.GetSingleAsync(b => b.BookId == bookId && b.UserId == userId && b.DueDate>DateTime.UtcNow);
+			if (res != null)
+			{
+				res.DueDate= res.DueDate.AddDays(days);
+				_unitOfWork.Borrowings.Update(res);
+				await _unitOfWork.SaveChangesAsync();
+				return true;
+			}
+			var borrowpdf = new Borrowing
+			{
+				BookId = bookId,
+				UserId = userId,
+				DueDate=	DateTime.UtcNow.AddDays(days)
+			};
+			try
+			{
+				await _unitOfWork.Borrowings.AddAsync(borrowpdf);
+				await _unitOfWork.SaveChangesAsync();
+				return true;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "AddBorrowPdfBooksToUser: Error while adding book {BookId} to user {UserId}.", bookId, userId);
+				return	false;
+			}
+		}
 
 		public async Task<Response> GetOrderHeaderDetailsByIdAsync(string orderHeaderId)
 		{
@@ -208,27 +317,6 @@ namespace Digital_Library.Service.Services
 			return Response.Ok("OrderHeader status updated successfully", orderHeader);
 		}
 
-		private async Task<bool> MakeTransation(string ordeHeaderId, decimal amount)
-		{
-			var transaction = new Transaction
-			{
-				OrderHeaderId = ordeHeaderId,
-				TransactionStatus = Status.Complete,
-				Amount = amount
-			};
-			try
-			{
-				await _unitOfWork.Transactions.AddAsync(transaction);
-				var orderHeader = await _unitOfWork.OrderHeaders.GetSingleAsync(t => t.Id == ordeHeaderId);
-				var vendor = await _unitOfWork.Vendors.GetSingleAsync(v => v.Id == orderHeader.VendorId);
-				vendor.WalletBalance += amount;
-				await _unitOfWork.SaveChangesAsync();
-				return true;
-			}
-			catch (Exception)
-			{
-				return false;
-			}
-		}
+
 	}
 }

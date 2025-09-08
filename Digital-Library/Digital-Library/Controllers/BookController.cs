@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace Digital_Library.Controllers
@@ -30,20 +31,35 @@ namespace Digital_Library.Controllers
             this.fileService = fileService;
             this.cartService = cartService;
         }
+        //[HttpGet("Index")]
+        //[Authorize(Roles = Roles.Vendor)]
+        //public async Task<IActionResult> Index()
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    var vendorId = await vendorService.ReturnVendorIdFromUserId(userId);
+        //    if (!vendorId.Success)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    var books = await bookService.GetAllBooks(new BookFilter { VendorId = (string)vendorId.Data });
+
+        //    return View(books);
+        //}
         [HttpGet("Index")]
         [Authorize(Roles = Roles.Vendor)]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var vendorId = await vendorService.ReturnVendorIdFromUserId(userId);
-            if (!vendorId.Success)
-            {
-                return BadRequest();
-            }
-            var books = await bookService.GetAllBooks(new BookFilter { VendorId = (string)vendorId.Data });
+            var (books, totalCount) = await bookService.GetPagedBooksAsync(page, pageSize);
+
+            int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
 
             return View(books);
         }
+
 
         [HttpGet("ConfirmDelete/{id}")]
         [Authorize(Roles = Roles.Vendor)]
@@ -273,8 +289,15 @@ namespace Digital_Library.Controllers
         }
 
         [HttpGet("allbooks")]
-        public async Task<IActionResult> ViewAllBooks(string category, string author, string priceRange, string sort)
+        public async Task<IActionResult> ViewAllBooks(
+    string category,
+    string author,
+    string priceRange,
+    string sort,
+    int page = 1)
         {
+            int pageSize = 8;
+
             var books = await bookService.GetAllBooks();
 
             // Filter by category
@@ -293,11 +316,13 @@ namespace Digital_Library.Controllers
                     decimal.TryParse(parts[0], out decimal minPrice) &&
                     decimal.TryParse(parts[1], out decimal maxPrice))
                 {
-                    books = books.Where(b => b.PricePhysical >= minPrice && b.PricePhysical <= maxPrice).ToList();
+                    books = books
+                        .Where(b => b.PricePhysical >= minPrice && b.PricePhysical <= maxPrice)
+                        .ToList();
                 }
             }
 
-            // Sorting (optional)
+            // Sorting
             books = sort switch
             {
                 "NameAsc" => books.OrderBy(b => b.Title).ToList(),
@@ -307,12 +332,27 @@ namespace Digital_Library.Controllers
                 _ => books
             };
 
-            // Populate viewbags
+           
+
+            // Pagination
+            var totalItems = books.Count();
+            var items = books.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            // Pass pagination info
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalItems = totalItems; // 👈 Add this
+
+            // ViewBags
             ViewBag.Categories = await categoryService.GetAllCategories();
             ViewBag.Authors = books.Select(b => b.Author).Distinct().ToList();
 
+            // Pass pagination info
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-            return View(books);
+            return View(items);
         }
 
 

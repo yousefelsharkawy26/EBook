@@ -61,7 +61,7 @@ public class AuthService : IAuthService
 																								"<p>Welcome back to E-BOOK platform! We're glad to see you again.</p>" +
 																								"<p>Enjoy browsing our library.</p>";
 
-			await _emailSender.SendEmailAsync(user.Email, "Welcome Back!", htmlMessage);
+		 _emailSender.SendEmailAsync(user.Email, "Welcome Back!", htmlMessage);
 			_logger.LogInformation($"Welcome email sent to {user.Email}");
 		}
 		catch (Exception ex)
@@ -98,7 +98,7 @@ public class AuthService : IAuthService
 		if (!res.Succeeded) return Response.Fail(res.Errors.FirstOrDefault()?.Description ?? "Sign-up failed");
 		var roleResult = await _userManager.AddToRoleAsync(user, Roles.Customer);
 		if (!roleResult.Succeeded) return Response.Fail(roleResult.Errors.FirstOrDefault()?.Description ?? "Assign role failed");
-		await SendEmailVerificationAsync(user);
+		  SendEmailVerificationAsync(user);
 
 		_logger.LogInformation($"User {user.Email} signed up.");
 		return Response.Ok("Sign-up successful", user);

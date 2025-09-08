@@ -37,6 +37,23 @@ namespace Digital_Library.Infrastructure.Context
 				.WithMany(b => b.OrderHeaders)
 				.HasForeignKey(od => od.VendorId)
 				.OnDelete(DeleteBehavior.Restrict);
+
+			modelBuilder.Entity<UserPdfBook>()
+				.HasKey(b => new { b.UserId, b.BookId });
+
+			modelBuilder.Entity<UserPdfBook>()
+				.HasOne(od => od.Book)
+				.WithMany(b => b.userPdfBooks)
+				.HasForeignKey(od => od.BookId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			modelBuilder.Entity<UserPdfBook>()
+				.HasOne(od => od.User)
+				.WithMany(b => b.userPdfBooks)
+				.HasForeignKey(od => od.UserId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+
 		}
 
 		#region Entities
@@ -50,6 +67,9 @@ namespace Digital_Library.Infrastructure.Context
 		public DbSet<VendorIdentityImagesUrl> vendorIdentityImagesUrls { get; set; }
 		public DbSet<Order> Orders { get; set; }
 		public DbSet<OrderDetail> OrderDetails { get; set; }
+		public DbSet<UserPdfBook> userPdfBooks { get; set; }
+
+
 		#endregion
 
 
