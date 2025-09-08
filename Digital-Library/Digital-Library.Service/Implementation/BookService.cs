@@ -1,4 +1,5 @@
 ﻿using Digital_Library.Core.Constant;
+using Digital_Library.Core.Enums;
 using Digital_Library.Core.Filters;
 using Digital_Library.Core.Models;
 using Digital_Library.Core.ViewModels.Requests;
@@ -6,6 +7,7 @@ using Digital_Library.Core.ViewModels.Responses;
 using Digital_Library.Infrastructure.UnitOfWork.Interface;
 using Digital_Library.Service.Interface;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 using System.Net;
@@ -278,6 +280,47 @@ namespace Digital_Library.Service.Implementation
             return (books, totalCount);
         }
 
+        public async Task<IEnumerable<MyBookViewModel>> GetMyBook(string userId)
+        {
+            // Step 1: Load orders with details + book
+            var orders = await _unitOfWork.OrderHeaders.GetManyQuery(
+                predicate: oh => oh.Order.UserId == userId,
+                includes: new Expression<Func<OrderHeader, object>>[]
+                {
+            oh => oh.OrderDetails
+                },
+                thenIncludes: new Func<IQueryable<OrderHeader>, IIncludableQueryable<OrderHeader, object>>[]
+                {
+            q => q.Include(oh => oh.OrderDetails).ThenInclude(od => od.Book)
+                }
+            ).ToListAsync();
+
+            // Step 2: Load borrowings for this user (all at once)
+            var borrowings = await _unitOfWork.Borrowings
+                .GetManyQuery(b => b.UserId == userId)
+                .ToListAsync();
+
+            // Step 3: Project into MyBookViewModel (skip Physical)
+            var books = orders
+                .SelectMany(oh => oh.OrderDetails
+                    .Where(od => od.FormatType != FormatType.Physical) // 🚀 filter here
+                    .Select(od => new MyBookViewModel
+                    {
+                        Book = od.Book,
+                        FormatType = od.FormatType,
+                        DueDate = od.FormatType == FormatType.Borrowing
+                            ? borrowings.FirstOrDefault(b => b.BookId == od.BookId)?.DueDate
+                            : null
+                    }))
+                .ToList();
+
+            return books;
+        }
+
+
+
+
+
 
     }
 }
@@ -286,4 +329,11 @@ public class BookGroupViewModel
 {
 	public decimal TotalSold { get; set; }
 	public Book Book { get; set; }
+}
+
+public class MyBookViewModel
+{
+    public Book Book { get; set; }
+    public FormatType FormatType { get; set; }
+    public DateTime? DueDate { get; set; } // for borrowed books
 }

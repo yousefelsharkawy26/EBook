@@ -1,5 +1,10 @@
-﻿@{
+﻿@using Digital_Library.Core.Models
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<User> UserManager
+@{
  ViewData["Title"] = "View PDF";
+    var user = await UserManager.GetUserAsync(User);
+    var roles = await UserManager.GetRolesAsync(user);
 }
 
 <div class="container my-5">
@@ -18,6 +23,14 @@
  {
   <div class="alert alert-danger">PDF not found.</div>
  }
+    @if (roles.Contains(Digital_Library.Core.Constant.Roles.Vendor))
+    {
+        <a asp-action="Index" asp-controller="Book" class="btn btn-secondary mt-3">Back to list Books</a>
 
- <a asp-action="Index" asp-controller="Book" class="btn btn-secondary mt-3">Back to My Books</a>
+        <a asp-action="ShowMyBook" asp-controller="Book" class="btn btn-secondary mt-3">Back to My Books</a>
+    }
+    else
+    {
+        <a asp-action="ShowMyBook" asp-controller="Book" class="btn btn-secondary mt-3">Back to My Books</a>
+    }
 </div>

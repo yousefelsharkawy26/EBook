@@ -21,5 +21,7 @@ namespace Digital_Library.Service.Interface
 
 		Task<(IEnumerable<Book> Books, int TotalCount)> GetPagedBooksAsync(int page, int pageSize, BookFilter? filter = null);
 
+		Task<IEnumerable<MyBookViewModel>> GetMyBook(string id);
+
     }
 }

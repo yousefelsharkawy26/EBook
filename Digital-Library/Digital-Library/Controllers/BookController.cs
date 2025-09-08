@@ -273,9 +273,13 @@ namespace Digital_Library.Controllers
 
 
         [HttpGet("ShowPdf/{id}")]
-        [Authorize(Roles = Roles.Vendor)]
+        [Authorize]
         public async Task<IActionResult> ShowPdf(string id)
         {
+            if (TempData["IsAllowed"] == null)
+            {
+                return BadRequest();
+            }
             if (string.IsNullOrEmpty(id))
                 return NotFound();
 
@@ -285,6 +289,8 @@ namespace Digital_Library.Controllers
                 return NotFound("PDF not available");
 
             ViewBag.PdfPath = book.PDFFilePath;
+            
+            TempData.Remove("IsAllowed");
             return View();
         }
 
@@ -354,6 +360,26 @@ namespace Digital_Library.Controllers
 
             return View(items);
         }
+
+        [HttpGet("ShowMyBook")]
+        [Authorize]
+        public async Task<IActionResult> ShowMyBook()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var books = await bookService.GetMyBook(userId);
+
+            if (books.Any())
+                TempData["IsAllowed"] = true;
+                
+
+
+            return View(books);
+        }
+
+
 
 
     }
