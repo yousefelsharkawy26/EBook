@@ -6,6 +6,31 @@
 @{
     ViewData["Title"] = "ViewAllBooks";
     var url = Url.Content("~/images/banner-image-bg-1.jpg");
+    var currentSort = Context.Request.Query["sort"].ToString();
+    var currentCategory = Context.Request.Query["category"].ToString();
+    var currentAuthor = Context.Request.Query["author"].ToString();
+    var currentPrice = Context.Request.Query["priceRange"].ToString();
+    var currentPage = ViewBag.CurrentPage as int? ?? 1;
+    var totalPages = ViewBag.TotalPages as int? ?? 1;
+    var totalItems = ViewBag.TotalItems as int? ?? 0;
+
+    
+    int maxPagesToShow = 5;
+    var pageSize = ViewBag.PageSize as int? ?? 8;
+
+    int startPage = Math.Max(1, currentPage - 2);
+    int endPage = Math.Min(totalPages, startPage + maxPagesToShow - 1);
+
+    if (endPage - startPage + 1 < maxPagesToShow && startPage > 1)
+    {
+        startPage = Math.Max(1, endPage - maxPagesToShow + 1);
+    }
+    
+    
+    
+
+    var startItem = ((currentPage - 1) * pageSize) + 1;
+    var endItem = Math.Min(currentPage * pageSize, totalItems);
 }
 
 <style>
@@ -59,6 +84,44 @@
     .z-index-2 {
         z-index: 2;
     }
+    /* Modern Pagination Styling */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+    }
+
+        .pagination .page-link {
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #0d6efd;
+            background-color: #f8f9fa;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            transition: all 0.25s ease;
+        }
+
+            .pagination .page-link:hover {
+                background-color: #0d6efd;
+                color: #fff;
+            }
+
+        .pagination .page-item.active .page-link {
+            background-color: #0d6efd;
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 3px 8px rgba(13, 110, 253, 0.3);
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #e9ecef;
+            color: #adb5bd;
+            box-shadow: none;
+            pointer-events: none;
+        }
+
 </style>
 
 
@@ -70,7 +133,7 @@
                     <h1>Shop</h1>
                     <div class="breadcrumbs">
                         <span class="item">
-                            <a href="index.html">Home > </a>
+                            <a asp-controller="Home" asp-action="Index">Home > </a>
                         </span>
                         <span class="item text-decoration-underline">Shop</span>
                     </div>
@@ -86,7 +149,8 @@
             <main class="col-md-9">
                 <div class="filter-shop d-flex flex-wrap justify-content-between mb-5">
                     <div class="showing-product">
-                        <p>Showing 1–9 of 55 results</p>
+                        <p>Showing @startItem–@endItem of @totalItems results</p>
+
                     </div>
                     <div class="sort-by">
                         <form method="get" id="sortForm">
@@ -205,63 +269,63 @@
                     }
                 </div>
 
-                <!-- ✅ Pagination Section -->
-                @{
-                    var currentSort = Context.Request.Query["sort"].ToString();
-                    var currentCategory = Context.Request.Query["category"].ToString();
-                    var currentAuthor = Context.Request.Query["author"].ToString();
-                    var currentPrice = Context.Request.Query["priceRange"].ToString();
-                    var currentPage = ViewBag.CurrentPage as int? ?? 1;
-                    var totalPages = ViewBag.TotalPages as int? ?? 1;
-
-                    // Window size (10 pages at a time)
-                    var windowSize = 10;
-
-                    // Calculate start & end of the current "window"
-                    var startPage = ((currentPage - 1) / windowSize) * windowSize + 1;
-                    var endPage = Math.Min(startPage + windowSize - 1, totalPages);
-                }
-
-                <nav class="py-5" aria-label="Page navigation">
-                    <ul class="pagination justify-content-center gap-2">
-
-                        <!-- Prev -->
-                        <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
-                            <a class="page-link" href="@Url.Action("ViewAllBooks", new { page = currentPage - 1, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">Prev</a>
+                <!-- Pagination -->
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center pagination-lg">
+                        <!-- Previous button -->
+                        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link d-flex align-items-center justify-content-center"
+                               asp-action="ViewAllBooks"
+                               asp-route-page="@(ViewBag.CurrentPage - 1)">
+                                «
+                            </a>
                         </li>
 
-                        <!-- Show first page and ellipsis if needed -->
+                        
+
+                        <!-- First page + dots -->
                         @if (startPage > 1)
                         {
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("ViewAllBooks", new { page = 1, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">1</a>
+                                <a class="page-link" asp-action="ViewAllBooks" asp-route-page="1">1</a>
                             </li>
-                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                            @if (startPage > 2)
+                            {
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                            }
                         }
 
-                        <!-- Page numbers window -->
+                        <!-- Page numbers -->
                         @for (int i = startPage; i <= endPage; i++)
                         {
                             <li class="page-item @(i == currentPage ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("ViewAllBooks", new { page = i, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">@i</a>
+                                <a class="page-link" asp-action="ViewAllBooks" asp-route-page="@i">@i</a>
                             </li>
                         }
 
-                        <!-- Show last page and ellipsis if needed -->
+                        <!-- Last page + dots -->
                         @if (endPage < totalPages)
                         {
-                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                            @if (endPage < totalPages - 1)
+                            {
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                            }
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("ViewAllBooks", new { page = totalPages, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">@totalPages</a>
+                                <a class="page-link" asp-action="ViewAllBooks" asp-route-page="@totalPages">@totalPages</a>
                             </li>
                         }
 
-                        <!-- Next -->
-                        <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
-                            <a class="page-link" href="@Url.Action("ViewAllBooks", new { page = currentPage + 1, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">Next</a>
+                        <!-- Next button -->
+                        <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                            <a class="page-link d-flex align-items-center justify-content-center"
+                               asp-action="ViewAllBooks"
+                               asp-route-page="@(currentPage + 1)">
+                                »
+                            </a>
                         </li>
                     </ul>
                 </nav>
+
 
             </main>
             <aside class="col-md-3">

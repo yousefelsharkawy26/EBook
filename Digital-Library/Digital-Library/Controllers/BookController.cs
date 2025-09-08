@@ -332,9 +332,17 @@ namespace Digital_Library.Controllers
                 _ => books
             };
 
+           
+
             // Pagination
             var totalItems = books.Count();
             var items = books.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            // Pass pagination info
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalItems = totalItems; // 👈 Add this
 
             // ViewBags
             ViewBag.Categories = await categoryService.GetAllCategories();
