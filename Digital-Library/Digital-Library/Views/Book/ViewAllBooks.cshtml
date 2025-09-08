@@ -12,22 +12,10 @@
     var currentPrice = Context.Request.Query["priceRange"].ToString();
     var currentPage = ViewBag.CurrentPage as int? ?? 1;
     var totalPages = ViewBag.TotalPages as int? ?? 1;
-    var totalItems = ViewBag.TotalItems as int? ?? 0;
 
-    
-    int maxPagesToShow = 5;
+
     var pageSize = ViewBag.PageSize as int? ?? 8;
-
-    int startPage = Math.Max(1, currentPage - 2);
-    int endPage = Math.Min(totalPages, startPage + maxPagesToShow - 1);
-
-    if (endPage - startPage + 1 < maxPagesToShow && startPage > 1)
-    {
-        startPage = Math.Max(1, endPage - maxPagesToShow + 1);
-    }
-    
-    
-    
+    var totalItems = ViewBag.TotalItems as int? ?? 0;
 
     var startItem = ((currentPage - 1) * pageSize) + 1;
     var endItem = Math.Min(currentPage * pageSize, totalItems);
@@ -89,6 +77,7 @@
         display: flex;
         justify-content: center;
         gap: 6px;
+        flex-wrap: wrap;
     }
 
         .pagination .page-link {
@@ -269,59 +258,63 @@
                     }
                 </div>
 
-                <!-- Pagination -->
-                <nav aria-label="Page navigation" class="mt-4">
-                    <ul class="pagination justify-content-center pagination-lg">
-                        <!-- Previous button -->
-                        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
-                            <a class="page-link d-flex align-items-center justify-content-center"
-                               asp-action="ViewAllBooks"
-                               asp-route-page="@(ViewBag.CurrentPage - 1)">
-                                «
-                            </a>
+                @{
+                    var windowSize = 10;
+
+                    var startPage = ((currentPage - 1) / windowSize) * windowSize + 1;
+                    var endPage = Math.Min(startPage + windowSize - 1, totalPages);
+
+                    // 🔥 Auto shift window when on the last page of the window
+                    if (currentPage == endPage && endPage < totalPages)
+                    {
+                        startPage++;
+                        endPage = Math.Min(startPage + windowSize - 1, totalPages);
+                    }
+
+                    // 🔥 Auto shift window when on the first page of the window (but not page 1)
+                    if (currentPage == startPage && startPage > 1)
+                    {
+                        startPage = Math.Max(1, startPage - 1);
+                        endPage = Math.Min(startPage + windowSize - 1, totalPages);
+                    }
+                }
+
+
+
+                <nav class="py-5" aria-label="Page navigation">
+                    <ul class="pagination">
+
+                        <!-- Prev -->
+                        <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("ViewAllBooks", new { page = currentPage - 1, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">Prev</a>
                         </li>
 
-                        
-
-                        <!-- First page + dots -->
                         @if (startPage > 1)
                         {
                             <li class="page-item">
-                                <a class="page-link" asp-action="ViewAllBooks" asp-route-page="1">1</a>
+                                <a class="page-link" href="@Url.Action("ViewAllBooks", new { page = 1, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">1</a>
                             </li>
-                            @if (startPage > 2)
-                            {
-                                <li class="page-item disabled"><span class="page-link">...</span></li>
-                            }
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
                         }
 
-                        <!-- Page numbers -->
                         @for (int i = startPage; i <= endPage; i++)
                         {
                             <li class="page-item @(i == currentPage ? "active" : "")">
-                                <a class="page-link" asp-action="ViewAllBooks" asp-route-page="@i">@i</a>
+                                <a class="page-link" href="@Url.Action("ViewAllBooks", new { page = i, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">@i</a>
                             </li>
                         }
 
-                        <!-- Last page + dots -->
                         @if (endPage < totalPages)
                         {
-                            @if (endPage < totalPages - 1)
-                            {
-                                <li class="page-item disabled"><span class="page-link">...</span></li>
-                            }
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
                             <li class="page-item">
-                                <a class="page-link" asp-action="ViewAllBooks" asp-route-page="@totalPages">@totalPages</a>
+                                <a class="page-link" href="@Url.Action("ViewAllBooks", new { page = totalPages, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">@totalPages</a>
                             </li>
                         }
 
-                        <!-- Next button -->
-                        <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-                            <a class="page-link d-flex align-items-center justify-content-center"
-                               asp-action="ViewAllBooks"
-                               asp-route-page="@(currentPage + 1)">
-                                »
-                            </a>
+                        <!-- Next -->
+                        <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("ViewAllBooks", new { page = currentPage + 1, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">Next</a>
                         </li>
                     </ul>
                 </nav>
