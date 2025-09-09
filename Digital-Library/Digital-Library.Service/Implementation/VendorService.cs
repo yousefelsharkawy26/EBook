@@ -183,7 +183,7 @@ namespace Digital_Library.Service.Services
 																										$"<p>Your vendor request for '<strong>{vendor.LibraryName}</strong>' has been <strong>approved</strong>.</p>" +
 																										"<p>Thank you.</p>";
 
-					await _emailSender.SendEmailAsync(vendor.User!.Email, "Vendor Request Approved", htmlMessage);
+					 _emailSender.SendEmailAsync(vendor.User!.Email, "Vendor Request Approved", htmlMessage);
 					_unitOfWork.Vendors.Update(vendor);
 				}
 				else if (status == VendorStatus.Rejected)

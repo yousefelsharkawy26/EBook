@@ -1,4 +1,5 @@
-﻿using Digital_Library.Core.Filters;
+﻿using Digital_Library.Core.Enums;
+using Digital_Library.Core.Filters;
 using Digital_Library.Core.Models;
 using Digital_Library.Core.ViewModels;
 using Digital_Library.Core.ViewModels.Requests;
@@ -22,8 +23,8 @@ namespace Digital_Library.Service.Interface
 
 		Task<(IEnumerable<Book> Books, int TotalCount)> GetPagedBooksAsync(string Vid, int page, int pageSize, BookFilter? filter = null);
 
-		Task<IEnumerable<Book>> GetRelatedBooksAsync(string categoryId, string excludeBookId, int count = 3);
+		Task<IEnumerable<Book>> GetRelatedBooksAsync( string excludeBookId, int count = 3);
 		Task<PagedResult<UserBookDto>> GetUserBooksAsync(string userId, int pageNumber, int pageSize);
-		Task<bool> UserHasAccessToBookAsync(string userId, string bookId);
+		Task<UserBookAccessType> GetUserBookAccessAsync(string userId, string bookId);
 	}
 }

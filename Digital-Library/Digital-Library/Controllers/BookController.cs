@@ -1,4 +1,5 @@
 ﻿using Digital_Library.Core.Constant;
+using Digital_Library.Core.Enums;
 using Digital_Library.Core.Filters;
 using Digital_Library.Core.Models;
 using Digital_Library.Core.ViewModels;
@@ -202,8 +203,8 @@ namespace Digital_Library.Controllers
 
 			if (!response.Success)
 			{
-				TempData["ErrorMessage"] = response.Message;
-				return RedirectToAction("Index", "Books");
+				TempData["ErrorMessage"] = "Can not Delete Book";
+				return RedirectToAction("Index", "Book");
 			}
 
 			TempData["SuccessMessage"] = "Book deleted successfully.";
@@ -220,7 +221,7 @@ namespace Digital_Library.Controllers
 				return NotFound();
 			}
 
-			var relatedBooks = await bookService.GetRelatedBooksAsync(book.CategoryID, book.Id);
+			var relatedBooks = await bookService.GetRelatedBooksAsync( book.Id);
 
 			var viewModel = new BookDetailsViewModel
 			{
@@ -240,7 +241,7 @@ namespace Digital_Library.Controllers
 				return NotFound();
 			}
 
-			var relatedBooks = await bookService.GetRelatedBooksAsync(book.CategoryID, book.Id);
+			var relatedBooks = await bookService.GetRelatedBooksAsync(book.Id);
 
 			var viewModel = new BookDetailsViewModel
 			{
@@ -345,54 +346,27 @@ namespace Digital_Library.Controllers
 			if (string.IsNullOrEmpty(userId))
 				return Unauthorized();
 
-			var hasAccess = await bookService.UserHasAccessToBookAsync(userId, id);
-			if (!hasAccess)
+			// تحقق من صلاحية المستخدم
+			var accessType = await bookService.GetUserBookAccessAsync(userId, id);
+			if (accessType == UserBookAccessType.None)
 				return Forbid();
 
 			var res = await bookService.GetBookById(id);
 			var book = res.Data as Book;
 			if (book == null)
 				return NotFound();
-
 
 			return View(new ReadBookViewModel
 			{
 				BookId = book.Id,
 				Title = book.Title,
 				FilePath = book.PDFFilePath,
-				IsBorrowed = book.IsBorrowable
+				IsBorrowed = accessType == UserBookAccessType.Borrowed,
+				CanDownload = accessType == UserBookAccessType.Purchased,
+				CanPrint = accessType == UserBookAccessType.Purchased
 			});
 		}
-		[Authorize]
-		[HttpGet("DownloadBook/{id}")]
-		public async Task<IActionResult> DownloadBook(string id)
-		{
-			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (string.IsNullOrEmpty(userId))
-				return Unauthorized();
 
-			var hasAccess = await bookService.UserHasAccessToBookAsync(userId, id);
-			if (!hasAccess)
-				return Forbid();
-
-			var res = await bookService.GetBookById(id);
-			var book = res.Data as Book;
-			if (book.IsBorrowable)
-				return Forbid();
-
-			if (book == null)
-				return NotFound();
-
-			var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", book.PDFFilePath);
-			var fileName = Path.GetFileName(filePath);
-			var mimeType = "application/pdf";
-
-			return PhysicalFile(filePath, mimeType, fileName);
-
-
-
-
-		}
 		[Authorize]
 		[HttpGet("StreamBook/{id}")]
 		public async Task<IActionResult> StreamBook(string id)
@@ -401,21 +375,43 @@ namespace Digital_Library.Controllers
 			if (string.IsNullOrEmpty(userId))
 				return Unauthorized();
 
-			var hasAccess = await bookService.UserHasAccessToBookAsync(userId, id);
-			if (!hasAccess)
+			var accessType = await bookService.GetUserBookAccessAsync(userId, id);
+			if (accessType == UserBookAccessType.None)
 				return Forbid();
 
-
-			var book = await bookService.GetBookById(id);
-			var bookData = book.Data as Book;
-			if (bookData == null)
+			var res = await bookService.GetBookById(id);
+			var book = res.Data as Book;
+			var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", book.PDFFilePath);
+			if (!System.IO.File.Exists(filePath))
 				return NotFound();
 
-			var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", bookData.PDFFilePath);
 			var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-
 			return File(fs, "application/pdf", enableRangeProcessing: true);
 		}
+
+		[Authorize]
+		[HttpGet("DownloadBook/{id}")]
+		public async Task<IActionResult> DownloadBook(string id)
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if (string.IsNullOrEmpty(userId))
+				return Unauthorized();
+
+			var accessType = await bookService.GetUserBookAccessAsync(userId, id);
+			if (accessType != UserBookAccessType.Purchased)
+				return Forbid(); 
+
+			var res = await bookService.GetBookById(id);
+			var book = res.Data as Book;
+			var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", book.PDFFilePath);
+			if (book == null || !System.IO.File.Exists(filePath))
+				return NotFound();
+
+			var fileName = Path.GetFileName(filePath);
+			return PhysicalFile(filePath, "application/pdf", fileName);
+		}
+
+
 
 	}
 }
