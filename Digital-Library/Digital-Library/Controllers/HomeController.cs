@@ -3,9 +3,12 @@ using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Models;
 using Digital_Library.Service.Implementation;
 using Digital_Library.Service.Interface;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Digital_Library.Controllers
 {
