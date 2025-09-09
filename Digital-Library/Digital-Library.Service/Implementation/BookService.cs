@@ -272,6 +272,32 @@ namespace Digital_Library.Service.Implementation
 							.ToListAsync();
 		}
 
+		public async Task<List<UserBookDto>> GetUserBooksAsync(string userId)
+		{
+			var pdfBooks = _unitOfWork.UserPdfBooks
+							.GetManyQuery(upb => upb.UserId == userId)
+							.Select(upb => new UserBookDto
+							{
+								BookId = upb.Book.Id,
+								Title = upb.Book.Title,
+								Author = upb.Book.Author,
+								Type = FormatType.PDF
+							});
+			var borrowedBooks = _unitOfWork.Borrowings
+							.GetManyQuery(b => b.UserId == userId)
+							.Select(b => new UserBookDto
+							{
+								BookId = b.Book.Id,
+								Title = b.Book.Title,
+								Author = b.Book.Author,
+								Type = FormatType.Borrowing
+							});
+			var result = await pdfBooks
+							.Union(borrowedBooks) 
+							.ToListAsync();
+
+			return result;
+		}
 
 
 	}
