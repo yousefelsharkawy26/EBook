@@ -5,6 +5,6 @@ namespace Digital_Library.Core.ViewModels
     public class BookDetailsViewModel
     {
         public Book Book { get; set; }
-        public List<Book> RelatedBooks { get; set; } = new();
+        public IEnumerable<Book> RelatedBooks { get; set; }
     }
 }

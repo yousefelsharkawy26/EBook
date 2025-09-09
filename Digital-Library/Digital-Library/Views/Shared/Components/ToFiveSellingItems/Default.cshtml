@@ -1,52 +1,151 @@
 ﻿@using Digital_Library.Core.Models
 @model IEnumerable<Book>
 
-@foreach (var item in Model)
-{
-    <div class="swiper-slide">
-        <div class="card position-relative p-4 border rounded-3">
-            <div class="position-absolute">
-                <p class="bg-primary py-1 px-3 fs-6 text-white rounded-2">10% off</p>
-            </div>
-            <img src="~/@item.ImageBookCoverPath" class="img-fluid shadow-sm" alt="product item">
-            <h6 class="mt-4 mb-0 fw-bold"><a href="index.html">@item.Title</a></h6>
-            <div class="review-content d-flex">
-                <p class="my-2 me-2 fs-6 text-black-50">@item.Author</p>
+<style>
+    .product-swiper .swiper-slide {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 
-                <div class="rating text-warning d-flex align-items-center">
-                    <svg class="star star-fill">
-                        <use xlink:href="#star-fill"></use>
-                    </svg>
-                    <svg class="star star-fill">
-                        <use xlink:href="#star-fill"></use>
-                    </svg>
-                    <svg class="star star-fill">
-                        <use xlink:href="#star-fill"></use>
-                    </svg>
-                    <svg class="star star-fill">
-                        <use xlink:href="#star-fill"></use>
-                    </svg>
-                    <svg class="star star-fill">
-                        <use xlink:href="#star-fill"></use>
-                    </svg>
-                </div>
+    .slide-inner {
+        width: 100%;
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+        .slide-inner:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+        }
+
+    .product-cover {
+        width: 100%;
+        height: 280px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .slide-caption {
+        margin-top: 8px;
+        text-align: center;
+    }
+
+        .slide-caption .title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+            .slide-caption .title a {
+                color: #212529;
+                text-decoration: none;
+            }
+
+                .slide-caption .title a:hover {
+                    color: #0d6efd;
+                }
+
+        .slide-caption .author {
+            font-size: 0.85rem;
+            color: #17a2b8;
+            margin: 0;
+        }
+
+    /* nav buttons */
+    .product-nav-row {
+        margin-top: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .product-nav {
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #ffffff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: transform .2s ease;
+    }
+
+        .product-nav:hover {
+            transform: scale(1.05);
+        }
+</style>
+
+<section id="best-selling-slider" class="position-relative padding-large bg-light">
+    <div class="container position-relative">
+
+        <div class="section-title d-md-flex justify-content-between align-items-center mb-4">
+            <h3 class="d-flex align-items-center">Best Selling Items</h3>
+        </div>
+
+        <div class="swiper product-swiper">
+            <div class="swiper-wrapper">
+                @foreach (var book in Model)
+                {
+                    <div class="swiper-slide">
+                        <div class="slide-inner">
+                            <a asp-controller="Book" asp-action="Details" asp-route-id="@book.Id">
+                                <img src="~/@book.ImageBookCoverPath" alt="@book.Title" class="product-cover" />
+                            </a>
+                        <div class="slide-caption">
+                            <h6 class="title">
+                                <a asp-controller="Book" asp-action="Details" asp-route-id="@book.Id">
+                                    @book.Title
+                                </a>
+                            </h6>
+                            <p class="author">@book.Author</p>
+                        </div>
+                        </div>
+
+                    </div>
+                }
             </div>
-            <span class="price text-primary fw-bold mb-2 fs-5">$@item.PricePhysical</span>
-            <div class="card-concern position-absolute start-0 end-0 d-flex gap-2">
-                <button type="button" href="#" class="btn btn-dark" data-bs-toggle="tooltip" data-bs-placement="top"
-                        data-bs-title="Tooltip on top">
-                    <svg class="cart">
-                        <use xlink:href="#cart"></use>
-                    </svg>
-                </button>
-                <a href="#" class="btn btn-dark">
-                    <span>
-                        <svg class="wishlist">
-                            <use xlink:href="#heart"></use>
-                        </svg>
-                    </span>
-                </a>
+        </div>
+
+        <!-- navigation -->
+        <div class="product-nav-row">
+            <div class="product-nav product-prev">
+                <svg width="24" height="24"><use xlink:href="#alt-arrow-left-outline"></use></svg>
+            </div>
+            <div class="product-nav product-next">
+                <svg width="24" height="24"><use xlink:href="#alt-arrow-right-outline"></use></svg>
             </div>
         </div>
     </div>
-}
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var productSwiper = new Swiper('.product-swiper', {
+        slidesPerView: 5,
+        spaceBetween: 20,
+        loop: true,
+        autoplay: {
+          delay: 4000,
+          disableOnInteraction: false
+        },
+        navigation: {
+          nextEl: '.product-next',
+          prevEl: '.product-prev'
+        },
+        breakpoints: {
+          320: { slidesPerView: 2 },
+          576: { slidesPerView: 3 },
+          768: { slidesPerView: 4 },
+          1200: { slidesPerView: 5 }
+        }
+      });
+    });
+</script>

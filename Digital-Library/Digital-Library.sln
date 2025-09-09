@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digital-Library.Infrastruct
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digital-Library", "Digital-Library\Digital-Library.csproj", "{7EAF1E08-9D96-59A7-23FE-8A754B359BB7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digital-Library.Test", "Digital-Library.Test\Digital-Library.Test.csproj", "{EC1045CC-2751-4495-B96F-6C7EF4910397}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digital-Library.AdminPanel", "Digital-Library.AdminPanel\Digital-Library.AdminPanel.csproj", "{88B3AFF0-363D-4C74-8B76-83A94C76C19D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{7EAF1E08-9D96-59A7-23FE-8A754B359BB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7EAF1E08-9D96-59A7-23FE-8A754B359BB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7EAF1E08-9D96-59A7-23FE-8A754B359BB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC1045CC-2751-4495-B96F-6C7EF4910397}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC1045CC-2751-4495-B96F-6C7EF4910397}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC1045CC-2751-4495-B96F-6C7EF4910397}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC1045CC-2751-4495-B96F-6C7EF4910397}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88B3AFF0-363D-4C74-8B76-83A94C76C19D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88B3AFF0-363D-4C74-8B76-83A94C76C19D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88B3AFF0-363D-4C74-8B76-83A94C76C19D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88B3AFF0-363D-4C74-8B76-83A94C76C19D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

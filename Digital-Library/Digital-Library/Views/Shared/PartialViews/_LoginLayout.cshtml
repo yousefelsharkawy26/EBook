@@ -36,16 +36,21 @@
      <i class="bi bi-person-circle me-2"></i> My Profile
     </a>
    </li>
+    <li>
+                <a class="dropdown-item d-flex align-items-center" asp-controller="Book" asp-action="MyBooks">
+                    <i class="bi bi-book me-2"></i> My Book
+        </a>
+    </li>
    <li>
     <a class="dropdown-item d-flex align-items-center" asp-controller="Orders" asp-action="MyOrders">
      <i class="bi bi-bag-check me-2"></i> My Orders
     </a>
    </li>
-   <li>
+   @* <li>
     <a class="dropdown-item d-flex align-items-center" asp-controller="Orders" asp-action="MyOrders">
      <i class="bi bi-bag-check me-2"></i> My Pdf Books
     </a>
-   </li>
+   </li> *@
 
    @if (roles.Contains(Digital_Library.Core.Constant.Roles.Vendor))
    {

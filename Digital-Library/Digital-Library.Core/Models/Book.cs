@@ -41,6 +41,7 @@ public class Book
 	[ForeignKey(nameof(Vendor))]
 	[Required]
 	public string VendorId { get; set; }
+	public ICollection<UserPdfBook>? userPdfBooks { get; set; }
 
 
 

@@ -1,5 +1,4 @@
-﻿
-
+﻿@model ContactViewModel
 
 <section class="hero-section position-relative padding-large"
          style="background-image: url(@Url.Content("~/images/banner-image-bg-1.jpg")); background-size: cover; background-repeat: no-repeat; background-position: center; height: 400px;">
@@ -35,15 +34,15 @@
                             </div>
                             <div class="contact-number">
                                 <p>
-                                    <a href="#">+123 987 321</a>
+                                    <h5 href="#">+123 987 321</h5>
                                 </p>
                                 <p>
-                                    <a href="#">+123 123 654</a>
+                                    <h5 href="#">+123 123 654</h5>
                                 </p>
                             </div>
                             <div class="email-address">
                                 <p>
-                                    <a href="#">info@yourinfo.com</a>
+                                    <h5 href="#">info@yourinfo.com</h5>
                                 </p>
                             </div>
                         </div>
@@ -56,15 +55,15 @@
                             </div>
                             <div class="contact-number">
                                 <p>
-                                    <a href="#">+123 987 321</a>
+                                    <h5 href="#">+123 987 321</h5>
                                 </p>
                                 <p>
-                                    <a href="#">+123 123 654</a>
+                                    <h5 href="#">+123 123 654</h5>
                                 </p>
                             </div>
                             <div class="email-address">
                                 <p>
-                                    <a href="#">info@yourinfo.com</a>
+                                    <h5 href="#">info@yourinfo.com</h5>
                                 </p>
                             </div>
                         </div>
@@ -75,25 +74,30 @@
                 <h3>Any questions?</h3>
                 <p class="mb-5">Use the form below to get in touch with us.</p>
 
-                <form id="form" class="d-flex gap-3 flex-wrap">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <form id="form" 
+                      class="d-flex gap-3 flex-wrap"
+                      method="post">
                     <div class="w-100 d-flex gap-3">
                         <div class="w-50">
-                            <input type="text" name="name" placeholder="Write your name here *" class="form-control w-100">
+                            <input asp-for="Name" placeholder="Write your name here *" class="form-control w-100">
+                            <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                         <div class="w-50">
-                            <input type="text" name="email" placeholder="Write your email here *" class="form-control w-100">
+                            <input asp-for="Email" placeholder="Write your email here *" class="form-control w-100">
+                            <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="w-100">
-                        <input type="text" name="phone" placeholder="Phone number" class="form-control w-100">
+                        <input asp-for="Subject" placeholder="Write your subject here" class="form-control w-100">
+                        <span asp-validation-for="Subject" class="text-danger"></span>
                     </div>
                     <div class="w-100">
-                        <input type="text" name="subject" placeholder="Write your subject here" class="form-control w-100">
+                        <textarea asp-for="Message" placeholder="Write your message here *" class="form-control w-100"></textarea>
+                        <span asp-validation-for="Message" class="text-danger"></span>
                     </div>
-                    <div class="w-100">
-                        <textarea placeholder="Write your message here *" class="form-control w-100"></textarea>
-                    </div>
-                    <button type="submit" name="submit" class="btn my-3">Submit</button>
+                    <button type="submit" class="btn my-3">Submit</button>
                 </form>
             </div>
         </div>
@@ -123,12 +127,12 @@
                                 </div>
                                 <div class="contact-number">
                                     <p>
-                                        <a href="#">+123 666 777 88</a>
+                                        <h5 href="#">+123 666 777 88</h5>
                                     </p>
                                 </div>
                                 <div class="email-address">
                                     <p>
-                                        <a href="#">info@yourinfo.com</a>
+                                        <h5 href="#">info@yourinfo.com</h5>
                                     </p>
                                 </div>
                             </div>
@@ -141,12 +145,12 @@
                                 </div>
                                 <div class="contact-number">
                                     <p>
-                                        <a href="#">+123 222 333 44</a>
+                                        <h5 href="#">+123 222 333 44</h5>
                                     </p>
                                 </div>
                                 <div class="email-address">
                                     <p>
-                                        <a href="#">info@yourinfo.com</a>
+                                        <h5 href="#">info@yourinfo.com</h5>
                                     </p>
                                 </div>
                             </div>
@@ -159,12 +163,12 @@
                                 </div>
                                 <div class="contact-number">
                                     <p>
-                                        <a href="#">+123 666 777 88</a>
+                                        <h5 href="#">+123 666 777 88</h5>
                                     </p>
                                 </div>
                                 <div class="email-address">
                                     <p>
-                                        <a href="#">info@yourinfo.com</a>
+                                        <h5 href="#">info@yourinfo.com</h5>
                                     </p>
                                 </div>
                             </div>
@@ -177,12 +181,12 @@
                                 </div>
                                 <div class="contact-number">
                                     <p>
-                                        <a href="#">+123 222 333 44</a>
+                                        <h5 href="#">+123 222 333 44</h5>
                                     </p>
                                 </div>
                                 <div class="email-address">
                                     <p>
-                                        <a href="#">info@yourinfo.com</a>
+                                        <h5 href="#">info@yourinfo.com</h5>
                                     </p>
                                 </div>
                             </div>
@@ -344,43 +348,43 @@
     <div class="container">
         <div class="section-title d-md-flex justify-content-between align-items-center mb-4">
             <h3 class="d-flex align-items-center">Latest posts</h3>
-            <a href="shop.html" class="btn">View All</a>
+            <a asp-controller="book" asp-action="allbooks" class="btn">View All</a>
         </div>
         <div class="row">
             <div class="col-md-3 posts mb-4">
                 <img src="~/images/post-item1.jpg" alt="post image" class="img-fluid rounded-3">
-                <a href="blog.html" class="fs-6 text-primary">Books</a>
-                <h4 class="card-title mb-2 text-capitalize text-dark"><a href="single-post.html">10 Must-Read Books of the Year: Our Top Picks!</a></h4>
+                <h5 class="fs-6 text-primary">Books</h5>
+                <h4 class="card-title mb-2 text-capitalize text-dark">10 Must-Read Books of the Year: Our Top Picks!</a></h4>
                 <p class="mb-2">
                     Dive into the world of cutting-edge technology with our latest blog post, where we highlight
-                    five essential gadge. <span><a class="text-decoration-underline text-black-50" href="single-post.html">Read More</a></span>
+                    five essential gadge. <span><a class="text-decoration-underline text-black-50" asp-controller="Book" asp-action="ViewAllBooks">Read More</a></span>
                 </p>
             </div>
             <div class="col-md-3 posts mb-4">
                 <img src="~/images/post-item2.jpg" alt="post image" class="img-fluid rounded-3">
-                <a href="blog.html" class="fs-6 text-primary">Books</a>
-                <h4 class="card-title mb-2 text-capitalize text-dark"><a href="single-post.html">The Fascinating Realm of Science Fiction</a></h4>
+                <h5 class="fs-6 text-primary">Books</h5>
+                <h4 class="card-title mb-2 text-capitalize text-dark">The Fascinating Realm of Science Fiction</a></h4>
                 <p class="mb-2">
                     Explore the intersection of technology and sustainability in our latest blog post. Learn about
-                    the innovative <span><a class="text-decoration-underline text-black-50" href="single-post.html">Read More</a></span>
+                    the innovative <span><a class="text-decoration-underline text-black-50" asp-controller="Book" asp-action="ViewAllBooks">Read More</a></span>
                 </p>
             </div>
             <div class="col-md-3 posts mb-4">
                 <img src="~/images/post-item3.jpg" alt="post image" class="img-fluid rounded-3">
-                <a href="blog.html" class="fs-6 text-primary">Books</a>
-                <h4 class="card-title mb-2 text-capitalize text-dark"><a href="single-post.html">Finding Love in the Pages of a Book</a></h4>
+                <h5 class="fs-6 text-primary">Books</h5>
+                <h4 class="card-title mb-2 text-capitalize text-dark">Finding Love in the Pages of a Book</a></h4>
                 <p class="mb-2">
                     Stay ahead of the curve with our insightful look into the rapidly evolving landscape of
-                    wearable technology. <span><a class="text-decoration-underline text-black-50" href="single-post.html">Read More</a></span>
+                    wearable technology. <span><a class="text-decoration-underline text-black-50" asp-controller="Book" asp-action="ViewAllBooks">Read More</a></span>
                 </p>
             </div>
             <div class="col-md-3 posts mb-4">
                 <img src="~/images/post-item4.jpg" alt="post image" class="img-fluid rounded-3">
-                <a href="blog.html" class="fs-6 text-primary">Books</a>
-                <h4 class="card-title mb-2 text-capitalize text-dark"><a href="single-post.html">Reading for Mental Health: How Books Can Heal and Inspire</a></h4>
+                <h5 class="fs-6 text-primary">Books</h5>
+                <h4 class="card-title mb-2 text-capitalize text-dark">Reading for Mental Health: How Books Can Heal and Inspire</a></h4>
                 <p class="mb-2">
                     In today's remote work environment, productivity is key. Discover the top apps and tools that
-                    can help you stay <span><a class="text-decoration-underline text-black-50" href="single-post.html">Read More</a></span>
+                    can help you stay <span><a class="text-decoration-underline text-black-50" asp-controller="Book" asp-action="ViewAllBooks">Read More</a></span>
                 </p>
             </div>
         </div>

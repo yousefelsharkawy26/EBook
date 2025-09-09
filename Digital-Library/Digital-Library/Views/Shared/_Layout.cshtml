@@ -112,9 +112,10 @@
 
  <partial name="PartialViews/_ConfirmAccount" />
 
- <partial name="PartialViews/_SearchBarView" />
 
  <partial name="PartialViews/_HeaderView" />
+
+ @await Component.InvokeAsync("SearchBar")
 
 
     <div class="container">
