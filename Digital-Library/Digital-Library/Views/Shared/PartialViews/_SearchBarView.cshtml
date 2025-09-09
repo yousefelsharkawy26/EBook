@@ -1,10 +1,4 @@
-﻿@using Digital_Library.Core.Models
-@{
- var categories = ViewBag.Categories as List<Category>;
-}
-
-
-<link rel="stylesheet" href="~/css/_SearchBarView.css" />
+﻿<link rel="stylesheet" href="~/css/_SearchBarView.css" />
 
 <div class="search-popup">
  <div class="search-popup-container">
@@ -24,16 +18,32 @@
 
   <!-- Categories -->
   <h5 class="cat-list-title">Browse Categories</h5>
-  <ul class="cat-list">
-   @foreach (var category in categories)
-   {
-    <li class="cat-list-item">
-     <a asp-controller="Book" asp-action="AllBooks"
-        asp-route-category="@category.Id">
-      @category.CategoryName
-     </a>
-    </li>
-   }
+  <ul id="cat-list" class="cat-list">
+   <!-- هيتعبّى بالـ JS -->
   </ul>
  </div>
 </div>
+
+<script>
+ document.addEventListener("DOMContentLoaded", function () {
+     fetch("/Home/GetCategories")
+         .then(response => response.json())
+         .then(data => {
+             const list = document.getElementById("cat-list");
+             list.innerHTML = "";
+
+             data.forEach(category => {
+                 const li = document.createElement("li");
+                 li.classList.add("cat-list-item");
+
+                 li.innerHTML = `
+                     <a href="/Book/AllBooks?category=${category.id}">
+                         ${category.name}
+                     </a>
+                 `;
+                 list.appendChild(li);
+             });
+         })
+         .catch(error => console.error("Error loading categories:", error));
+ });
+</script>

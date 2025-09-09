@@ -24,10 +24,15 @@ namespace Digital_Library.Controllers
 
 		public async Task<IActionResult> Index()
 		{
+			return View(await GetRandomCategories());
+		}
+		[HttpGet]
+		private async Task<HomeViewModel> GetRandomCategories()
+		{
 			var books = await bookService
-							.GetAllBooks()
-							.AsNoTracking()
-							.ToListAsync();
+				.GetAllBooks()
+				.AsNoTracking()
+				.ToListAsync();
 
 			var categories = books
 							.Where(b => b.Category != null)
@@ -37,18 +42,13 @@ namespace Digital_Library.Controllers
 							.OrderBy(_ => Guid.NewGuid())
 							.Take(8)
 							.ToList();
-
-			var model = new HomeViewModel
+			return new HomeViewModel
 			{
-				Books = books,
-				RandomCategories = categories
+					RandomCategories = categories,
+					Books = books
+				
 			};
-			ViewBag.Categories = categories;
-
-			return View(model);
 		}
-
-
 		public IActionResult About()
 		{
 			return View();

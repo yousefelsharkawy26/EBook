@@ -115,7 +115,8 @@
 
  <partial name="PartialViews/_HeaderView" />
 
- <partial name="PartialViews/_SearchBarView"/> 
+ @await Component.InvokeAsync("SearchBar")
+
 
     <div class="container">
 		<main role="main" class="pb-3">
