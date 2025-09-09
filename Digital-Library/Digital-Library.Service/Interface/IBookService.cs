@@ -23,7 +23,7 @@ namespace Digital_Library.Service.Interface
 		Task<(IEnumerable<Book> Books, int TotalCount)> GetPagedBooksAsync(string Vid, int page, int pageSize, BookFilter? filter = null);
 
 		Task<IEnumerable<Book>> GetRelatedBooksAsync(string categoryId, string excludeBookId, int count = 3);
- Task<List<UserBookDto>> GetUserBooksAsync(string userId);
-
+		Task<PagedResult<UserBookDto>> GetUserBooksAsync(string userId, int pageNumber, int pageSize);
+		Task<bool> UserHasAccessToBookAsync(string userId, string bookId);
 	}
 }

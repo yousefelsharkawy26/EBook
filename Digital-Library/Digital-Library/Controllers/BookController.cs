@@ -7,6 +7,7 @@ using Digital_Library.Service.Implementation;
 using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -278,7 +279,7 @@ namespace Digital_Library.Controllers
 		{
 			int pageSize = 8;
 
-			IQueryable<Book> booksQuery = bookService.GetAllBooks(); 
+			IQueryable<Book> booksQuery = bookService.GetAllBooks();
 
 			if (!string.IsNullOrEmpty(query))
 			{
@@ -325,29 +326,96 @@ namespace Digital_Library.Controllers
 			return View(items);
 		}
 
+		[HttpGet("MyBooks")]
+		[Authorize]
+		public async Task<IActionResult> MyBooks(int page = 1, int pageSize = 10)
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if (string.IsNullOrEmpty(userId))
+				return Unauthorized();
+			var result = await bookService.GetUserBooksAsync(userId, page, pageSize);
+
+			return View(result);
+		}
+		[Authorize]
+		[HttpGet("ReadBook/{id}")]
+		public async Task<IActionResult> ReadBook(string id)
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if (string.IsNullOrEmpty(userId))
+				return Unauthorized();
+
+			var hasAccess = await bookService.UserHasAccessToBookAsync(userId, id);
+			if (!hasAccess)
+				return Forbid();
+
+			var res = await bookService.GetBookById(id);
+			var book = res.Data as Book;
+			if (book == null)
+				return NotFound();
 
 
-		//[HttpGet("ShowMyBook")]
-		//[Authorize]
-		//public async Task<IActionResult> ShowMyBook()
-		//{
-		//    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-		//    if (string.IsNullOrEmpty(userId))
-		//        return Unauthorized();
+			return View(new ReadBookViewModel
+			{
+				BookId = book.Id,
+				Title = book.Title,
+				FilePath = book.PDFFilePath,
+				IsBorrowed = book.IsBorrowable
+			});
+		}
+		[Authorize]
+		[HttpGet("DownloadBook/{id}")]
+		public async Task<IActionResult> DownloadBook(string id)
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if (string.IsNullOrEmpty(userId))
+				return Unauthorized();
 
-		//    var books = await bookService.GetMyBook(userId);
+			var hasAccess = await bookService.UserHasAccessToBookAsync(userId, id);
+			if (!hasAccess)
+				return Forbid();
 
-		//    if (books.Any())
-		//        TempData["IsAllowed"] = true;
+			var res = await bookService.GetBookById(id);
+			var book = res.Data as Book;
+			if (book.IsBorrowable)
+				return Forbid();
+
+			if (book == null)
+				return NotFound();
+
+			var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", book.PDFFilePath);
+			var fileName = Path.GetFileName(filePath);
+			var mimeType = "application/pdf";
+
+			return PhysicalFile(filePath, mimeType, fileName);
 
 
 
-		//    return View(books);
-		//}
+
+		}
+		[Authorize]
+		[HttpGet("StreamBook/{id}")]
+		public async Task<IActionResult> StreamBook(string id)
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if (string.IsNullOrEmpty(userId))
+				return Unauthorized();
+
+			var hasAccess = await bookService.UserHasAccessToBookAsync(userId, id);
+			if (!hasAccess)
+				return Forbid();
 
 
+			var book = await bookService.GetBookById(id);
+			var bookData = book.Data as Book;
+			if (bookData == null)
+				return NotFound();
 
+			var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", bookData.PDFFilePath);
+			var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
+			return File(fs, "application/pdf", enableRangeProcessing: true);
+		}
 
 	}
 }

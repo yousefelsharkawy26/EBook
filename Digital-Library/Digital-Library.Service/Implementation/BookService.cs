@@ -272,7 +272,7 @@ namespace Digital_Library.Service.Implementation
 							.ToListAsync();
 		}
 
-		public async Task<List<UserBookDto>> GetUserBooksAsync(string userId)
+		public async Task<PagedResult<UserBookDto>> GetUserBooksAsync(string userId, int pageNumber, int pageSize)
 		{
 			var pdfBooks = _unitOfWork.UserPdfBooks
 							.GetManyQuery(upb => upb.UserId == userId)
@@ -281,8 +281,11 @@ namespace Digital_Library.Service.Implementation
 								BookId = upb.Book.Id,
 								Title = upb.Book.Title,
 								Author = upb.Book.Author,
-								Type = FormatType.PDF
+								Type = FormatType.PDF,
+								ImageBookCoverPath	= upb.Book.ImageBookCoverPath,
+								BorrowedUntil = null
 							});
+
 			var borrowedBooks = _unitOfWork.Borrowings
 							.GetManyQuery(b => b.UserId == userId)
 							.Select(b => new UserBookDto
@@ -290,15 +293,44 @@ namespace Digital_Library.Service.Implementation
 								BookId = b.Book.Id,
 								Title = b.Book.Title,
 								Author = b.Book.Author,
-								Type = FormatType.Borrowing
+								Type = FormatType.Borrowing,
+								ImageBookCoverPath	= b.Book.ImageBookCoverPath,
+								BorrowedUntil = b.DueDate
 							});
-			var result = await pdfBooks
-							.Union(borrowedBooks) 
+
+			var query = pdfBooks.Union(borrowedBooks);
+
+			var totalCount = await query.CountAsync();
+
+			var items = await query
+							.Skip((pageNumber - 1) * pageSize)
+							.Take(pageSize)
 							.ToListAsync();
 
-			return result;
+			return new PagedResult<UserBookDto>
+			{
+				Items = items,
+				TotalCount = totalCount,
+				PageNumber = pageNumber,
+				PageSize = pageSize
+			};
 		}
 
+		public async Task<bool> UserHasAccessToBookAsync(string userId, string bookId)
+		{
+			var pdfAccess = await _unitOfWork.UserPdfBooks
+							.GetManyQuery(upb => upb.UserId == userId && upb.BookId == bookId)
+							.AnyAsync();
+
+			if (pdfAccess)
+				return true;
+			var borrowingAccess = await _unitOfWork.Borrowings
+							.GetManyQuery(b => b.UserId == userId && b.BookId == bookId)
+							.Where(b => b.DueDate >= DateTime.UtcNow) 
+							.AnyAsync();
+
+			return borrowingAccess;
+		}
 
 	}
 }

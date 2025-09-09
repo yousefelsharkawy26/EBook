@@ -1,0 +1,150 @@
+﻿@using Digital_Library.Core.Enums
+@model ReadBookViewModel
+
+<div class="container mt-4">
+ <h2 class="mb-4">@Model.Title</h2>
+
+ <div class="card shadow-sm">
+  <div class="card-body">
+   <!-- PDF Viewer Controls -->
+   <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+     <button id="prevPage" class="btn btn-secondary">Previous</button>
+     <button id="nextPage" class="btn btn-secondary">Next</button>
+    </div>
+    <div>
+     <span>Page: <span id="pageNum">1</span> / <span id="pageCount">?</span></span>
+    </div>
+    <div>
+     @if (Model.CanDownload)
+     {
+      <a href="@Url.Action("DownloadBook", "Book", new { id = Model.BookId })"
+         class="btn btn-success me-2">Download PDF</a>
+     }
+
+     @if (Model.CanPrint)
+     {
+      <button id="printBtn" class="btn btn-primary">Print</button>
+     }
+    </div>
+   </div>
+
+   <!-- PDF Canvas -->
+   <div id="pdfViewer" style="border:1px solid #ccc; overflow:hidden; text-align:center;">
+    <canvas id="pdfCanvas"></canvas>
+   </div>
+  </div>
+ </div>
+</div>
+
+@section Scripts {
+ <script src="~/lib/pdfjs/pdf.js"></script>
+ <script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc = '~/lib/pdfjs/pdf.worker.js';
+
+  const url = '@Url.Action("StreamBook", "Book", new { id = Model.BookId })';
+  const canvas = document.getElementById('pdfCanvas');
+  const ctx = canvas.getContext('2d');
+
+  let pdfDoc = null,
+      pageNum = 1,
+      pageRendering = false,
+      pageNumPending = null,
+      scale = 1.2;
+
+  const pageNumDisplay = document.getElementById('pageNum');
+  const pageCountDisplay = document.getElementById('pageCount');
+
+  // Load PDF
+  pdfjsLib.getDocument(url).promise.then(function (pdf) {
+      pdfDoc = pdf;
+      pageCountDisplay.textContent = pdf.numPages;
+      renderPage(pageNum);
+  });
+
+  function renderPage(num) {
+      pageRendering = true;
+      pdfDoc.getPage(num).then(function (page) {
+          const viewport = page.getViewport({ scale: scale });
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          const renderContext = {
+              canvasContext: ctx,
+              viewport: viewport
+          };
+          const renderTask = page.render(renderContext);
+
+          renderTask.promise.then(function () {
+              pageRendering = false;
+              if (pageNumPending !== null) {
+                  renderPage(pageNumPending);
+                  pageNumPending = null;
+              }
+          });
+      });
+      pageNumDisplay.textContent = num;
+  }
+
+  function queueRenderPage(num) {
+      if (pageRendering) {
+          pageNumPending = num;
+      } else {
+          renderPage(num);
+      }
+  }
+
+  document.getElementById('prevPage').addEventListener('click', function () {
+      if (pageNum <= 1) return;
+      pageNum--;
+      queueRenderPage(pageNum);
+  });
+
+  document.getElementById('nextPage').addEventListener('click', function () {
+      if (pageNum >= pdfDoc.numPages) return;
+      pageNum++;
+      queueRenderPage(pageNum);
+  });
+
+  // Print Button
+  const printBtn = document.getElementById('printBtn');
+  @if (!Model.CanPrint)
+  {
+       <text>
+       printBtn.style.display = 'none';
+       </text>
+  }
+  printBtn?.addEventListener('click', function () {
+      window.print();
+  });
+
+  // حماية المستعير
+  @if (Model.IsBorrowed)
+  {
+       <text>
+       // منع النسخ والزر يمين والـ Print/S
+       document.addEventListener('contextmenu', e => e.preventDefault());
+       document.addEventListener('copy', e => e.preventDefault());
+       document.addEventListener('keydown', function(e) {
+           if ((e.ctrlKey && (e.key === 'p' || e.key === 's')) || e.key === 'PrintScreen') {
+               e.preventDefault();
+               alert('Printing, saving, or copying is disabled for borrowed books.');
+           }
+       });
+       </text>
+  }
+ </script>
+
+ <style>
+  #pdfCanvas {
+   border: 1px solid #ddd;
+   border-radius: 8px;
+   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+   max-width: 100%;
+  }
+
+  .btn {
+   min-width: 120px;
+  }
+ </style>
+}

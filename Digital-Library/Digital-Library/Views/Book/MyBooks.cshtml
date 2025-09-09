@@ -1,0 +1,125 @@
+﻿@using Digital_Library.Core.Enums
+@model PagedResult<UserBookDto>
+
+<h2>My Books</h2>
+
+@if (Model == null || !Model.Items.Any())
+{
+ <div class="alert alert-dismissible alert-danger">
+  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  <h4 class="alert-heading">Warning!</h4>
+  <p class="mb-0">You haven’t purchased or borrowed any books yet.</p>
+  <a class="btn btn-primary" asp-controller="Book" asp-action="ViewAllBooks">Shop</a>
+ </div>
+}
+else
+{
+ <div class="row">
+
+
+  @if (Model.Items.Any(m => m.Type == FormatType.PDF))
+  {
+   <div class="col-md-12 mb-5">
+    <h3>💻 PDF Books</h3>
+    <div class="row">
+     @foreach (var item in Model.Items.Where(m => m.Type == FormatType.PDF))
+     {
+      <div class="col-md-3 mb-3">
+       <div class="card shadow-sm h-100">
+        <img src="/@item.ImageBookCoverPath" class="card-img-top" alt="@item.Title" />
+        <div class="card-body d-flex flex-column">
+         <h5>@item.Title</h5>
+         <p class="text-muted">@item.Author</p>
+         <a asp-controller="Book" asp-action="ReadBook" asp-route-id="@item.BookId"
+            class="btn btn-primary mt-auto d-block">Open PDF</a>
+        </div>
+       </div>
+      </div>
+     }
+    </div>
+   </div>
+  }
+
+  @* --- Borrowed Books --- *@
+  @if (Model.Items.Any(m => m.Type == FormatType.Borrowing))
+  {
+   <div class="col-md-12 mb-5">
+    <h3>📖 Borrowed Books</h3>
+    <div class="row">
+     @foreach (var item in Model.Items.Where(m => m.Type == FormatType.Borrowing))
+     {
+      <div class="col-md-3 mb-3">
+       <div class="card shadow-sm h-100">
+        <img src="/@item.ImageBookCoverPath" class="card-img-top" alt="@item.Title" />
+        <div class="card-body d-flex flex-column">
+         <h5>@item.Title</h5>
+         <p class="text-muted">@item.Author</p>
+
+         @if (item.BorrowedUntil.HasValue)
+         {
+          var remaining = (item.BorrowedUntil.Value - DateTime.UtcNow).Days;
+          if (remaining > 0)
+          {
+           <span class="badge bg-success mb-2 text-center">
+            ⏳ @remaining day(s) left
+           </span>
+           <a asp-controller="Book" asp-action="ReadBook" asp-route-id="@item.BookId"
+              class="btn btn-primary mt-auto d-block">Open Book</a>
+          }
+          else
+          {
+           <span class="badge bg-danger d-block text-center">
+            ❌ Borrowing expired
+           </span>
+          }
+         }
+         else
+         {
+          <span class="badge bg-warning d-block text-center">
+           Unknown due date
+          </span>
+         }
+        </div>
+       </div>
+      </div>
+     }
+    </div>
+   </div>
+  }
+
+ </div>
+
+ @* --- Pagination --- *@
+ <nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+   @{
+    var totalPages = (int)Math.Ceiling(Model.TotalCount / (double)Model.PageSize);
+    var currentPage = Model.PageNumber;
+   }
+
+   <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+    <a class="page-link"
+       asp-action="MyBooks"
+       asp-route-page="@(currentPage - 1)"
+       asp-route-pageSize="@Model.PageSize">Previous</a>
+   </li>
+
+   @for (int i = 1; i <= totalPages; i++)
+   {
+    <li class="page-item @(i == currentPage ? "active" : "")">
+     <a class="page-link"
+        asp-action="MyBooks"
+        asp-route-page="@i"
+        asp-route-pageSize="@Model.PageSize">@i</a>
+    </li>
+   }
+
+   <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+    <a class="page-link"
+       asp-action="MyBooks"
+       asp-route-page="@(currentPage + 1)"
+       asp-route-pageSize="@Model.PageSize">Next</a>
+   </li>
+  </ul>
+ </nav>
+}
