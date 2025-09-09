@@ -1,18 +1,10 @@
-﻿@using Digital_Library.Service.Interface
-@inject IBookService bookService
+﻿@model HomeViewModel
 
 @{
-    var books = await bookService.GetAllBooks();
-    
-    var categories = books
-       .Where(b => b.Category != null)
-       .Select(b => b.Category!)
-       .GroupBy(c => c.Id)
-       .Select(g => g.First())
-       .OrderBy(_ => Guid.NewGuid())
-       .Take(4)
-       .ToList();
+ var books = Model.Books;
+ var categories = Model.RandomCategories;
 }
+
 
 <style>
     /* Category wrapper */
