@@ -1,37 +1,59 @@
 ﻿@using Digital_Library.Core.Enums
 @model PagedResult<UserBookDto>
 
-<h2>My Books</h2>
-
-@if (Model == null || !Model.Items.Any())
-{
- <div class="alert alert-dismissible alert-danger">
-  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-  <h4 class="alert-heading">Warning!</h4>
-  <p class="mb-0">You haven’t purchased or borrowed any books yet.</p>
-  <a class="btn btn-primary" asp-controller="Book" asp-action="ViewAllBooks">Shop</a>
- </div>
+@{
+ ViewData["Title"] = "My Bookshelf";
 }
-else
-{
- <div class="row">
 
+<!-- Font Awesome for Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
 
-  @if (Model.Items.Any(m => m.Type == FormatType.PDF))
+<div class="container my-5">
+ <h2 class="display-5 fw-bold text-center mb-5">My Bookshelf</h2>
+
+ @if (Model == null || !Model.Items.Any())
+ {
+  <div class="text-center p-5 border rounded bg-light">
+   <i class="fas fa-book-dead fa-5x mb-3 text-muted"></i>
+   <h4 class="alert-heading">Your bookshelf is empty!</h4>
+   <p class="mb-4">You haven’t purchased or borrowed any books yet. Let's find your next read.</p>
+   <a class="btn btn-primary btn-lg" asp-controller="Book" asp-action="ViewAllBooks">
+    <i class="fas fa-store me-2"></i> Explore the Store
+   </a>
+  </div>
+ }
+ else
+ {
+  var purchasedBooks = Model.Items.Where(m => m.Type == FormatType.PDF).ToList();
+  var borrowedBooks = Model.Items.Where(m => m.Type == FormatType.Borrowing).ToList();
+
+  <!-- Purchased Books Section -->
+  @if (purchasedBooks.Any())
   {
-   <div class="col-md-12 mb-5">
-    <h3>💻 PDF Books</h3>
+   <div class="mb-5">
+    <h3 class="section-title">
+     <i class="fas fa-file-pdf text-primary"></i> Purchased Books
+    </h3>
+    <hr class="mb-4">
     <div class="row">
-     @foreach (var item in Model.Items.Where(m => m.Type == FormatType.PDF))
+     @foreach (var item in purchasedBooks)
      {
-      <div class="col-md-3 mb-3">
-       <div class="card shadow-sm h-100">
-        <img src="/@item.ImageBookCoverPath" class="card-img-top" alt="@item.Title" />
+      <div class="col-md-4 col-lg-3 mb-4">
+       <div class="card book-card h-100">
+        <div class="book-card-ribbon ribbon-purchased"><span>Purchased</span></div>
+        <div class="card-img-container">
+         <img src="/@item.ImageBookCoverPath" class="card-img-top" alt="@item.Title" />
+         <a asp-controller="Book" asp-action="ReadBook" asp-route-id="@item.BookId" class="card-img-overlay">
+          <i class="fas fa-eye fa-3x"></i>
+         </a>
+        </div>
         <div class="card-body d-flex flex-column">
-         <h5>@item.Title</h5>
-         <p class="text-muted">@item.Author</p>
+         <h5 class="card-title">@item.Title</h5>
+         <p class="card-subtitle mb-2 " style="border-color: #0056b3 !important;">by @item.Author</p>
          <a asp-controller="Book" asp-action="ReadBook" asp-route-id="@item.BookId"
-            class="btn btn-primary mt-auto d-block">Open PDF</a>
+            class="btn btn-read mt-auto">
+          <i class="fas fa-book-open me-2"></i>Open PDF
+         </a>
         </div>
        </div>
       </div>
@@ -40,45 +62,79 @@ else
    </div>
   }
 
-  @* --- Borrowed Books --- *@
-  @if (Model.Items.Any(m => m.Type == FormatType.Borrowing))
+  <!-- Borrowed Books Section -->
+  @if (borrowedBooks.Any())
   {
-   <div class="col-md-12 mb-5">
-    <h3>📖 Borrowed Books</h3>
+   <div class="mb-5">
+    <h3 class="section-title">
+     <i class="fas fa-hand-holding-hand text-success"></i> Borrowed Books
+    </h3>
+    <hr class="mb-4">
     <div class="row">
-     @foreach (var item in Model.Items.Where(m => m.Type == FormatType.Borrowing))
+     @foreach (var item in borrowedBooks)
      {
-      <div class="col-md-3 mb-3">
-       <div class="card shadow-sm h-100">
-        <img src="/@item.ImageBookCoverPath" class="card-img-top" alt="@item.Title" />
-        <div class="card-body d-flex flex-column">
-         <h5>@item.Title</h5>
-         <p class="text-muted">@item.Author</p>
+      var remainingDays = 0;
+      var isExpired = true;
+      var ribbonClass = "ribbon-expired";
+      var ribbonText = "Expired";
 
-         @if (item.BorrowedUntil.HasValue)
+      if (item.BorrowedUntil.HasValue)
+      {
+       remainingDays = (item.BorrowedUntil.Value.Date - DateTime.UtcNow.Date).Days;
+       isExpired = remainingDays < 0;
+       if (!isExpired)
+       {
+        ribbonClass = "ribbon-borrowed";
+        ribbonText = "Borrowed";
+       }
+      }
+
+      <div class="col-md-4 col-lg-3 mb-4">
+       <div class="card book-card h-100 @(isExpired ? "expired-card" : "")">
+        <div class="book-card-ribbon @ribbonClass"><span>@ribbonText</span></div>
+        <div class="card-img-container">
+         <img src="/@item.ImageBookCoverPath" class="card-img-top" alt="@item.Title" />
+         @if (!isExpired)
          {
-          var remaining = (item.BorrowedUntil.Value - DateTime.UtcNow).Days;
-          if (remaining > 0)
+          <a asp-controller="Book" asp-action="ReadBook" asp-route-id="@item.BookId" class="card-img-overlay">
+           <i class="fas fa-eye fa-3x"></i>
+          </a>
+         }
+        </div>
+        <div class="card-body d-flex flex-column">
+         <h5 class="card-title">@item.Title</h5>
+         <p class="card-subtitle mb-2 ">by @item.Author</p>
+
+         <div class="mt-auto">
+          @if (isExpired)
           {
-           <span class="badge bg-success mb-2 text-center">
-            ⏳ @remaining day(s) left
-           </span>
-           <a asp-controller="Book" asp-action="ReadBook" asp-route-id="@item.BookId"
-              class="btn btn-primary mt-auto d-block">Open Book</a>
+           <div class="badge bg-danger w-100 p-2 fs-6">
+            <i class="fas fa-times-circle me-1"></i> Expired
+           </div>
+           <button class="btn btn-secondary w-100 mt-2" disabled>
+            <i class="fas fa-book me-2"></i>Unavailable
+           </button>
           }
           else
           {
-           <span class="badge bg-danger d-block text-center">
-            ❌ Borrowing expired
-           </span>
+           var badgeColor = remainingDays > 7 ? "bg-success" : "bg-warning";
+           <div class="badge @badgeColor w-100 p-2 fs-6 mb-2">
+            <i class="fas fa-hourglass-half me-1"></i>
+            @if (remainingDays == 0)
+            {
+             <span>Expires today</span>
+            }
+            else
+            {
+             <span>@remainingDays day(s) left</span>
+            }
+           </div>
+           <a asp-controller="Book" asp-action="ReadBook" asp-route-id="@item.BookId"
+              class="btn btn-read w-100">
+            <i class="fas fa-book-open me-2"></i>Read Now
+           </a>
           }
-         }
-         else
-         {
-          <span class="badge bg-warning d-block text-center">
-           Unknown due date
-          </span>
-         }
+         </div>
         </div>
        </div>
       </div>
@@ -87,39 +143,152 @@ else
    </div>
   }
 
- </div>
+  <!-- Pagination -->
+  @if (Model.TotalCount > Model.PageSize)
+  {
+   <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+     @{
+      var totalPages = (int)Math.Ceiling(Model.TotalCount / (double)Model.PageSize);
+      var currentPage = Model.PageNumber;
+     }
+     <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+      <a class="page-link" asp-action="MyBooks" asp-route-page="@(currentPage - 1)" asp-route-pageSize="@Model.PageSize">Previous</a>
+     </li>
+     @for (int i = 1; i <= totalPages; i++)
+     {
+      <li class="page-item @(i == currentPage ? "active" : "")">
+       <a class="page-link" asp-action="MyBooks" asp-route-page="@i" asp-route-pageSize="@Model.PageSize">@i</a>
+      </li>
+     }
+     <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+      <a class="page-link" asp-action="MyBooks" asp-route-page="@(currentPage + 1)" asp-route-pageSize="@Model.PageSize">Next</a>
+     </li>
+    </ul>
+   </nav>
+  }
+ }
+</div>
 
- @* --- Pagination --- *@
- <nav aria-label="Page navigation">
-  <ul class="pagination justify-content-center">
-   @{
-    var totalPages = (int)Math.Ceiling(Model.TotalCount / (double)Model.PageSize);
-    var currentPage = Model.PageNumber;
-   }
+<style>
+ .section-title {
+  font-weight: 300;
+  font-size: 1.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+ }
 
-   <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-    <a class="page-link"
-       asp-action="MyBooks"
-       asp-route-page="@(currentPage - 1)"
-       asp-route-pageSize="@Model.PageSize">Previous</a>
-   </li>
+ .book-card {
+  border: none;
+  border-radius: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden; /* Important for ribbon */
+ }
 
-   @for (int i = 1; i <= totalPages; i++)
-   {
-    <li class="page-item @(i == currentPage ? "active" : "")">
-     <a class="page-link"
-        asp-action="MyBooks"
-        asp-route-page="@i"
-        asp-route-pageSize="@Model.PageSize">@i</a>
-    </li>
-   }
+  .book-card:hover {
+   transform: translateY(-8px);
+   box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+  }
 
-   <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-    <a class="page-link"
-       asp-action="MyBooks"
-       asp-route-page="@(currentPage + 1)"
-       asp-route-pageSize="@Model.PageSize">Next</a>
-   </li>
-  </ul>
- </nav>
-}
+ .card-img-container {
+  position: relative;
+ }
+
+ .card-img-top {
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+ }
+
+ .card-img-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+ }
+
+ .book-card:hover .card-img-overlay {
+  opacity: 1;
+ }
+
+ .card-title {
+  font-weight: bold;
+ }
+
+ .btn-read {
+  background-color: #0056b3;
+  color: white;
+  border: none;
+ }
+
+  .btn-read:hover {
+   background-color: #003d80;
+   color: white;
+  }
+
+ .expired-card {
+  filter: grayscale(80%);
+  opacity: 0.8;
+ }
+
+ /* Ribbon Styles */
+ .book-card-ribbon {
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  z-index: 1;
+ }
+
+  .book-card-ribbon::before,
+  .book-card-ribbon::after {
+   position: absolute;
+   z-index: -1;
+   content: '';
+   display: block;
+   border: 5px solid;
+  }
+
+  .book-card-ribbon span {
+   position: absolute;
+   display: block;
+   width: 225px;
+   padding: 10px 0;
+   box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+   color: #fff;
+   font: 700 14px/1 'Lato', sans-serif;
+   text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+   text-transform: uppercase;
+   text-align: center;
+   left: -35px;
+   top: 30px;
+   transform: rotate(-45deg);
+  }
+
+ .ribbon-purchased span {
+  background-color: #0d6efd;
+ }
+
+ .ribbon-borrowed span {
+  background-color: #198754;
+ }
+
+ .ribbon-expired span {
+  background-color: #dc3545;
+ }
+
+ /* Pagination styles */
+ .pagination .page-item.active .page-link {
+  background-color: #0056b3;
+  border-color: #0056b3;
+ }
+
+ .pagination .page-link {
+  color: #0056b3;
+ }
+</style>

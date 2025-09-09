@@ -264,10 +264,10 @@ namespace Digital_Library.Service.Implementation
 			return query; 
 		}
 
-		public async Task<IEnumerable<Book>> GetRelatedBooksAsync(string categoryId, string excludeBookId, int count = 3)
+		public async Task<IEnumerable<Book>> GetRelatedBooksAsync( string excludeBookId, int count = 3)
 		{
 			return await _unitOfWork.Books.GetAllQuery()
-							.Where(b => b.CategoryID == categoryId && b.Id != excludeBookId)
+							.Where(b => b.Id != excludeBookId)
 							.Take(count)
 							.ToListAsync();
 		}
@@ -316,20 +316,15 @@ namespace Digital_Library.Service.Implementation
 			};
 		}
 
-		public async Task<bool> UserHasAccessToBookAsync(string userId, string bookId)
+		public async Task<UserBookAccessType> GetUserBookAccessAsync(string userId, string bookId)
 		{
-			var pdfAccess = await _unitOfWork.UserPdfBooks
-							.GetManyQuery(upb => upb.UserId == userId && upb.BookId == bookId)
-							.AnyAsync();
+			if (await _unitOfWork.Borrowings.GetManyQuery(b => b.UserId == userId && b.BookId == bookId).AnyAsync())
+				return UserBookAccessType.Borrowed;
 
-			if (pdfAccess)
-				return true;
-			var borrowingAccess = await _unitOfWork.Borrowings
-							.GetManyQuery(b => b.UserId == userId && b.BookId == bookId)
-							.Where(b => b.DueDate >= DateTime.UtcNow) 
-							.AnyAsync();
+			if (await _unitOfWork.UserPdfBooks.GetManyQuery(upb => upb.UserId == userId && upb.BookId == bookId).AnyAsync())
+				return UserBookAccessType.Purchased;
 
-			return borrowingAccess;
+			return UserBookAccessType.None;
 		}
 
 	}

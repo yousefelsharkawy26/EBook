@@ -47,101 +47,131 @@ namespace Digital_Library.Service.Services
 			{
 				foreach (var vendorGroup in items.GroupBy(s => s.VendorId))
 				{
-					var orderHeader = new OrderHeader
+					var pdfItems = vendorGroup.Where(i => i.FormatType == FormatType.PDF || i.FormatType == FormatType.Borrowing).ToList();
+					var physicalItems = vendorGroup.Where(i => i.FormatType == FormatType.Physical).ToList();
+
+					// ======= PDF / Borrowing OrderHeader =======
+					if (pdfItems.Any())
 					{
-						VendorId = vendorGroup.Key,
-						OrderDetails = new List<OrderDetail>()
-					};
-
-					decimal orderHeaderAmount = 0;
-
-					foreach (var item in vendorGroup)
-					{
-						if (item.Quantity <= 0 || item.Price < 0)
+						var pdfOrderHeader = new OrderHeader
 						{
-							_logger.LogWarning("CreateOrderAsync: Invalid item quantity or price.");
-							return Response.Fail("Invalid item quantity or price.");
-						}
-
-						var book = await _unitOfWork.Books.GetSingleAsync(b => b.Id == item.BookId);
-						if (book == null)
-						{
-							_logger.LogWarning("CreateOrderAsync: Book with ID {BookId} not found.", item.BookId);
-							return Response.Fail($"Book  not found.");
-						}
-
-						if (book.Stock < item.Quantity)
-						{
-							return Response.Fail($"Not enough stock for {book.Title}. Available: {book.Stock}");
-						}
-
-						book.Stock -= item.Quantity;
-						_unitOfWork.Books.Update(book);
-
-						var orderDetail = new OrderDetail
-						{
-							BookId = item.BookId,
-							Quantity = item.Quantity,
-							FormatType = item.FormatType
+							VendorId = vendorGroup.Key,
+							OrderDetails = new List<OrderDetail>(),
+							Status	= Status.Complete 
 						};
+						decimal pdfTotal = 0;
 
-						switch (item.FormatType)
+						foreach (var item in pdfItems)
 						{
-							case FormatType.PDF:
-								orderDetail.Price = book.PricePdf ?? 0;
-								break;
-							case FormatType.Physical:
-								orderDetail.Price = book.PricePhysical;
-								break;
-							case FormatType.Borrowing:
-								orderDetail.Price = book.PricePDFPerDay ?? 0;
-								break;
-							default:
-								orderDetail.Price = 0;
-								break;
-						}
+							if (item.Quantity <= 0 || item.Price < 0)
+								return Response.Fail("Invalid item quantity or price.");
 
-						orderHeader.OrderDetails.Add(orderDetail);
-						orderHeaderAmount += orderDetail.Price * orderDetail.Quantity;
+							var book = await _unitOfWork.Books.GetSingleAsync(b => b.Id == item.BookId);
+							if (book == null)
+								return Response.Fail($"Book not found: {item.BookId}");
 
-						if (orderDetail.FormatType == FormatType.PDF)
-						{
-						var res=	await AddPdfBooksToUser(userId, book.Id);
-							if (!res)
+							var orderDetail = new OrderDetail
 							{
-								await _unitOfWork.RolleBack();
-								return Response.Fail($"Already Own Book : {book.Title} ");
-							}
-						}
-						else if (orderDetail.FormatType == FormatType.Borrowing)
-						{
-						var res=	await AddBorrowPdfBooksToUser(userId, book.Id, item.Quantity);
-							if (!res)
+								BookId = item.BookId,
+								Quantity = item.Quantity,
+								FormatType = item.FormatType,
+							
+							};
+
+							// تحديد السعر حسب النوع
+							switch (item.FormatType)
 							{
-								await _unitOfWork.RolleBack();
-								return Response.Fail($"Please Try Later! ");
+								case FormatType.PDF:
+									orderDetail.Price = book.PricePdf ?? 0;
+									break;
+								case FormatType.Borrowing:
+									orderDetail.Price = book.PricePDFPerDay ?? 0;
+									break;
 							}
+
+							pdfTotal += orderDetail.Price * orderDetail.Quantity;
+							pdfOrderHeader.OrderDetails.Add(orderDetail);
 						}
 
+						pdfOrderHeader.TotalAmount = pdfTotal;
+						order.OrderHeaders.Add(pdfOrderHeader);
 					}
 
-					orderHeader.TotalAmount = orderHeaderAmount;
-					order.OrderHeaders.Add(orderHeader);
+					// ======= Physical OrderHeader =======
+					if (physicalItems.Any())
+					{
+						var physicalOrderHeader = new OrderHeader
+						{
+							VendorId = vendorGroup.Key,
+							OrderDetails = new List<OrderDetail>()
+						};
+						decimal physicalTotal = 0;
+
+						foreach (var item in physicalItems)
+						{
+							if (item.Quantity <= 0 || item.Price < 0)
+								return Response.Fail("Invalid item quantity or price.");
+
+							var book = await _unitOfWork.Books.GetSingleAsync(b => b.Id == item.BookId);
+							if (book == null)
+								return Response.Fail($"Book not found: {item.BookId}");
+
+							// خصم المخزون للكتب الفيزيائية فقط
+							if (book.Stock < item.Quantity)
+								return Response.Fail($"Not enough stock for {book.Title}. Available: {book.Stock}");
+
+							book.Stock -= item.Quantity;
+							_unitOfWork.Books.Update(book);
+
+							var orderDetail = new OrderDetail
+							{
+								BookId = item.BookId,
+								Quantity = item.Quantity,
+								FormatType = FormatType.Physical,
+								Price = book.PricePhysical
+							};
+
+							physicalTotal += orderDetail.Price * orderDetail.Quantity;
+							physicalOrderHeader.OrderDetails.Add(orderDetail);
+						}
+
+						physicalOrderHeader.TotalAmount = physicalTotal;
+						order.OrderHeaders.Add(physicalOrderHeader);
+					}
 				}
 
+				// مجموع كل الـ OrderHeaders
 				order.TotalAmount = order.OrderHeaders.Sum(h => h.TotalAmount);
 
+				// حفظ الـ Order
 				await _unitOfWork.Orders.AddAsync(order);
 				await _unitOfWork.SaveChangesAsync();
 
+				// معالجة الترانزاكشن لكل OrderHeader
 				foreach (var header in order.OrderHeaders)
 				{
-					await MakeTransaction(header.Id, header.TotalAmount);
+					var transactionSuccess = await MakeTransaction(header.Id, header.TotalAmount);
+
+					if (transactionSuccess)
+					{
+						// إعطاء الكتب الرقمية للعميل بعد نجاح الدفع
+						foreach (var detail in header.OrderDetails)
+						{
+							if (detail.FormatType == FormatType.PDF)
+							{
+								await AddPdfBooksToUser(userId, detail.BookId);
+							}
+							else if (detail.FormatType == FormatType.Borrowing)
+							{
+								await AddBorrowPdfBooksToUser(userId, detail.BookId, detail.Quantity);
+							}
+						}
+					}
 				}
 
 				await _unitOfWork.Commit();
-
 				_logger.LogInformation("CreateOrderAsync: Order {OrderId} created successfully.", order.Id);
+
 				return Response.Ok("Order created successfully.");
 			}
 			catch (Exception ex)
@@ -151,6 +181,7 @@ namespace Digital_Library.Service.Services
 				return Response.Fail("Error creating order.");
 			}
 		}
+
 
 		private async Task<bool> MakeTransaction(string ordeHeaderId, decimal amount)
 		{

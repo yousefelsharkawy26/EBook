@@ -5,14 +5,13 @@
  ViewData["Title"] = "Shop - All Books";
  var bannerUrl = Url.Content("~/images/banner-image-bg-1.jpg");
 
- // Get current filter values from query string for persistence
  var currentQuery = Context.Request.Query["query"].ToString();
  var currentSort = Context.Request.Query["sort"].ToString();
  var currentCategory = Context.Request.Query["category"].ToString();
  var currentAuthor = Context.Request.Query["author"].ToString();
  var currentPrice = Context.Request.Query["priceRange"].ToString();
 
- // Pagination variables
+
  var currentPage = ViewBag.CurrentPage as int? ?? 1;
  var totalPages = ViewBag.TotalPages as int? ?? 1;
  var pageSize = ViewBag.PageSize as int? ?? 8;
@@ -20,7 +19,7 @@
  var startItem = totalItems > 0 ? ((currentPage - 1) * pageSize) + 1 : 0;
  var endItem = Math.Min(currentPage * pageSize, totalItems);
 
- // Data for dropdowns to make the view cleaner
+
  var sortOptions = new List<(string Value, string Text)>
     {
         ("NameAsc", "Name (A - Z)"),
