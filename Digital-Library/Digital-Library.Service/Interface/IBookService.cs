@@ -15,13 +15,13 @@ namespace Digital_Library.Service.Interface
 
 		Task<Response> GetBookById(string bookId);
 
-		Task<IEnumerable<Book>> GetAllBooks(BookFilter? filter = null);
+		IQueryable<Book> GetAllBooks(BookFilter? filter = null);
 
 		Task<IEnumerable<Book>> GetBestTenSellingBook();
 
-		Task<(IEnumerable<Book> Books, int TotalCount)> GetPagedBooksAsync(string Vid ,int page, int pageSize, BookFilter? filter = null);
+		Task<(IEnumerable<Book> Books, int TotalCount)> GetPagedBooksAsync(string Vid, int page, int pageSize, BookFilter? filter = null);
 
-		Task<IEnumerable<MyBookViewModel>> GetMyBook(string id);
+		Task<IEnumerable<Book>> GetRelatedBooksAsync(string categoryId, string excludeBookId, int count = 3);
 
-    }
+	}
 }

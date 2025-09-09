@@ -2,6 +2,7 @@
 using Digital_Library.Core.Enums;
 using Digital_Library.Core.Filters;
 using Digital_Library.Core.Models;
+using Digital_Library.Core.ViewModels;
 using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Core.ViewModels.Responses;
 using Digital_Library.Infrastructure.UnitOfWork.Interface;
@@ -104,53 +105,6 @@ namespace Digital_Library.Service.Implementation
 			}
 		}
 
-		public async Task<IEnumerable<Book>> GetAllBooks(BookFilter? filter = null)
-		{
-			_logger.LogInformation("Start GetAllBooks with filter: {@Filter}", filter);
-
-			IQueryable<Book> query = _unitOfWork.Books.GetAllQuery(
-							includes: new Expression<Func<Book, object>>[] { b => b.Category, b => b.Vendor }
-			);
-
-			if (filter != null)
-			{
-				if (!string.IsNullOrEmpty(filter.VendorId))
-				{
-					query = query.Where(b => b.VendorId == filter.VendorId);
-					_logger.LogDebug("Applied VendorId filter: {VendorId}", filter.VendorId);
-				}
-
-				if (!string.IsNullOrEmpty(filter.CategoryId))
-				{
-					query = query.Where(b => b.CategoryID == filter.CategoryId);
-					_logger.LogDebug("Applied CategoryId filter: {CategoryId}", filter.CategoryId);
-				}
-
-				if (filter.HasPDF.HasValue)
-				{
-					query = query.Where(b => b.HasPDF == filter.HasPDF.Value);
-					_logger.LogDebug("Applied HasPDF filter: {HasPDF}", filter.HasPDF.Value);
-				}
-
-				if (filter.IsBorrowable.HasValue)
-				{
-					query = query.Where(b => b.IsBorrowable == filter.IsBorrowable.Value);
-					_logger.LogDebug("Applied IsBorrowable filter: {IsBorrowable}", filter.IsBorrowable.Value);
-				}
-
-				if (!string.IsNullOrEmpty(filter.Keyword))
-				{
-					query = query.Where(b => b.Title.Contains(filter.Keyword) || b.Author.Contains(filter.Keyword));
-					_logger.LogDebug("Applied Keyword filter: {Keyword}", filter.Keyword);
-				}
-			}
-
-			var books = await query.ToListAsync();
-			_logger.LogInformation("GetAllBooks retrieved {Count} records", books.Count);
-
-			return books;
-		}
-
 		public async Task<Response> GetBookById(string bookId)
 		{
 			_logger.LogInformation("Start GetBookById with Id: {BookId}", bookId);
@@ -225,7 +179,7 @@ namespace Digital_Library.Service.Implementation
 				includes: new Expression<Func<OrderDetail, object>>[] { o => o.Book }
 				);
 
-			var ordersGroup = orders.GroupBy(oi => oi.Book ) // GroupBy على BookId + Book
+			var ordersGroup = orders.GroupBy(oi => oi.Book )
 									.Select(g => new BookGroupViewModel
 									{
 										Book = g.Key,
@@ -240,7 +194,7 @@ namespace Digital_Library.Service.Implementation
             return await bestFiveSales.ToListAsync();
         }
 
-        public async Task<(IEnumerable<Book> Books, int TotalCount)> GetPagedBooksAsync(
+  public async Task<(IEnumerable<Book> Books, int TotalCount)> GetPagedBooksAsync(
      string vendorId, int page, int pageSize, BookFilter? filter = null)
         {
             _logger.LogInformation(
@@ -251,10 +205,10 @@ namespace Digital_Library.Service.Implementation
                 includes: new Expression<Func<Book, object>>[] { b => b.Category, b => b.Vendor }
             );
 
-            // ✅ Always restrict to this vendor
+            
             query = query.Where(b => b.VendorId == vendorId);
 
-            // ✅ Apply additional filters
+            
             if (filter != null)
             {
                 if (!string.IsNullOrEmpty(filter.CategoryId))
@@ -283,61 +237,43 @@ namespace Digital_Library.Service.Implementation
             return (books, totalCount);
         }
 
+		public IQueryable<Book> GetAllBooks(BookFilter? filter = null)
+		{
+			IQueryable<Book> query = _unitOfWork.Books.GetAllQuery(
+							includes: new Expression<Func<Book, object>>[] { b => b.Category, b => b.Vendor }
+			);
 
-        public async Task<IEnumerable<MyBookViewModel>> GetMyBook(string userId)
-        {
-            // Step 1: Load orders with details + book
-            var orders = await _unitOfWork.OrderHeaders.GetManyQuery(
-                predicate: oh => oh.Order.UserId == userId,
-                includes: new Expression<Func<OrderHeader, object>>[]
-                {
-            oh => oh.OrderDetails
-                },
-                thenIncludes: new Func<IQueryable<OrderHeader>, IIncludableQueryable<OrderHeader, object>>[]
-                {
-            q => q.Include(oh => oh.OrderDetails).ThenInclude(od => od.Book)
-                }
-            ).ToListAsync();
+			if (filter != null)
+			{
+				if (!string.IsNullOrEmpty(filter.VendorId))
+					query = query.Where(b => b.VendorId == filter.VendorId);
 
-            // Step 2: Load borrowings for this user (all at once)
-            var borrowings = await _unitOfWork.Borrowings
-                .GetManyQuery(b => b.UserId == userId)
-                .ToListAsync();
+				if (!string.IsNullOrEmpty(filter.CategoryId))
+					query = query.Where(b => b.CategoryID == filter.CategoryId);
 
-            // Step 3: Project into MyBookViewModel (skip Physical)
-            var books = orders
-                .SelectMany(oh => oh.OrderDetails
-                    .Where(od => od.FormatType != FormatType.Physical) // 🚀 filter here
-                    .Select(od => new MyBookViewModel
-                    {
-                        Book = od.Book,
-                        FormatType = od.FormatType,
-                        DueDate = od.FormatType == FormatType.Borrowing
-                            ? borrowings.FirstOrDefault(b => b.BookId == od.BookId)?.DueDate
-                            : null
-                    }))
-                .ToList();
+				if (filter.HasPDF.HasValue)
+					query = query.Where(b => b.HasPDF == filter.HasPDF.Value);
 
-            return books;
-        }
+				if (filter.IsBorrowable.HasValue)
+					query = query.Where(b => b.IsBorrowable == filter.IsBorrowable.Value);
+
+				if (!string.IsNullOrEmpty(filter.Keyword))
+					query = query.Where(b => b.Title.Contains(filter.Keyword) || b.Author.Contains(filter.Keyword));
+			}
+
+			return query; 
+		}
+
+		public async Task<IEnumerable<Book>> GetRelatedBooksAsync(string categoryId, string excludeBookId, int count = 3)
+		{
+			return await _unitOfWork.Books.GetAllQuery()
+							.Where(b => b.CategoryID == categoryId && b.Id != excludeBookId)
+							.Take(count)
+							.ToListAsync();
+		}
 
 
 
-
-
-
-    }
+	}
 }
 
-public class BookGroupViewModel
-{
-	public decimal TotalSold { get; set; }
-	public Book Book { get; set; }
-}
-
-public class MyBookViewModel
-{
-    public Book Book { get; set; }
-    public FormatType FormatType { get; set; }
-    public DateTime? DueDate { get; set; } // for borrowed books
-}
