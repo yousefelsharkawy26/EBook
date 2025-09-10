@@ -33,19 +33,14 @@ jobs:
       with:
         dotnet-version: '8.0.x' # IMPORTANT: Change this to match your project's .NET version.
 
-    # Step 3: Restore dependencies for all projects in the solution.
-    # This is equivalent to running 'dotnet restore' locally.
+    # Step 3: Restore dependencies for the specific solution.
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore ./Digital-Library/Digital-Library.sln
 
-    # Step 4: Build the entire solution in Release configuration.
-    # The '--no-restore' flag is used for efficiency because we already restored dependencies in the previous step.
+    # Step 4: Build the entire solution.
     - name: Build solution
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build ./Digital-Library/Digital-Library.sln --configuration Release --no-restore
 
-    # Step 5 (Optional but Highly Recommended): Run unit tests.
-    # This step will look for any test projects in your solution and run them.
-    # If any test fails, the workflow will fail, preventing bad code from being merged.
-    # If you don't have a test project yet, you can comment this step out.
+    # Step 5 (Optional): Run unit tests for the solution.
     - name: Run tests
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test ./Digital-Library/Digital-Library.sln --no-build --verbosity normal
