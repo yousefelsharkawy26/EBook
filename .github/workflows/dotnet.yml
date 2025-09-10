@@ -1,0 +1,51 @@
+# This is a basic workflow to help you get started with Actions
+
+# 1. Workflow Name: Give your workflow a descriptive name.
+name: .NET CI Build and Test
+
+# 2. Triggers: Define when this workflow should run.
+on:
+  # Run on pushes to the 'main' branch
+  push:
+    branches: [ "main" ]
+  # Run on pull requests targeting the 'main' branch
+  pull_request:
+    branches: [ "main" ]
+
+# 3. Jobs: A workflow run is made up of one or more jobs that can run sequentially or in parallel.
+jobs:
+  # Define a job named 'build'
+  build:
+    # 4. Runner: Specify the type of machine to run the job on. 
+    # 'ubuntu-latest' is a cost-effective and common choice.
+    runs-on: ubuntu-latest
+
+    # 5. Steps: A job contains a sequence of tasks called steps.
+    steps:
+    # Step 1: Check out your repository code so the workflow can access it.
+    - name: Checkout repository
+      uses: actions/checkout@v4 # Use the latest version of the checkout action
+
+    # Step 2: Set up the .NET SDK environment.
+    # Make sure the version matches the one used in your project.
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x' # IMPORTANT: Change this to match your project's .NET version.
+
+    # Step 3: Restore dependencies for all projects in the solution.
+    # This is equivalent to running 'dotnet restore' locally.
+    - name: Restore dependencies
+      run: dotnet restore
+
+    # Step 4: Build the entire solution in Release configuration.
+    # The '--no-restore' flag is used for efficiency because we already restored dependencies in the previous step.
+    - name: Build solution
+      run: dotnet build --configuration Release --no-restore
+
+    # Step 5 (Optional but Highly Recommended): Run unit tests.
+    # This step will look for any test projects in your solution and run them.
+    # If any test fails, the workflow will fail, preventing bad code from being merged.
+    # If you don't have a test project yet, you can comment this step out.
+    - name: Run tests
+      run: dotnet test --no-build --verbosity normal
