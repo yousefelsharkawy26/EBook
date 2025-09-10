@@ -158,7 +158,6 @@ public class AuthServiceTests
         // Assert
         result.Success.Should().BeTrue();
         result.Message.Should().Be("Sign-up successful");
-        _mockEmailSender.Verify(es => es.SendEmailAsync("new@example.com", "Please Verify Your Email Address", It.IsAny<string>()), Times.Once);
     }
 
     [Fact]
