@@ -46,9 +46,6 @@ namespace Digital_Library.Core.Models
 		[Required]
 		public VendorStatus Status { get; set; } = VendorStatus.Pending;
 
-
-		public string? RejectionReason { get; set; }
-
 		public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
 		public DateTime? ReviewedAt { get; set; }
 

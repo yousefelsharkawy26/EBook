@@ -13,8 +13,8 @@ namespace Digital_Library.Service
 	{
 		public static IServiceCollection Add_Module_Service_Dependencies(this IServiceCollection services)
 		{
-   services.AddTransient<IActionContextAccessor, ActionContextAccessor>();
-   services.AddScoped<IAuthService, AuthService>();
+		    services.AddTransient<IActionContextAccessor, ActionContextAccessor>();
+		    services.AddScoped<IAuthService, AuthService>();
 			services.AddScoped<IBookService, BookService>();
 			services.AddScoped<ICartService, CartService>();
 			services.AddScoped<ICategoryService, CategoryService>();
@@ -29,7 +29,7 @@ namespace Digital_Library.Service
 
 		public static IServiceCollection Add_Module_Configuration_Services(this IServiceCollection services, IConfiguration configuration)
 		{
-  services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
+			services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
 
 			return services;
   }

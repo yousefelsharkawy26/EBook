@@ -338,9 +338,6 @@ namespace Digital_Library.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RejectionReason")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("ReviewedAt")
                         .HasColumnType("datetime2");
 

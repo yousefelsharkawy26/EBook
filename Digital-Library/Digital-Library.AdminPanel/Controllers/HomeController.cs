@@ -1,6 +1,7 @@
 ﻿using Digital_Library.AdminPanel.Models;
-using Digital_Library.AdminPanel.ViewModels;
 using Digital_Library.Core.Models;
+using Digital_Library.Core.ViewModels;
+using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,12 +13,15 @@ namespace Digital_Library.AdminPanel.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<User> _userManager;
+        private readonly IVendorService _vendorService;
 
-        public HomeController(ILogger<HomeController> logger, 
-                              UserManager<User> userManager)
+        public HomeController(ILogger<HomeController> logger,
+                              UserManager<User> userManager,
+                              IVendorService vendorService)
         {
             _logger = logger;
             _userManager = userManager;
+            _vendorService = vendorService;
         }
 
         public IActionResult Index()
@@ -36,6 +40,26 @@ namespace Digital_Library.AdminPanel.Controllers
         public IActionResult Charts()
         {
             return View();
+        }
+
+        
+
+        [HttpPost("api/Vendors/UpdateStatus")]
+        public async Task<IActionResult> UpdateStatus([FromBody] UpdateVendorStatusDto dto)
+        {
+            if (dto == null || string.IsNullOrEmpty(dto.VendorId))
+            {
+                return BadRequest("Invalid data.");
+            }
+
+            var res = await _vendorService.ChangeStatusAsync(dto.VendorId, dto.NewStatus);
+
+            if (res.Success)
+            {
+                return Ok(new { message = "Status updated successfully." });
+            }
+
+            return NotFound(new { message = "Vendor not found or failed to update." });
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -81,11 +105,6 @@ namespace Digital_Library.AdminPanel.Controllers
             }
 
             return Json(chartData); // إرجاع البيانات كـ JSON
-        }
-
-        public IActionResult Defult()
-        {
-            return Json("Hello");
         }
     }
 }

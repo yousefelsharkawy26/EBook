@@ -1,4 +1,4 @@
-﻿namespace Digital_Library.AdminPanel.ViewModels;
+﻿namespace Digital_Library.Core.ViewModels;
 public class ChartDataViewModel
 {
     // قائمة بالتسميات (Labels)، ستكون التواريخ

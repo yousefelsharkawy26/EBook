@@ -1,5 +1,4 @@
 ﻿// BookServiceTests.cs
-using Digital_Library.Core.Filters;
 using Digital_Library.Core.Models;
 using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Infrastructure.Repositories.Interface;
@@ -10,7 +9,6 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System.Linq.Expressions;
 using Xunit;
 
 namespace Digital_Library.Test;

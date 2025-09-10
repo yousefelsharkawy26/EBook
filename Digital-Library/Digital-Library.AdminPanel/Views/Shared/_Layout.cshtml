@@ -1,12 +1,9 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
-    <title>DASHMIN - Bootstrap Admin Template</title>
+    <title>@ViewBag.Title - EBook Admin</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="" name="keywords">
-    <meta content="" name="description">
 
     <!-- Favicon -->
     <link href="~/img/favicon.ico" rel="icon">
@@ -29,9 +26,14 @@
 
     <!-- Template Stylesheet -->
     <link href="~/css/style.css" rel="stylesheet">
+
 </head>
 <body>
-    <div class="container-xxl position-relative bg-white d-flex p-0">
+    <!--
+        تغيير 1: الحاوية الرئيسية تم تغييرها من container-xxl إلى container-fluid لتكون متوافقة
+        مع هيكل القالب. تمت إزالة container-xxl لأنها مخصصة لمحتوى الصفحة وليس للتخطيط العام.
+    -->
+    <div class="container-fluid position-relative bg-white d-flex p-0">
         <!-- Spinner Start -->
         <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
@@ -42,49 +44,114 @@
         <!-- Sidebar Start -->
         <div class="sidebar pe-4 pb-3">
             <nav class="navbar bg-light navbar-light">
-                <a href="index.html" class="navbar-brand mx-4 mb-3">
-                    <h3 class="text-primary"><i class="fa fa-hashtag me-2"></i>DASHMIN</h3>
-                </a>
-                <div class="d-flex align-items-center ms-4 mb-4">
-                    <div class="position-relative">
-                        <img class="rounded-circle" src="~/img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                        <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
-                    </div>
-                    <div class="ms-3">
-                        <h6 class="mb-0">Jhon Doe</h6>
-                        <span>Admin</span>
-                    </div>
-                </div>
                 <div class="navbar-nav w-100">
-                    <a asp-action="Index" class="nav-item nav-link "><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
-                    
-                    <a asp-action="Forms" class="nav-item nav-link"><i class="fa fa-keyboard me-2"></i>Forms</a>
-                    <a asp-action="Tables" class="nav-item nav-link"><i class="fa fa-table me-2"></i>Tables</a>
-                    <a asp-action="Charts" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Charts</a>
-                    
+                    <!-- الرابط الرئيسي (بدون قائمة فرعية) -->
+                    <a asp-action="Index" asp-controller="Home" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+
+                    <!-- القائمة المنسدلة الأولى: Management -->
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#managementMenu">
+                            <i class="fa fa-users-cog me-2"></i>Management
+                        </a>
+                        <div class="collapse" id="managementMenu">
+                            <div class="bg-white border-0 rounded py-2">
+                                <a asp-action="NewVendors" asp-controller="Vendor" class="dropdown-item nav-link"><i class="bi bi-shop me-2"></i>New Vendors</a>
+                                <a asp-action="Index" asp-controller="Customers" class="dropdown-item nav-link"><i class="fa fa-user-friends me-2"></i>Customers</a>
+                                <a asp-action="Index" asp-controller="Books" class="dropdown-item nav-link"><i class="fa fa-book me-2"></i>Books</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- القائمة المنسدلة الثانية: UI Elements -->
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#uiElementsMenu">
+                            <i class="fa fa-laptop me-2"></i>UI Elements
+                        </a>
+                        <div class="collapse" id="uiElementsMenu">
+                            <div class="bg-white border-0 rounded py-2">
+                                <a asp-action="Forms" asp-controller="Home" class="dropdown-item nav-link"><i class="fa fa-keyboard me-2"></i>Forms</a>
+                                <a asp-action="Tables" asp-controller="Home" class="dropdown-item nav-link"><i class="fa fa-table me-2"></i>Tables</a>
+                                <a asp-action="Charts" asp-controller="Home" class="dropdown-item nav-link"><i class="fa fa-chart-bar me-2"></i>Charts</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </nav>
         </div>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+        <!-- Sidebar End -->
+        <!-- =============================================================== -->
+        <!-- ==================== Content Section Start ==================== -->
+        <!-- =============================================================== -->
+        <!--
+            تغيير 2: إضافة div خاص بالـ Content. هذا هو الجزء المفقود والأهم.
+            الـ Content والـ Sidebar الآن شقيقان (siblings) داخل الحاوية الرئيسية.
+        -->
+        <div class="content">
+            <!-- Navbar Start -->
+            <nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
+                <a href="#" class="navbar-brand d-flex d-lg-none me-4">
+                    <h2 class="text-primary mb-0"><i class="fa fa-hashtag"></i></h2>
+                </a>
+
+                <!-- تغيير 3: إضافة زر Toggler لفتح وإغلاق الشريط الجانبي -->
+                <a href="#" class="sidebar-toggler flex-shrink-0">
+                    <i class="fa fa-bars"></i>
+                </a>
+
+                <div class="navbar-nav align-items-center ms-auto">
+                    <!-- ... هنا يمكنك وضع عناصر الـ Navbar الأخرى مثل البحث، الإشعارات، البروفايل ... -->
+                    <div class="nav-item">
+                        <a href="#" class="nav-link">
+                            <img class="rounded-circle me-lg-2" src="~/img/user.jpg" alt="" style="width: 40px; height: 40px;">
+                            <span class="d-none d-lg-inline-flex">Jhon Doe</span>
+                        </a>
+                       
+                    </div>
+                </div>
+            </nav>
+            <!-- Navbar End -->
+            <!--
+                تغيير 4: وضع RenderBody داخل الـ Content div.
+                الـ container-fluid يضمن أن المحتوى سيأخذ المساحة المتاحة بشكل صحيح.
+            -->
+            <main role="main" class="container-fluid pt-4 px-4">
+                @RenderBody()
+            </main>
+
+            <!-- Footer Start (optional) -->
+            <div class="container-fluid pt-4 px-4">
+                <div class="bg-light rounded-top p-4">
+                    <div class="row">
+                        <div class="col-12 col-sm-6 text-center text-sm-start">
+                            &copy; <a href="#">Your Site Name</a>, All Right Reserved.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer End -->
+        </div>
+        <!-- Content End -->
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
     </div>
-    </div>
-    <a class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+
+    <!-- JavaScript Libraries -->
+    <!--
+        تغيير 5: تم توحيد ملفات الـ JS. نستخدم نسخة واحدة فقط من كل مكتبة.
+    -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/chart/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script> <!-- تمت إضافة مكتبة Easing -->
     <script src="~/lib/waypoints/waypoints.min.js"></script>
     <script src="~/lib/owlcarousel/owl.carousel.min.js"></script>
     <script src="~/lib/tempusdominus/js/moment.min.js"></script>
     <script src="~/lib/tempusdominus/js/moment-timezone.min.js"></script>
     <script src="~/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
-    <script src="~/js/main.js"></script>
+    <script src="~/js/script.js"></script>
+    <!-- Template Javascript -->
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

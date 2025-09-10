@@ -1,0 +1,77 @@
+﻿@using Digital_Library.Core.ViewModels
+@model CustomerDetailsViewModel
+@{
+    ViewData["Title"] = "Customer Details";
+}
+
+<div class="container-fluid pt-4 px-4">
+    <div class="row">
+        <!-- Customer Info Card -->
+        <div class="col-md-4">
+            <div class="bg-light rounded p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <img class="rounded-circle" src="~/img/user.jpg" alt="" style="width: 60px; height: 60px;">
+                    <div class="ms-3">
+                        <h5 class="mb-0">@Model.FullName</h5>
+                        <small class="text-muted">Customer</small>
+                    </div>
+                </div>
+                <hr>
+                <p><strong>Email:</strong> @Model.Email</p>
+                <p><strong>Phone Number:</strong> @(Model.PhoneNumber ?? "N/A")</p>
+                <p><strong>Registered On:</strong> @Model.RegistrationDate.ToString("MMM dd, yyyy")</p>
+                <p>
+                    <strong>Status:</strong>
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Banned</span>
+                    }
+                </p>
+                <a asp-action="Index" class="btn btn-secondary mt-3">Back to List</a>
+            </div>
+        </div>
+
+        <!-- Recent Orders Card -->
+        <div class="col-md-8">
+            <div class="bg-light rounded h-100 p-4">
+                <h6 class="mb-4">Recent Orders (Last 10)</h6>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Date</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.RecentOrders.Any())
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center">This customer has no orders.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var order in Model.RecentOrders)
+                                {
+                                    <tr>
+                                        <td>#@order.OrderId</td>
+                                        <td>@order.OrderDate.ToString("yyyy-MM-dd")</td>
+                                        <td>$@order.OrderTotal.ToString("N2")</td>
+                                        <td>@order.OrderStatus</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

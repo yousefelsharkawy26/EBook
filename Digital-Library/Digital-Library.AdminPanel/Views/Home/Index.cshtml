@@ -2,286 +2,301 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="content">
- 
-    <!-- Sale & Revenue Start -->
-    <div class="container-fluid pt-4 px-4">
-        <div class="row g-4">
-            <div class="col-sm-6 col-xl-3">
-                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                    <i class="fa fa-chart-line fa-3x text-primary"></i>
-                    <div class="ms-3">
-                        <p class="mb-2">Today Sale</p>
-                        <h6 class="mb-0">$1234</h6>
-                    </div>
+<!-- =============================================================== -->
+<!-- ======================= 1. KPI CARDS ========================== -->
+<!-- =============================================================== -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <!-- Total Revenue Card -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-chart-line fa-3x text-primary"></i>
+                <div class="ms-3 text-end">
+                    <p class="mb-2">Total Revenue</p>
+                    <h6 id="totalRevenue" class="mb-0">$0</h6>
                 </div>
             </div>
-            <div class="col-sm-6 col-xl-3">
-                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                    <i class="fa fa-chart-bar fa-3x text-primary"></i>
-                    <div class="ms-3">
-                        <p class="mb-2">Total Sale</p>
-                        <h6 class="mb-0">$1234</h6>
-                    </div>
+        </div>
+        <!-- New Users Today Card -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-user-plus fa-3x text-primary"></i>
+                <div class="ms-3 text-end">
+                    <p class="mb-2">New Users Today</p>
+                    <h6 id="newUsersToday" class="mb-0">0</h6>
                 </div>
             </div>
-            <div class="col-sm-6 col-xl-3">
-                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                    <i class="fa fa-chart-area fa-3x text-primary"></i>
-                    <div class="ms-3">
-                        <p class="mb-2">Today Revenue</p>
-                        <h6 class="mb-0">$1234</h6>
-                    </div>
+        </div>
+        <!-- Pending Vendors Card -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-store fa-3x text-primary"></i>
+                <div class="ms-3 text-end">
+                    <p class="mb-2">Pending Vendors</p>
+                    <h6 id="pendingVendors" class="mb-0">0</h6>
                 </div>
             </div>
-            <div class="col-sm-6 col-xl-3">
-                <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                    <i class="fa fa-chart-pie fa-3x text-primary"></i>
-                    <div class="ms-3">
-                        <p class="mb-2">Total Revenue</p>
-                        <h6 class="mb-0">$1234</h6>
-                    </div>
+        </div>
+        <!-- Total Books Card -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-book fa-3x text-primary"></i>
+                <div class="ms-3 text-end">
+                    <p class="mb-2">Total Books</p>
+                    <h6 id="totalBooks" class="mb-0">0</h6>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Sale & Revenue End -->
-    <!-- Sales Chart Start -->
-    <div class="container-fluid pt-4 px-4">
-        <div class="row g-4">
-            <div class="col-sm-12 col-xl-6">
-                <div class="bg-light text-center rounded p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-4">
-                        <h6 class="mb-0">Worldwide Sales</h6>
-                        <a asp-action="Charts">Show All</a>
-                    </div>
-                    <canvas id="worldwide-sales"></canvas>
-                </div>
-            </div>
-            <div class="col-sm-12 col-xl-6">
-                <div class="bg-light text-center rounded p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-4">
-                        <h6 class="mb-0">Salse & Revenue</h6>
-                        <a asp-action="Charts">Show All</a>
-                    </div>
-                    <canvas id="salse-revenue"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Sales Chart End -->
-    <!-- Recent Sales Start -->
-    <div class="container-fluid pt-4 px-4">
-        <div class="bg-light text-center rounded p-4">
-            <div class="d-flex align-items-center justify-content-between mb-4">
-                <h6 class="mb-0">Recent Salse</h6>
-                <a href="">Show All</a>
-            </div>
-            <div class="table-responsive">
-                <table class="table text-start align-middle table-bordered table-hover mb-0">
-                    <thead>
-                        <tr class="text-dark">
-                            <th scope="col"><input class="form-check-input" type="checkbox"></th>
-                            <th scope="col">Date</th>
-                            <th scope="col">Invoice</th>
-                            <th scope="col">Customer</th>
-                            <th scope="col">Amount</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><input class="form-check-input" type="checkbox"></td>
-                            <td>01 Jan 2045</td>
-                            <td>INV-0123</td>
-                            <td>Jhon Doe</td>
-                            <td>$123</td>
-                            <td>Paid</td>
-                            <td><a class="btn btn-sm btn-primary" href="">Detail</a></td>
-                        </tr>
-                        <tr>
-                            <td><input class="form-check-input" type="checkbox"></td>
-                            <td>01 Jan 2045</td>
-                            <td>INV-0123</td>
-                            <td>Jhon Doe</td>
-                            <td>$123</td>
-                            <td>Paid</td>
-                            <td><a class="btn btn-sm btn-primary" href="">Detail</a></td>
-                        </tr>
-                        <tr>
-                            <td><input class="form-check-input" type="checkbox"></td>
-                            <td>01 Jan 2045</td>
-                            <td>INV-0123</td>
-                            <td>Jhon Doe</td>
-                            <td>$123</td>
-                            <td>Paid</td>
-                            <td><a class="btn btn-sm btn-primary" href="">Detail</a></td>
-                        </tr>
-                        <tr>
-                            <td><input class="form-check-input" type="checkbox"></td>
-                            <td>01 Jan 2045</td>
-                            <td>INV-0123</td>
-                            <td>Jhon Doe</td>
-                            <td>$123</td>
-                            <td>Paid</td>
-                            <td><a class="btn btn-sm btn-primary" href="">Detail</a></td>
-                        </tr>
-                        <tr>
-                            <td><input class="form-check-input" type="checkbox"></td>
-                            <td>01 Jan 2045</td>
-                            <td>INV-0123</td>
-                            <td>Jhon Doe</td>
-                            <td>$123</td>
-                            <td>Paid</td>
-                            <td><a class="btn btn-sm btn-primary" href="">Detail</a></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <!-- Recent Sales End -->
-    <!-- Widgets Start -->
-    <div class="container-fluid pt-4 px-4">
-        <div class="row g-4">
-            <div class="col-sm-12 col-md-6 col-xl-4">
-                <div class="h-100 bg-light rounded p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <h6 class="mb-0">Messages</h6>
-                        <a href="">Show All</a>
-                    </div>
-                    <div class="d-flex align-items-center border-bottom py-3">
-                        <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                        <div class="w-100 ms-3">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-0">Jhon Doe</h6>
-                                <small>15 minutes ago</small>
-                            </div>
-                            <span>Short message goes here...</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center border-bottom py-3">
-                        <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                        <div class="w-100 ms-3">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-0">Jhon Doe</h6>
-                                <small>15 minutes ago</small>
-                            </div>
-                            <span>Short message goes here...</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center border-bottom py-3">
-                        <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                        <div class="w-100 ms-3">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-0">Jhon Doe</h6>
-                                <small>15 minutes ago</small>
-                            </div>
-                            <span>Short message goes here...</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center pt-3">
-                        <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                        <div class="w-100 ms-3">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-0">Jhon Doe</h6>
-                                <small>15 minutes ago</small>
-                            </div>
-                            <span>Short message goes here...</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-12 col-md-6 col-xl-4">
-                <div class="h-100 bg-light rounded p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-4">
-                        <h6 class="mb-0">Calender</h6>
-                        <a href="">Show All</a>
-                    </div>
-                    <div id="calender"></div>
-                </div>
-            </div>
-            <div class="col-sm-12 col-md-6 col-xl-4">
-                <div class="h-100 bg-light rounded p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-4">
-                        <h6 class="mb-0">To Do List</h6>
-                        <a href="">Show All</a>
-                    </div>
-                    <div class="d-flex mb-2">
-                        <input class="form-control bg-transparent" type="text" placeholder="Enter task">
-                        <button type="button" class="btn btn-primary ms-2">Add</button>
-                    </div>
-                    <div class="d-flex align-items-center border-bottom py-2">
-                        <input class="form-check-input m-0" type="checkbox">
-                        <div class="w-100 ms-3">
-                            <div class="d-flex w-100 align-items-center justify-content-between">
-                                <span>Short task goes here...</span>
-                                <button class="btn btn-sm"><i class="fa fa-times"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center border-bottom py-2">
-                        <input class="form-check-input m-0" type="checkbox">
-                        <div class="w-100 ms-3">
-                            <div class="d-flex w-100 align-items-center justify-content-between">
-                                <span>Short task goes here...</span>
-                                <button class="btn btn-sm"><i class="fa fa-times"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center border-bottom py-2">
-                        <input class="form-check-input m-0" type="checkbox" checked>
-                        <div class="w-100 ms-3">
-                            <div class="d-flex w-100 align-items-center justify-content-between">
-                                <span><del>Short task goes here...</del></span>
-                                <button class="btn btn-sm text-primary"><i class="fa fa-times"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center border-bottom py-2">
-                        <input class="form-check-input m-0" type="checkbox">
-                        <div class="w-100 ms-3">
-                            <div class="d-flex w-100 align-items-center justify-content-between">
-                                <span>Short task goes here...</span>
-                                <button class="btn btn-sm"><i class="fa fa-times"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center pt-2">
-                        <input class="form-check-input m-0" type="checkbox">
-                        <div class="w-100 ms-3">
-                            <div class="d-flex w-100 align-items-center justify-content-between">
-                                <span>Short task goes here...</span>
-                                <button class="btn btn-sm"><i class="fa fa-times"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Widgets End -->
-    <!-- Footer Start -->
-    <div class="container-fluid pt-4 px-4">
-        <div class="bg-light rounded-top p-4">
-            <div class="row">
-                <div class="col-12 col-sm-6 text-center text-sm-start">
-                    &copy; <a href="#">Your Site Name</a>, All Right Reserved.
-                </div>
-                <div class="col-12 col-sm-6 text-center text-sm-end">
-                    <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
-                    Designed By <a href="https://htmlcodex.com">HTML Codex</a>
-                    </br>
-                    Distributed By <a class="border-bottom" href="https://themewagon.com" target="_blank">ThemeWagon</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Footer End -->
 </div>
 
+<!-- =============================================================== -->
+<!-- ======================= 2. CHARTS ============================= -->
+<!-- =============================================================== -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <!-- User Growth Chart -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-light text-center rounded p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h6 class="mb-0">User Growth (Last 30 Days)</h6>
+                </div>
+                <canvas id="userGrowthChart"></canvas>
+            </div>
+        </div>
+        <!-- Sales Performance Chart -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-light text-center rounded p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h6 class="mb-0">Sales Performance (Last 30 Days)</h6>
+                </div>
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============================================================== -->
+<!-- ======================= 3. RECENT ACTIVITY ==================== -->
+<!-- =============================================================== -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <!-- Recent Sales Table -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-light rounded h-100 p-4">
+                <h6 class="mb-4">Recent Sales</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th scope="col">Customer</th>
+                                <th scope="col">Amount</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentSalesTableBody">
+                            <!-- Rows will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- Pending Vendors Table -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-light rounded h-100 p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h6 class="mb-0">Pending Vendor Approvals</h6>
+                    <a asp-action="NewVendors" asp-controller="Vendors">Show All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th scope="col">Vendor</th>
+                                <th scope="col">Library</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingVendorsTableBody">
+                            <!-- Rows will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============================================================== -->
+<!-- ======================= JAVASCRIPT CODE ======================= -->
+<!-- =============================================================== -->
 @section Scripts {
-    <script src="~/js/dashboard.js"></script>
-    <script src="~/js/sharedCharts.js"></script>
+    <script>
+        // --- CHART GLOBAL CONFIG (لتتناسق مع ألوان القالب) ---
+        Chart.defaults.color = "#6C7293";
+        Chart.defaults.borderColor = "rgba(0, 0, 0, 0.1)";
+
+        /**
+            * ------------------------------------------------------------------
+            * بيانات محاكاة (Mock Data) - هذا الجزء ستقوم باستبداله بـ Fetch API
+            * ------------------------------------------------------------------
+            * في مشروع حقيقي، ستقوم بإنشاء API واحد يرجع كل هذه البيانات مرة واحدة.
+            */
+        function getMockDashboardData() {
+            // بيانات وهمية للبطاقات
+            const summaryStats = {
+                totalRevenue: 12345.67,
+                newUsersToday: 15,
+                pendingVendors: 4,
+                totalBooks: 567
+            };
+
+            // بيانات وهمية للرسوم البيانية (30 يوم)
+            const chartLabels = Array.from({ length: 30 }, (_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() - (29 - i));
+                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            });
+
+            const userGrowthChartData = {
+                labels: chartLabels,
+                data: Array.from({ length: 30 }, (_, i) => 150 + i * 5 + Math.floor(Math.random() * 20))
+            };
+
+            const salesChartData = {
+                labels: chartLabels,
+                data: Array.from({ length: 30 }, () => Math.floor(Math.random() * (500 - 50 + 1) + 50))
+            };
+
+            // بيانات وهمية للجداول
+            const recentSales = [
+                { date: 'May 24, 2024', customer: 'Yousef Sharkawy', amount: 125.50, status: 'Completed' },
+                { date: 'May 24, 2024', customer: 'Ali Ahmed', amount: 89.00, status: 'Shipped' },
+                { date: 'May 23, 2024', customer: 'Sara Ibrahim', amount: 45.75, status: 'Completed' },
+                { date: 'May 22, 2024', customer: 'Mona Hesham', amount: 210.00, status: 'Pending' }
+            ];
+
+            const pendingVendorsList = [
+                { vendorName: 'Maktabt El-Eman', libraryName: 'Eman Library', id: 'vendor1' },
+                { vendorName: 'Al-Azhar Books', libraryName: 'Al-Azhar Store', id: 'vendor2' },
+                { vendorName: 'Modern Readers', libraryName: 'Modern Readers', id: 'vendor3' }
+            ];
+
+            return { summaryStats, userGrowthChartData, salesChartData, recentSales, pendingVendorsList };
+        }
+
+
+        /**
+            * ------------------------------------------------------------------
+            * دالة رئيسية لتحميل بيانات لوحة التحكم
+            * ------------------------------------------------------------------
+            */
+        async function loadDashboardData() {
+            try {
+                // *** الخطوة التي ستعدلها لاحقًا ***
+                // استبدل السطر التالي بطلب fetch حقيقي للـ API الخاص بك
+                // const response = await fetch('/api/Dashboard/GetSummary');
+                // const data = await response.json();
+                const data = getMockDashboardData(); // <-- نستخدم البيانات الوهمية حاليًا
+
+                // 1. تعبئة بطاقات الإحصائيات
+                $('#totalRevenue').text(`$${data.summaryStats.totalRevenue.toLocaleString('en-US')}`);
+                $('#newUsersToday').text(data.summaryStats.newUsersToday);
+                $('#pendingVendors').text(data.summaryStats.pendingVendors);
+                $('#totalBooks').text(data.summaryStats.totalBooks);
+
+                // 2. رسم المخططات
+                renderUserGrowthChart(data.userGrowthChartData);
+                renderSalesChart(data.salesChartData);
+
+                // 3. تعبئة الجداول
+                populateRecentSalesTable(data.recentSales);
+                populatePendingVendorsTable(data.pendingVendorsList);
+
+            } catch (error) {
+                console.error("Failed to load dashboard data:", error);
+                // يمكنك عرض رسالة خطأ هنا
+            }
+        }
+
+        function renderUserGrowthChart(chartData) {
+            const ctx = $("#userGrowthChart").get(0).getContext("2d");
+            new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: "Total Users",
+                        fill: true,
+                        backgroundColor: "rgba(0, 156, 255, .3)",
+                        borderColor: "rgba(0, 156, 255, .7)",
+                        data: chartData.data
+                    }]
+                },
+                options: { responsive: true, tension: 0.4 }
+            });
+        }
+
+        function renderSalesChart(chartData) {
+            const ctx = $("#salesChart").get(0).getContext("2d");
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: "Daily Sales ($)",
+                        backgroundColor: "rgba(0, 156, 255, .7)",
+                        data: chartData.data
+                    }]
+                },
+                options: { responsive: true }
+            });
+        }
+
+        function populateRecentSalesTable(sales) {
+            const tableBody = $('#recentSalesTableBody');
+            tableBody.empty(); // تفريغ الجدول قبل ملئه
+            if(sales.length === 0) {
+                tableBody.append('<tr><td colspan="4" class="text-center">No recent sales.</td></tr>');
+                return;
+            }
+            sales.forEach(sale => {
+                let statusClass = '';
+                if(sale.status === 'Completed') statusClass = 'text-success';
+                if(sale.status === 'Pending') statusClass = 'text-warning';
+
+                const row = `
+                    <tr>
+                        <td>${sale.date}</td>
+                        <td>${sale.customer}</td>
+                        <td>$${sale.amount.toFixed(2)}</td>
+                        <td class="${statusClass}">${sale.status}</td>
+                    </tr>`;
+                tableBody.append(row);
+            });
+        }
+
+        function populatePendingVendorsTable(vendors) {
+            const tableBody = $('#pendingVendorsTableBody');
+            tableBody.empty();
+            if(vendors.length === 0) {
+                tableBody.append('<tr><td colspan="3" class="text-center">No pending vendors.</td></tr>');
+                return;
+            }
+            vendors.forEach(vendor => {
+                const reviewUrl = '@Url.Action("NewVendors", "Vendors")'; // رابط لصفحة المراجعة
+                const row = `
+                    <tr>
+                        <td>${vendor.vendorName}</td>
+                        <td>${vendor.libraryName}</td>
+                        <td><a href="${reviewUrl}" class="btn btn-sm btn-primary">Review</a></td>
+                    </tr>`;
+                tableBody.append(row);
+            });
+        }
+
+        // --- قم بتحميل البيانات عند فتح الصفحة ---
+        loadDashboardData();
+    </script>
 }
