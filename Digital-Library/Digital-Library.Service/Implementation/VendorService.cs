@@ -168,7 +168,6 @@ namespace Digital_Library.Service.Services
 					return Response.Fail("Vendor not found.");
 
 				vendor.Status = status;
-				vendor.RejectionReason = status == VendorStatus.Rejected ? reason : null;
 				vendor.ReviewedAt = DateTime.UtcNow;
 
 				if (status == VendorStatus.Approved)
