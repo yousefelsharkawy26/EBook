@@ -1,0 +1,35 @@
+﻿@model IEnumerable<Digital_Library.Core.Models.Category>
+
+<link rel="stylesheet" href="~/css/_SearchBarView.css" />
+
+<div class="search-popup">
+ <div class="search-popup-container">
+
+  <!-- Search Form -->
+  <form role="search" method="get" class="search-form"
+        asp-controller="Book" asp-action="ViewAllBooks">
+   <input type="search" id="search-form" class="search-field"
+          placeholder="Type and press enter"
+          name="query" />
+   <button type="submit" class="search-submit">
+    <svg class="search">
+     <use xlink:href="#search"></use>
+    </svg>
+   </button>
+  </form>
+
+  <!-- Categories -->
+  <h5 class="cat-list-title">Browse Categories</h5>
+  <ul class="cat-list">
+   @foreach (var category in Model)
+   {
+    <li class="cat-list-item">
+     <a asp-controller="Book" asp-action="AllBooks"
+        asp-route-category="@category.Id">
+      @category.CategoryName
+     </a>
+    </li>
+   }
+  </ul>
+ </div>
+</div>

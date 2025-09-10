@@ -15,5 +15,6 @@ namespace Digital_Library.Service.Interface
 		Task<bool> FileExists(string fileName);
 		Task<IEnumerable<string>> GetFilesInFolder(string folderName);
 		Task<string> UpdateFile(IFormFile file, string existingFileName, string folderName);
-	}
+		Task<IFormFile?> GetFormFile(string fileName, string contentType);
+    }
 }

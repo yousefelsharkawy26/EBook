@@ -4,6 +4,7 @@ using Digital_Library.Service;
 using Digital_Library.Service.Implementation;
 using Digital_Library.Service.Interface;
 using Digital_Library.Service.Seed;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -31,12 +32,17 @@ namespace Digital_Library
                         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                     });
 
+            builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+            {
+                options.ValidationInterval = TimeSpan.Zero;
+            });
+
 
             #region Dependency injections
 
             builder.Services.Add_Module_Infrastructure_Dependencies()
-.Add_Module_Service_Dependencies()
-.Add_Module_Configuration_Services(builder.Configuration);
+							.Add_Module_Service_Dependencies()
+							.Add_Module_Configuration_Services(builder.Configuration);
 
 			#endregion
 

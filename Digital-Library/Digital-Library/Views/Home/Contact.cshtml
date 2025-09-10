@@ -1,5 +1,4 @@
-﻿
-
+﻿@model ContactViewModel
 
 <section class="hero-section position-relative padding-large"
          style="background-image: url(@Url.Content("~/images/banner-image-bg-1.jpg")); background-size: cover; background-repeat: no-repeat; background-position: center; height: 400px;">
@@ -75,25 +74,30 @@
                 <h3>Any questions?</h3>
                 <p class="mb-5">Use the form below to get in touch with us.</p>
 
-                <form id="form" class="d-flex gap-3 flex-wrap">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <form id="form" 
+                      class="d-flex gap-3 flex-wrap"
+                      method="post">
                     <div class="w-100 d-flex gap-3">
                         <div class="w-50">
-                            <input type="text" name="name" placeholder="Write your name here *" class="form-control w-100">
+                            <input asp-for="Name" placeholder="Write your name here *" class="form-control w-100">
+                            <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                         <div class="w-50">
-                            <input type="text" name="email" placeholder="Write your email here *" class="form-control w-100">
+                            <input asp-for="Email" placeholder="Write your email here *" class="form-control w-100">
+                            <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="w-100">
-                        <input type="text" name="phone" placeholder="Phone number" class="form-control w-100">
+                        <input asp-for="Subject" placeholder="Write your subject here" class="form-control w-100">
+                        <span asp-validation-for="Subject" class="text-danger"></span>
                     </div>
                     <div class="w-100">
-                        <input type="text" name="subject" placeholder="Write your subject here" class="form-control w-100">
+                        <textarea asp-for="Message" placeholder="Write your message here *" class="form-control w-100"></textarea>
+                        <span asp-validation-for="Message" class="text-danger"></span>
                     </div>
-                    <div class="w-100">
-                        <textarea placeholder="Write your message here *" class="form-control w-100"></textarea>
-                    </div>
-                    <button type="submit" name="submit" class="btn my-3">Submit</button>
+                    <button type="submit" class="btn my-3">Submit</button>
                 </form>
             </div>
         </div>
@@ -195,7 +199,7 @@
 </section>
 
 <section id="customers-reviews" class="position-relative padding-large"
-         style="background-image: url(images/banner-image-bg.jpg); background-size: cover; background-repeat: no-repeat; background-position: center; height: 600px;">
+         style="background-image: url(@Url.Content("~/images/banner-image-bg.jpg")); background-size: cover; background-repeat: no-repeat; background-position: center; height: 600px;">
     <div class="container offset-md-3 col-md-6 ">
         <div class="position-absolute top-50 end-0 pe-0 pe-xxl-5 me-0 me-xxl-5 swiper-next testimonial-button-next">
             <svg class="chevron-forward-circle d-flex justify-content-center align-items-center p-2" width="80" height="80">

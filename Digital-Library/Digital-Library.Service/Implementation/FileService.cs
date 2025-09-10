@@ -60,6 +60,8 @@ namespace Digital_Library.Service.Implementation
 				return true;
 			}
 
+			await Task.CompletedTask;
+
 			return false;
 		}
 
@@ -78,6 +80,9 @@ namespace Digital_Library.Service.Implementation
 		public async Task<bool> FileExists(string fileName)
 		{
 			string filePath = Path.Combine(_webHostEnvironment.WebRootPath, fileName);
+
+			await Task.CompletedTask;
+
 			return File.Exists(filePath);
 		}
 
@@ -89,7 +94,9 @@ namespace Digital_Library.Service.Implementation
 				return Enumerable.Empty<string>();
 
 			var files = Directory.GetFiles(folderPath)
-																								.Select(f => Path.Combine(folderName, Path.GetFileName(f)).Replace("\\", "/"));
+								 .Select(f => Path.Combine(folderName, Path.GetFileName(f)).Replace("\\", "/"));
+
+			await Task.CompletedTask;
 
 			return files;
 		}
@@ -100,6 +107,20 @@ namespace Digital_Library.Service.Implementation
 
 			return await AddFile(file, folderName);
 		}
-	}
+        public async Task<IFormFile?> GetFormFile(string fileName, string contentType)
+        {
+			var fileBytes = await GetFile(fileName);
+			if (fileBytes != null)
+			{
+				var stream = new MemoryStream(fileBytes);
+				return new FormFile(stream, 0, fileBytes.Length, "file", fileName)
+				{
+					Headers = new HeaderDictionary(),
+					ContentType = contentType
+				};
+			}
+			return null;
+        }
+    }
 
 }

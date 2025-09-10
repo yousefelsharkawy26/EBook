@@ -15,6 +15,12 @@
    background-color: #dc3545; /* Red background */
    color: #fff; /* White text on hover */
   }
+
+    .dropdown-menu-end[data-bs-popper] {
+        right: 0;
+        left: -40px;
+        width: min-content;
+    }
 </style>
 
 <li class="nav-item dropdown pe-3">
@@ -37,7 +43,7 @@
     </a>
    </li>
     <li>
-                <a class="dropdown-item d-flex align-items-center" asp-controller="Book" asp-action="ShowMyBook">
+                <a class="dropdown-item d-flex align-items-center" asp-controller="Book" asp-action="MyBooks">
                     <i class="bi bi-book me-2"></i> My Book
         </a>
     </li>

@@ -1,0 +1,56 @@
+﻿@using Digital_Library.Core.ViewModels
+@model BookFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<input type="hidden" asp-for="Id" />
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="form-floating mb-3">
+            <input asp-for="Title" class="form-control" placeholder="Book Title">
+            <label asp-for="Title"></label>
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+        <div class="form-floating mb-3">
+            <input asp-for="Author" class="form-control" placeholder="Author Name">
+            <label asp-for="Author"></label>
+            <span asp-validation-for="Author" class="text-danger"></span>
+        </div>
+        <div class="form-floating mb-3">
+            <textarea asp-for="Description" class="form-control" placeholder="Description" style="height: 150px;"></textarea>
+            <label asp-for="Description"></label>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-floating mb-3">
+            <input type="file" name="CoverImage" class="form-control" placeholder="Cover Image URL">
+            <label asp-for="CoverImage"></label>
+            <span asp-validation-for="CoverImage" class="text-danger"></span>
+        </div>
+        <div class="form-floating mb-3">
+            <input asp-for="PricePhysical" class="form-control" placeholder="Physical Price">
+            <label asp-for="PricePhysical"></label>
+            <span asp-validation-for="PricePhysical" class="text-danger"></span>
+        </div>
+        <div class="form-floating mb-3">
+            <input asp-for="PricePdf" class="form-control" placeholder="PDF Price">
+            <label asp-for="PricePdf"></label>
+            <span asp-validation-for="PricePdf" class="text-danger"></span>
+        </div>
+        <div class="form-floating mb-3">
+            <select asp-for="CategoryId" class="form-select" asp-items="Model.Categories">
+                <option value="">Select a Category</option>
+            </select>
+            <label asp-for="CategoryId"></label>
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
+        </div>
+        <div class="form-floating mb-3">
+            <select asp-for="VendorId" class="form-select" asp-items="Model.Vendors">
+                <option value="">Select a Vendor</option>
+            </select>
+            <label asp-for="VendorId"></label>
+            <span asp-validation-for="VendorId" class="text-danger"></span>
+        </div>
+    </div>
+</div>

@@ -1,49 +1,49 @@
-﻿@using Digital_Library.Service.Interface
-@inject IBookService bookService
-@{
-    var books = await bookService.GetAllBooks();
-
-    var categories = books
-       .Where(b => b.Category != null)
-       .Select(b => b.Category!)
-       .GroupBy(c => c.Id)
-       .Select(g => g.First())
-       .OrderBy(_ => Guid.NewGuid())
-       .Take(8)
-       .ToList();
-}
-
-<link rel="stylesheet" href="~/css/_SearchBarView.css" />
+﻿<link rel="stylesheet" href="~/css/_SearchBarView.css" />
 
 <div class="search-popup">
-    <div class="search-popup-container">
+ <div class="search-popup-container">
 
-        <!-- Search Form -->
-        <form role="search" method="get" class="search-form"
-              asp-controller="Book" asp-action="ViewAllBooks">
-            <input type="search" id="search-form" class="search-field"
-                   placeholder="Type and press enter"
-                   name="query" />
-            <button type="submit" class="search-submit">
-                <svg class="search">
-                    <use xlink:href="#search"></use>
-                </svg>
-            </button>
-        </form>
+  <!-- Search Form -->
+  <form role="search" method="get" class="search-form"
+        asp-controller="Book" asp-action="ViewAllBooks">
+   <input type="search" id="search-form" class="search-field"
+          placeholder="Type and press enter"
+          name="query" />
+   <button type="submit" class="search-submit">
+    <svg class="search">
+     <use xlink:href="#search"></use>
+    </svg>
+   </button>
+  </form>
 
-
-        <!-- Categories -->
-        <h5 class="cat-list-title">Browse Categories</h5>
-        <ul class="cat-list">
-            
-            @foreach(var catgory in categories)
-            {
-                <li class="cat-list-item">
-                    <a asp-controller="Book" asp-action="allbooks" asp-route-category="@catgory.Id">@catgory.CategoryName</a>
-                </li>
-            }
-
-            
-        </ul>
-    </div>
+  <!-- Categories -->
+  <h5 class="cat-list-title">Browse Categories</h5>
+  <ul id="cat-list" class="cat-list">
+   <!-- هيتعبّى بالـ JS -->
+  </ul>
+ </div>
 </div>
+
+<script>
+ document.addEventListener("DOMContentLoaded", function () {
+     fetch("/Home/GetCategories")
+         .then(response => response.json())
+         .then(data => {
+             const list = document.getElementById("cat-list");
+             list.innerHTML = "";
+
+             data.forEach(category => {
+                 const li = document.createElement("li");
+                 li.classList.add("cat-list-item");
+
+                 li.innerHTML = `
+                     <a href="/Book/AllBooks?category=${category.id}">
+                         ${category.name}
+                     </a>
+                 `;
+                 list.appendChild(li);
+             });
+         })
+         .catch(error => console.error("Error loading categories:", error));
+ });
+</script>

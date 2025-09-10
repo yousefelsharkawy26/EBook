@@ -47,12 +47,6 @@ namespace Digital_Library.Core.ViewModels.Requests
 		{
 			if (HasPDF)
 			{
-				if (PDFFile == null)
-				{
-					yield return new ValidationResult(
-									"You must upload a PDF file if the book has PDF.",
-									new[] { nameof(PDFFile) });
-				}
 
 				if (PricePDF == null || PricePDF <= 0)
 				{

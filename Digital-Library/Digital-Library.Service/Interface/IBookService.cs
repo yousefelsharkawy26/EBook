@@ -1,5 +1,7 @@
-﻿using Digital_Library.Core.Filters;
+﻿using Digital_Library.Core.Enums;
+using Digital_Library.Core.Filters;
 using Digital_Library.Core.Models;
+using Digital_Library.Core.ViewModels;
 using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Core.ViewModels.Responses;
 
@@ -15,13 +17,20 @@ namespace Digital_Library.Service.Interface
 
 		Task<Response> GetBookById(string bookId);
 
-		Task<IEnumerable<Book>> GetAllBooks(BookFilter? filter = null);
+		IQueryable<Book> GetAllBooks(BookFilter? filter = null);
 
 		Task<IEnumerable<Book>> GetBestTenSellingBook();
 
-		Task<(IEnumerable<Book> Books, int TotalCount)> GetPagedBooksAsync(string Vid ,int page, int pageSize, BookFilter? filter = null);
+		Task<(IEnumerable<Book> Books, int TotalCount)> GetPagedBooksAsync(string Vid, int page, int pageSize, BookFilter? filter = null);
 
-		Task<IEnumerable<MyBookViewModel>> GetMyBook(string id);
+		Task<IEnumerable<Book>> GetRelatedBooksAsync( string excludeBookId, int count = 3);
+		Task<PagedResult<UserBookDto>> GetUserBooksAsync(string userId, int pageNumber, int pageSize);
+		Task<UserBookAccessType> GetUserBookAccessAsync(string userId, string bookId);
 
+        Task<IEnumerable<BookSummaryViewModel>> GetAllBooksAsync();
+        Task<BookFormViewModel?> GetBookForEditAsync(string bookId);
+        Task<BookFormViewModel> GetBookCreationDataAsync(); // للحصول على بيانات الـ Dropdowns
+        Task CreateBookAsync(BookFormViewModel model);
+        Task UpdateBookAsync(BookFormViewModel model);
     }
 }

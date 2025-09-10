@@ -13,10 +13,9 @@ namespace Digital_Library.Service
 	{
 		public static IServiceCollection Add_Module_Service_Dependencies(this IServiceCollection services)
 		{
-   services.AddTransient<IActionContextAccessor, ActionContextAccessor>();
-   services.AddScoped<IAuthService, AuthService>();
+		    services.AddTransient<IActionContextAccessor, ActionContextAccessor>();
+		    services.AddScoped<IAuthService, AuthService>();
 			services.AddScoped<IBookService, BookService>();
-			services.AddScoped<IBorrowService, BorrowService>();
 			services.AddScoped<ICartService, CartService>();
 			services.AddScoped<ICategoryService, CategoryService>();
 			services.AddTransient<IEmailSender, EmailSender>();
@@ -24,14 +23,14 @@ namespace Digital_Library.Service
 			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<IVendorService, VendorService>();
 			services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IDashboardService, DashboardService>();
 
-			return services;
+            return services;
 		}
 
 		public static IServiceCollection Add_Module_Configuration_Services(this IServiceCollection services, IConfiguration configuration)
 		{
-  // 1. Configure the EmailSettings class with values from appsettings.json
-  services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
+			services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
 
 			return services;
   }

@@ -1,5 +1,6 @@
 ﻿using Digital_Library.Core.Enums;
 using Digital_Library.Core.Models;
+using Digital_Library.Core.ViewModels;
 using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Core.ViewModels.Responses;
 namespace Digital_Library.Service.Interface;
@@ -21,6 +22,8 @@ public interface IVendorService
 	Task<Response> ChangeStatusAsync(string vendorId, VendorStatus status, string? reason = null);
 
 	Task<Response> ReturnVendorIdFromUserId(string userId);
+
+	Task<IEnumerable<VendorViewModel>> GetVendorsDetailsAsync();
 }
 
 

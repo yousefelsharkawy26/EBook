@@ -1,3 +1,9 @@
+using Digital_Library.Infrastructure;
+using Digital_Library.Infrastructure.Context;
+using Digital_Library.Service;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+
 namespace Digital_Library.AdminPanel
 {
     public class Program
@@ -6,8 +12,26 @@ namespace Digital_Library.AdminPanel
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddDbContext<EBookContext>(option =>
+            {
+                option.UseSqlServer(builder.Configuration.GetConnectionString("DevConn"));
+            });
+
+
+            #region Dependency injections
+
+            builder.Services.Add_Module_Infrastructure_Dependencies()
+                            .Add_Module_Service_Dependencies()
+                            .Add_Module_Configuration_Services(builder.Configuration);
+
+            #endregion
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews()
+                            .AddJsonOptions(options =>
+                            {
+                                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                            });
 
             var app = builder.Build();
 
@@ -20,15 +44,16 @@ namespace Digital_Library.AdminPanel
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();
             app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
-                .WithStaticAssets();
+                            name: "default",
+                            pattern: "{controller=Home}/{action=Index}/{id?}")
+                            .WithStaticAssets();
 
             app.Run();
         }

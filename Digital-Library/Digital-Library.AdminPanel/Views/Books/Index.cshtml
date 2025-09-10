@@ -1,0 +1,40 @@
+﻿@using Digital_Library.Core.ViewModels
+
+@inject Microsoft.Extensions.Configuration.IConfiguration _config;
+
+@model IEnumerable<BookSummaryViewModel>
+@{
+    ViewData["Title"] = "Book Management";
+}
+
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-light rounded h-100 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h6>All Books</h6>
+            <a asp-action="Create" class="btn btn-primary">Add New Book</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <!-- ... Thead ... -->
+                <tbody>
+                    @foreach (var book in Model)
+                    {
+                        <tr>
+                            <td><img src="@_config["Digital-Library-Url"]/@book.CoverImageUrl" alt="@book.Title" style="width: 50px; height: 75px; object-fit: cover;"></td>
+                            <td>
+                                <div class="fw-bold">@book.Title</div>
+                                <small class="text-muted">@book.Author</small>
+                            </td>
+                            <td>@book.VendorName</td>
+                            <td>$@book.PricePhysical.ToString("N2")</td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@book.Id" class="btn btn-sm btn-warning">Edit</a>
+                                <a asp-action="Delete" asp-route-id="@book.Id" class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
