@@ -1,16 +1,7 @@
-﻿@* 
-    1. تأكد من أن الموديل هو ViewModel الخاص بك.
-*@
-@model IEnumerable<VendorViewModel>
-@* 
-    2. تأكد من أن مسار الـ enum صحيح.
-*@
-@using Digital_Library.AdminPanel.ViewModels
-@using Digital_Library.Core.Enums
-@* 
-    3. تأكد من وجود using لـ System.Text.Json.
-*@
+﻿@using Digital_Library.Core.Enums
 @using System.Text.Json
+@using Digital_Library.Core.ViewModels
+@model IEnumerable<VendorViewModel>
 
 @{
     ViewData["Title"] = "Vendor Management";
@@ -216,7 +207,7 @@
             imagesContainer.innerHTML = ''; // Clear previous images
 
             if (vendor.identityImageUrls && vendor.identityImageUrls.length > 0) {
-                const baseUrl = "@Model.FirstOrDefault().ImageBaseUrl";
+                const baseUrl = "@Model.FirstOrDefault()?.ImageBaseUrl";
                 vendor.identityImageUrls.forEach(url => {
                     const link = document.createElement('a');
                     link.href = `${baseUrl}${url}`;

@@ -1,11 +1,6 @@
-﻿using Digital_Library.Core.Models;
+﻿using Digital_Library.Core.ViewModels;
 using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Core.ViewModels.Responses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Digital_Library.Service.Interface
 {
@@ -13,5 +8,8 @@ namespace Digital_Library.Service.Interface
 	{
 		Task<Response> UpdateProfileAsync(string userId, UserRequest request);
 		Task<Response> GetProfileAsync(string userId);
-	}
+        Task<IEnumerable<CustomerSummaryViewModel>> GetAllCustomersAsync();
+        Task<CustomerDetailsViewModel?> GetCustomerDetailsAsync(string customerId);
+        Task<bool> ToggleUserStatusAsync(string customerId);
+    }
 }

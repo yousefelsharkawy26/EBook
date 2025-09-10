@@ -59,6 +59,32 @@
             loop: true,
             nav : false
         });
+
+        var currentUrl = window.location.href;
+
+        $('.sidebar .nav-item .collapse .nav-link').each(function () {
+            // تحقق مما إذا كان رابط العنصر الفرعي مطابقًا للـ URL الحالي
+            if (this.href === currentUrl) {
+                // أضف كلاس 'active' للرابط الحالي
+                $(this).addClass('active');
+
+                // اعثر على الحاوية 'collapse' الأب واجعلها مفتوحة
+                $(this).closest('.collapse').addClass('show');
+
+                // اعثر على الرابط الرئيسي للقائمة وأزل كلاس 'collapsed' منه
+                // وأضف كلاس 'active' له أيضًا
+                var parentToggle = $(this).closest('.nav-item.dropdown').find('.dropdown-toggle');
+                parentToggle.removeClass('collapsed').addClass('active');
+                parentToggle.attr('aria-expanded', 'true');
+            }
+        });
+
+        // هذا الكود لجعل الرابط الرئيسي (مثل Dashboard) نشطًا
+        $('.sidebar .nav-item > .nav-link').not('.dropdown-toggle').each(function () {
+            if (this.href === currentUrl) {
+                $(this).addClass('active');
+            }
+        });
     }); // أغلق دالة ready
 
 })(jQuery);

@@ -44,25 +44,37 @@
         <!-- Sidebar Start -->
         <div class="sidebar pe-4 pb-3">
             <nav class="navbar bg-light navbar-light">
-                <a asp-action="Index" class="navbar-brand mx-4 mb-3">
-                    <h3 class="text-primary"><i class="fa fa-hashtag me-2"></i>DASHMIN</h3>
-                </a>
-                <div class="d-flex align-items-center ms-4 mb-4">
-                    <div class="position-relative">
-                        <img class="rounded-circle" src="~/img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                        <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
-                    </div>
-                    <div class="ms-3">
-                        <h6 class="mb-0">Jhon Doe</h6>
-                        <span>Admin</span>
-                    </div>
-                </div>
                 <div class="navbar-nav w-100">
+                    <!-- الرابط الرئيسي (بدون قائمة فرعية) -->
                     <a asp-action="Index" asp-controller="Home" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
-                    <a asp-action="NewVendors" asp-controller="Home" class="nav-item nav-link"><i class="bi bi-shop me-2"></i>New Vendors</a>
-                    <a asp-action="Forms" asp-controller="Home" class="nav-item nav-link"><i class="fa fa-keyboard me-2"></i>Forms</a>
-                    <a asp-action="Tables" asp-controller="Home" class="nav-item nav-link"><i class="fa fa-table me-2"></i>Tables</a>
-                    <a asp-action="Charts" asp-controller="Home" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Charts</a>
+
+                    <!-- القائمة المنسدلة الأولى: Management -->
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#managementMenu">
+                            <i class="fa fa-users-cog me-2"></i>Management
+                        </a>
+                        <div class="collapse" id="managementMenu">
+                            <div class="bg-white border-0 rounded py-2">
+                                <a asp-action="NewVendors" asp-controller="Vendor" class="dropdown-item nav-link"><i class="bi bi-shop me-2"></i>New Vendors</a>
+                                <a asp-action="Index" asp-controller="Customers" class="dropdown-item nav-link"><i class="fa fa-user-friends me-2"></i>Customers</a>
+                                <a asp-action="Index" asp-controller="Books" class="dropdown-item nav-link"><i class="fa fa-book me-2"></i>Books</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- القائمة المنسدلة الثانية: UI Elements -->
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#uiElementsMenu">
+                            <i class="fa fa-laptop me-2"></i>UI Elements
+                        </a>
+                        <div class="collapse" id="uiElementsMenu">
+                            <div class="bg-white border-0 rounded py-2">
+                                <a asp-action="Forms" asp-controller="Home" class="dropdown-item nav-link"><i class="fa fa-keyboard me-2"></i>Forms</a>
+                                <a asp-action="Tables" asp-controller="Home" class="dropdown-item nav-link"><i class="fa fa-table me-2"></i>Tables</a>
+                                <a asp-action="Charts" asp-controller="Home" class="dropdown-item nav-link"><i class="fa fa-chart-bar me-2"></i>Charts</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </nav>
         </div>
