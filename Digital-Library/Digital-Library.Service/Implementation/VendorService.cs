@@ -192,6 +192,12 @@ public class VendorService : IVendorService
 			}
 			else if (status == VendorStatus.Rejected)
 			{
+				var identityImages = await _unitOfWork.VendorIdentityImagesUrls.GetManyAsync(img => img.VendorId == vendor.Id);
+				foreach (var img in identityImages)
+				{
+					await _fileService.DeleteFile(img.ImageUrl);
+					_unitOfWork.VendorIdentityImagesUrls.Delete(img);
+				}
 				var roles	= await userManager.GetRolesAsync(vendor.User!);
 				if (roles.Contains(Roles.Vendor))
 				{

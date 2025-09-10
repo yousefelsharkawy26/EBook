@@ -16,6 +16,7 @@ public interface IUnitOfWork : IDisposable
 	IBaseRepository<Transaction> Transactions {  get; }
 	IBaseRepository<Vendor> Vendors {  get; }
 	IBaseRepository<UserPdfBook> UserPdfBooks {  get; }
+	IBaseRepository<VendorIdentityImagesUrl> VendorIdentityImagesUrls { get; }
 
 
 	Task SaveChangesAsync();
