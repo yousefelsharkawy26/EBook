@@ -1,46 +1,41 @@
-# This is a basic workflow to help you get started with Actions
-
-# 1. Workflow Name: Give your workflow a descriptive name.
 name: .NET CI Build and Test
 
-# 2. Triggers: Define when this workflow should run.
 on:
-  # Run on pushes to the 'main' branch
   push:
     branches: [ "main" ]
-  # Run on pull requests targeting the 'main' branch
   pull_request:
     branches: [ "main" ]
 
-# 3. Jobs: A workflow run is made up of one or more jobs that can run sequentially or in parallel.
 jobs:
-  # Define a job named 'build'
   build:
-    # 4. Runner: Specify the type of machine to run the job on. 
-    # 'ubuntu-latest' is a cost-effective and common choice.
     runs-on: ubuntu-latest
 
-    # 5. Steps: A job contains a sequence of tasks called steps.
     steps:
-    # Step 1: Check out your repository code so the workflow can access it.
     - name: Checkout repository
-      uses: actions/checkout@v4 # Use the latest version of the checkout action
+      uses: actions/checkout@v4
 
-    # Step 2: Set up the .NET SDK environment.
-    # Make sure the version matches the one used in your project.
-    - name: Setup .NET
+    # === اختر أحد الخيارين التاليين ===
+    # الخيار 1 (الموصى به): إذا كنت تستهدف .NET 8 المستقر
+    - name: Setup .NET 9
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '9.0.x' # IMPORTANT: Change this to match your project's .NET version.
+        dotnet-version: '9.0.x'
 
-    # Step 3: Restore dependencies for the specific solution.
+    # الخيار 2: إذا كنت تريد استخدام .NET 9 التجريبي
+    # - name: Setup .NET 9
+    #   uses: actions/setup-dotnet@v4
+    #   with:
+    #     dotnet-version: '9.0.x' 
+    # =================================
+
     - name: Restore dependencies
-      run: dotnet restore ./Digital-Library/Digital-Library.sln
+      run: dotnet restore
+      working-directory: ./Digital-Library
 
-    # Step 4: Build the entire solution.
-    - name: Build solution
-      run: dotnet build ./Digital-Library/Digital-Library.sln --configuration Release --no-restore
+    - name: Build solution in Release mode
+      run: dotnet build --configuration Release --no-restore
+      working-directory: ./Digital-Library
 
-    # Step 5 (Optional): Run unit tests for the solution.
-    - name: Run tests
-      run: dotnet test ./Digital-Library/Digital-Library.sln --no-build --verbosity normal
+    - name: Run tests in Release mode
+      run: dotnet test --configuration Release --no-build --verbosity normal
+      working-directory: ./Digital-Library
