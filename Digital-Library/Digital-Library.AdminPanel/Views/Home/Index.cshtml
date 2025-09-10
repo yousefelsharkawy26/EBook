@@ -1,4 +1,6 @@
-﻿@{
+﻿@using Digital_Library.Core.ViewModels
+@model DashboardViewModel
+@{
     ViewData["Title"] = "Dashboard";
 }
 
@@ -13,7 +15,7 @@
                 <i class="fa fa-chart-line fa-3x text-primary"></i>
                 <div class="ms-3 text-end">
                     <p class="mb-2">Total Revenue</p>
-                    <h6 id="totalRevenue" class="mb-0">$0</h6>
+                    <h6 class="mb-0">$@Model.TotalRevenue.ToString("N2")</h6>
                 </div>
             </div>
         </div>
@@ -23,7 +25,7 @@
                 <i class="fa fa-user-plus fa-3x text-primary"></i>
                 <div class="ms-3 text-end">
                     <p class="mb-2">New Users Today</p>
-                    <h6 id="newUsersToday" class="mb-0">0</h6>
+                    <h6 class="mb-0">@Model.NewUsersToday</h6>
                 </div>
             </div>
         </div>
@@ -33,7 +35,7 @@
                 <i class="fa fa-store fa-3x text-primary"></i>
                 <div class="ms-3 text-end">
                     <p class="mb-2">Pending Vendors</p>
-                    <h6 id="pendingVendors" class="mb-0">0</h6>
+                    <h6 class="mb-0">@Model.PendingVendorsCount</h6>
                 </div>
             </div>
         </div>
@@ -43,7 +45,7 @@
                 <i class="fa fa-book fa-3x text-primary"></i>
                 <div class="ms-3 text-end">
                     <p class="mb-2">Total Books</p>
-                    <h6 id="totalBooks" class="mb-0">0</h6>
+                    <h6 class="mb-0">@Model.TotalBooksCount</h6>
                 </div>
             </div>
         </div>
@@ -95,8 +97,25 @@
                                 <th scope="col">Status</th>
                             </tr>
                         </thead>
-                        <tbody id="recentSalesTableBody">
-                            <!-- Rows will be inserted here by JavaScript -->
+                        <tbody>
+                            @if (!Model.RecentSales.Any())
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">No recent sales found.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var sale in Model.RecentSales)
+                                {
+                                    <tr>
+                                        <td>@sale.SaleDate.ToString("MMM dd, yyyy")</td>
+                                        <td>@sale.CustomerName</td>
+                                        <td>$@sale.Amount.ToString("N2")</td>
+                                        <td>@sale.Status</td>
+                                    </tr>
+                                }
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -118,8 +137,26 @@
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="pendingVendorsTableBody">
-                            <!-- Rows will be inserted here by JavaScript -->
+                        <tbody>
+                            @if (!Model.PendingVendors.Any())
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">No pending vendor requests.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var vendor in Model.PendingVendors)
+                                {
+                                    <tr>
+                                        <td>@vendor.VendorName</td>
+                                        <td>@vendor.LibraryName</td>
+                                        <td>
+                                            <a asp-action="NewVendors" asp-controller="Vendors" class="btn btn-sm btn-primary">Review</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -128,175 +165,64 @@
     </div>
 </div>
 
-<!-- =============================================================== -->
-<!-- ======================= JAVASCRIPT CODE ======================= -->
-<!-- =============================================================== -->
+
 @section Scripts {
+    <script src="~/lib/chart/chart.min.js"></script>
     <script>
-        // --- CHART GLOBAL CONFIG (لتتناسق مع ألوان القالب) ---
-        Chart.defaults.color = "#6C7293";
-        Chart.defaults.borderColor = "rgba(0, 0, 0, 0.1)";
+        $(document).ready(function() {
+            // Configuración global de los gráficos para que coincidan con el tema
+            Chart.defaults.color = "#6C7293";
+            Chart.defaults.borderColor = "rgba(0, 0, 0, 0.1)";
 
-        /**
-            * ------------------------------------------------------------------
-            * بيانات محاكاة (Mock Data) - هذا الجزء ستقوم باستبداله بـ Fetch API
-            * ------------------------------------------------------------------
-            * في مشروع حقيقي، ستقوم بإنشاء API واحد يرجع كل هذه البيانات مرة واحدة.
-            */
-        function getMockDashboardData() {
-            // بيانات وهمية للبطاقات
-            const summaryStats = {
-                totalRevenue: 12345.67,
-                newUsersToday: 15,
-                pendingVendors: 4,
-                totalBooks: 567
-            };
+            /**
+             * Función genérica para obtener datos de gráficos desde una API y renderizarlos.
+             * param {string} url - La URL del endpoint de la API.
+             * param {string} canvasId - El ID del elemento canvas.
+             * param {string} chartType - El tipo de gráfico ('line', 'bar', etc.).
+             * param {string} label - La etiqueta para el conjunto de datos.
+             * param {boolean} fill - Si se debe rellenar el área bajo la línea (para gráficos de línea).
+             */
+            async function fetchAndRenderChart(url, canvasId, chartType, label, fill = false) {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
 
-            // بيانات وهمية للرسوم البيانية (30 يوم)
-            const chartLabels = Array.from({ length: 30 }, (_, i) => {
-                const d = new Date();
-                d.setDate(d.getDate() - (29 - i));
-                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            });
-
-            const userGrowthChartData = {
-                labels: chartLabels,
-                data: Array.from({ length: 30 }, (_, i) => 150 + i * 5 + Math.floor(Math.random() * 20))
-            };
-
-            const salesChartData = {
-                labels: chartLabels,
-                data: Array.from({ length: 30 }, () => Math.floor(Math.random() * (500 - 50 + 1) + 50))
-            };
-
-            // بيانات وهمية للجداول
-            const recentSales = [
-                { date: 'May 24, 2024', customer: 'Yousef Sharkawy', amount: 125.50, status: 'Completed' },
-                { date: 'May 24, 2024', customer: 'Ali Ahmed', amount: 89.00, status: 'Shipped' },
-                { date: 'May 23, 2024', customer: 'Sara Ibrahim', amount: 45.75, status: 'Completed' },
-                { date: 'May 22, 2024', customer: 'Mona Hesham', amount: 210.00, status: 'Pending' }
-            ];
-
-            const pendingVendorsList = [
-                { vendorName: 'Maktabt El-Eman', libraryName: 'Eman Library', id: 'vendor1' },
-                { vendorName: 'Al-Azhar Books', libraryName: 'Al-Azhar Store', id: 'vendor2' },
-                { vendorName: 'Modern Readers', libraryName: 'Modern Readers', id: 'vendor3' }
-            ];
-
-            return { summaryStats, userGrowthChartData, salesChartData, recentSales, pendingVendorsList };
-        }
-
-
-        /**
-            * ------------------------------------------------------------------
-            * دالة رئيسية لتحميل بيانات لوحة التحكم
-            * ------------------------------------------------------------------
-            */
-        async function loadDashboardData() {
-            try {
-                // *** الخطوة التي ستعدلها لاحقًا ***
-                // استبدل السطر التالي بطلب fetch حقيقي للـ API الخاص بك
-                // const response = await fetch('/api/Dashboard/GetSummary');
-                // const data = await response.json();
-                const data = getMockDashboardData(); // <-- نستخدم البيانات الوهمية حاليًا
-
-                // 1. تعبئة بطاقات الإحصائيات
-                $('#totalRevenue').text(`$${data.summaryStats.totalRevenue.toLocaleString('en-US')}`);
-                $('#newUsersToday').text(data.summaryStats.newUsersToday);
-                $('#pendingVendors').text(data.summaryStats.pendingVendors);
-                $('#totalBooks').text(data.summaryStats.totalBooks);
-
-                // 2. رسم المخططات
-                renderUserGrowthChart(data.userGrowthChartData);
-                renderSalesChart(data.salesChartData);
-
-                // 3. تعبئة الجداول
-                populateRecentSalesTable(data.recentSales);
-                populatePendingVendorsTable(data.pendingVendorsList);
-
-            } catch (error) {
-                console.error("Failed to load dashboard data:", error);
-                // يمكنك عرض رسالة خطأ هنا
+                    const ctx = document.getElementById(canvasId).getContext("2d");
+                    new Chart(ctx, {
+                        type: chartType,
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: label,
+                                data: data.data,
+                                backgroundColor: chartType === 'bar' ? "rgba(0, 156, 255, .7)" : "rgba(0, 156, 255, .3)",
+                                borderColor: "rgba(0, 156, 255, .7)",
+                                fill: fill
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            tension: chartType === 'line' ? 0.4 : 0, // Suavizar la línea solo para gráficos de línea
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error(`Failed to load data for chart '${canvasId}':`, error);
+                    // Opcional: mostrar un mensaje de error en lugar del gráfico
+                    $(`#${canvasId}`).replaceWith('<p class="text-center text-danger">Could not load chart data.</p>');
+                }
             }
-        }
 
-        function renderUserGrowthChart(chartData) {
-            const ctx = $("#userGrowthChart").get(0).getContext("2d");
-            new Chart(ctx, {
-                type: "line",
-                data: {
-                    labels: chartData.labels,
-                    datasets: [{
-                        label: "Total Users",
-                        fill: true,
-                        backgroundColor: "rgba(0, 156, 255, .3)",
-                        borderColor: "rgba(0, 156, 255, .7)",
-                        data: chartData.data
-                    }]
-                },
-                options: { responsive: true, tension: 0.4 }
-            });
-        }
-
-        function renderSalesChart(chartData) {
-            const ctx = $("#salesChart").get(0).getContext("2d");
-            new Chart(ctx, {
-                type: "bar",
-                data: {
-                    labels: chartData.labels,
-                    datasets: [{
-                        label: "Daily Sales ($)",
-                        backgroundColor: "rgba(0, 156, 255, .7)",
-                        data: chartData.data
-                    }]
-                },
-                options: { responsive: true }
-            });
-        }
-
-        function populateRecentSalesTable(sales) {
-            const tableBody = $('#recentSalesTableBody');
-            tableBody.empty(); // تفريغ الجدول قبل ملئه
-            if(sales.length === 0) {
-                tableBody.append('<tr><td colspan="4" class="text-center">No recent sales.</td></tr>');
-                return;
-            }
-            sales.forEach(sale => {
-                let statusClass = '';
-                if(sale.status === 'Completed') statusClass = 'text-success';
-                if(sale.status === 'Pending') statusClass = 'text-warning';
-
-                const row = `
-                    <tr>
-                        <td>${sale.date}</td>
-                        <td>${sale.customer}</td>
-                        <td>$${sale.amount.toFixed(2)}</td>
-                        <td class="${statusClass}">${sale.status}</td>
-                    </tr>`;
-                tableBody.append(row);
-            });
-        }
-
-        function populatePendingVendorsTable(vendors) {
-            const tableBody = $('#pendingVendorsTableBody');
-            tableBody.empty();
-            if(vendors.length === 0) {
-                tableBody.append('<tr><td colspan="3" class="text-center">No pending vendors.</td></tr>');
-                return;
-            }
-            vendors.forEach(vendor => {
-                const reviewUrl = '@Url.Action("NewVendors", "Vendors")'; // رابط لصفحة المراجعة
-                const row = `
-                    <tr>
-                        <td>${vendor.vendorName}</td>
-                        <td>${vendor.libraryName}</td>
-                        <td><a href="${reviewUrl}" class="btn btn-sm btn-primary">Review</a></td>
-                    </tr>`;
-                tableBody.append(row);
-            });
-        }
-
-        // --- قم بتحميل البيانات عند فتح الصفحة ---
-        loadDashboardData();
+            // Cargar los datos para cada gráfico al cargar la página
+            fetchAndRenderChart('/api/Dashboard/GetUserGrowthChartData', 'userGrowthChart', 'line', 'New Users', true);
+            fetchAndRenderChart('/api/Dashboard/GetSalesChartData', 'salesChart', 'bar', 'Daily Sales ($)');
+        });
     </script>
 }
