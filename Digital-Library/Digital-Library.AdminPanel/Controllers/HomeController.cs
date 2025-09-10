@@ -62,7 +62,6 @@ namespace Digital_Library.AdminPanel.Controllers
                 ContactNumber = v.ContactNumber,
                 WalletBalance = v.WalletBalance,
                 Status = v.Status.ToString(),
-                RejectionReason = v.RejectionReason,
                 SubmittedAt = v.SubmittedAt,
                 ReviewedAt = v.ReviewedAt,
                 ImageBaseUrl = _config["Digital-Library-Url"]!,
