@@ -12,7 +12,6 @@ public class VendorViewModel
     public string ContactNumber { get; set; }
     public decimal WalletBalance { get; set; }
     public string Status { get; set; }
-    public string RejectionReason { get; set; }
     public DateTime SubmittedAt { get; set; }
     public DateTime? ReviewedAt { get; set; }
 
