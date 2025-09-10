@@ -1,97 +1,167 @@
-﻿@using Digital_Library.Core.Enums
-@model IEnumerable<Digital_Library.Core.Models.Vendor>
+﻿@* 
+    1. تأكد من أن الموديل هو ViewModel الخاص بك.
+*@
+@model IEnumerable<VendorViewModel>
+@* 
+    2. تأكد من أن مسار الـ enum صحيح.
+*@
+@using Digital_Library.AdminPanel.ViewModels
+@using Digital_Library.Core.Enums
+@* 
+    3. تأكد من وجود using لـ System.Text.Json.
+*@
+@using System.Text.Json
 
 @{
-    ViewData["Title"] = "NewVendors";
+    ViewData["Title"] = "Vendor Management";
 }
-<div class="content">
-    <div class="pt-4">
-        <div class="row g-4">
-            <div class="col-12">
-                <div class="bg-light rounded h-100 p-2">
-                    <h6 class="mb-4">Vendor Management</h6>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead>
+
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="bg-light rounded h-100 p-4">
+                <h6 class="mb-4">New Vendor Requests</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th scope="col">Vendor</th>
+                                <th scope="col">Library</th>
+                                <th scope="col">Location</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Submitted</th>
+                                <th scope="col" class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.Any())
+                            {
                                 <tr>
-                                    <th scope="col">Vendor</th>
-                                    <th scope="col">Library</th>
-                                    <th scope="col">Location</th>
-                                    <th scope="col">Contact</th>
-                                    <th scope="col">Wallet</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Rejection Reason</th>
-                                    <th scope="col">Submitted</th>
+                                    <td colspan="6" class="text-center">No pending vendor requests found.</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @if (!Model.Any())
+                            }
+                            else
+                            {
+                                @foreach (var item in Model)
                                 {
-                                    <tr>
-                                        <td colspan="8" class="text-center">No pending vendor requests found.</td>
+                                    <tr id="vendor-row-@item.Id">
+                                        <td>
+                                            <div class="fw-bold">@item.FullName</div>
+                                            <small class="text-muted">@item.Email</small>
+                                        </td>
+                                        <td>@item.LibraryName</td>
+                                        <td>@item.City, @item.State</td>
+                                        <td>
+                                            @{
+                                                var statusClass = item.Status switch
+                                                {
+                                                    "Approved" => "text-bg-success",
+                                                    "Rejected" => "text-bg-danger",
+                                                    _ => "text-bg-warning"
+                                                };
+                                            }
+                                            <select class="form-select form-select-sm @statusClass"
+                                                    data-vendor-id="@item.Id"
+                                                    onchange="handleStatusChange(this)">
+                                                @foreach (var status in Enum.GetValues(typeof(VendorStatus)))
+                                                {
+                                                    var statusValue = status.ToString();
+                                                    <option value="@statusValue" selected="@(item.Status == statusValue)">
+                                                        @statusValue
+                                                    </option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>@item.SubmittedAt.ToString("MMM dd, yyyy")</td>
+                                        <td class="text-center">
+                                            @{
+                                                // 4. نقوم بتحويل ViewModel بالكامل إلى JSON
+                                                var vendorJson = Json.Serialize(item);
+                                            }
+                                            <button type="button" class="btn btn-sm btn-info"
+                                                    data-vendor='@vendorJson'
+                                                    onclick="showVendorDetails(this)">
+                                                Details
+                                            </button>
+                                        </td>
                                     </tr>
                                 }
-                                else
-                                {
-                                    @foreach (var item in Model)
-                                    {
-                                        <tr id="vendor-row-@item.Id">
-                                            <td>
-                                                <div class="fw-bold">@item.User.FullName</div>
-                                                <small class="text-muted">@item.User.Email</small>
-                                            </td>
-                                            <td>@item.LibraryName</td>
-                                            <td>@item.City, @item.State</td>
-                                            <td>@item.ContactNumber</td>
-                                            <td>$@item.WalletBalance.ToString("N2")</td>
-                                            <td>
-                                                @{
-                                                    var statusClass = item.Status switch
-                                                    {
-                                                        VendorStatus.Approved => "text-bg-success",
-                                                        VendorStatus.Rejected => "text-bg-danger",
-                                                        _ => "text-bg-warning"
-                                                    };
-                                                }
-                                                <select class="form-select form-select-sm @statusClass"
-                                                        data-vendor-id="@item.Id"
-                                                        onchange="handleStatusChange(this)">
-                                                    @foreach (var status in Enum.GetValues(typeof(VendorStatus)))
-                                                    {
-                                                        var statusValue = (VendorStatus)status;
-                                                        <option value="@statusValue" selected="@(item.Status == statusValue)">
-                                                            @statusValue.ToString()
-                                                        </option>
-                                                    }
-                                                </select>
-                                            </td>
-                                            <td>@item.RejectionReason</td>
-                                            <td>@item.SubmittedAt.ToString("MMM dd, yyyy")</td>
-                                        </tr>
-                                    }
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- =============================================================== -->
+<!-- ======================= MODAL HTML CODE ======================= -->
+<!-- =============================================================== -->
+<div class="modal fade" id="vendorDetailsModal" tabindex="-1" aria-labelledby="vendorDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="vendorDetailsModalLabel">Vendor Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong class="d-block text-muted">Vendor Name:</strong>
+                        <span id="modalVendorName"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong class="d-block text-muted">Library Name:</strong>
+                        <span id="modalLibraryName"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong class="d-block text-muted">Email:</strong>
+                        <span id="modalVendorEmail"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong class="d-block text-muted">Contact Number:</strong>
+                        <span id="modalContactNumber"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong class="d-block text-muted">Location:</strong>
+                        <span id="modalLocation"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong class="d-block text-muted">Submitted At:</strong>
+                        <span id="modalSubmittedAt"></span>
+                    </div>
+                </div>
+                <hr>
+                <h6 class="mt-3">Identity Documents:</h6>
+                <div id="modalIdentityImagesContainer" class="row g-2 mt-2">
+                    <!-- Images will be dynamically inserted here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- =============================================================== -->
+<!-- ======================= JAVASCRIPT CODE ======================= -->
+<!-- =============================================================== -->
 @section Scripts {
     <script>
-        // استخدمنا الطريقة الآمنة لتمرير الـ ID عبر data-attributes
+        /**
+         * Handles the status change event from a dropdown.
+         * param {HTMLSelectElement} selectElement The dropdown element that triggered the event.
+         */
         async function handleStatusChange(selectElement) {
             const vendorId = selectElement.dataset.vendorId;
             const newStatus = selectElement.value;
 
-            console.log(`Vendor ID: ${vendorId}`);
-            console.log(`New Status: ${newStatus}`);
+            console.log(`Updating Vendor ID: ${vendorId} to New Status: ${newStatus}`);
 
-            // نستخدم try...catch للتعامل مع الأخطاء
             try {
-                // 1. انتظر (await) نتيجة الـ fetch
                 const response = await fetch('/api/Vendors/UpdateStatus', {
                     method: 'POST',
                     headers: {
@@ -103,20 +173,71 @@
                     })
                 });
 
-                // 2. تحقق من نجاح الـ response
                 if (response.ok) {
-                    console.log("Status updated successfully!");
+                    // Update the color of the dropdown without reloading the page
+                    selectElement.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning');
+                    let newClass = 'text-bg-warning'; // Default for Pending
+                    if (newStatus === 'Approved') newClass = 'text-bg-success';
+                    if (newStatus === 'Rejected') newClass = 'text-bg-danger';
+                    selectElement.classList.add(newClass);
+
                     alert('Status updated successfully!');
                 } else {
-                    // إذا كان هناك خطأ من السيرفر (مثل 404 أو 500)
-                    console.error("Failed to update status. Server responded with:", response.status);
                     alert(`Error: Could not update the status. (Status: ${response.status})`);
                 }
             } catch (error) {
-                // 3. هذا الـ catch يلتقط أخطاء الشبكة فقط (مثل فشل الاتصال)
                 console.error('Network error:', error);
                 alert('A network error occurred. Please try again.');
             }
+        }
+
+        /**
+         * Displays vendor details in a modal popup.
+         * param {HTMLButtonElement} buttonElement The 'Details' button that was clicked.
+         */
+        function showVendorDetails(buttonElement) {
+            // 1. Get vendor data object from the data-vendor attribute
+            const vendor = JSON.parse(buttonElement.dataset.vendor);
+
+            // 2. Populate the modal with text data
+            document.getElementById('modalVendorName').innerText = vendor.fullName ?? 'N/A';
+            document.getElementById('modalLibraryName').innerText = vendor.libraryName ?? 'N/A';
+            document.getElementById('modalVendorEmail').innerText = vendor.email ?? 'N/A';
+            document.getElementById('modalContactNumber').innerText = vendor.contactNumber ?? 'N/A';
+            document.getElementById('modalLocation').innerText = `${vendor.city ?? ''}, ${vendor.state ?? ''}`;
+
+            const submittedDate = new Date(vendor.submittedAt);
+            document.getElementById('modalSubmittedAt').innerText = submittedDate.toLocaleDateString('en-US', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+
+            // 3. Populate the modal with identity images
+            const imagesContainer = document.getElementById('modalIdentityImagesContainer');
+            imagesContainer.innerHTML = ''; // Clear previous images
+
+            if (vendor.identityImageUrls && vendor.identityImageUrls.length > 0) {
+                const baseUrl = "@Model.FirstOrDefault().ImageBaseUrl";
+                vendor.identityImageUrls.forEach(url => {
+                    const link = document.createElement('a');
+                    link.href = `${baseUrl}${url}`;
+                    link.target = '_blank';
+                    link.className = 'col-md-4 col-sm-6'; // Responsive grid columns
+
+                    const img = document.createElement('img');
+                    img.src = `${baseUrl}${url}`;
+                    img.className = 'img-fluid rounded shadow-sm'; // Bootstrap classes for styling
+                    img.alt = 'Identity Document';
+
+                    link.appendChild(img);
+                    imagesContainer.appendChild(link);
+                });
+            } else {
+                imagesContainer.innerHTML = '<div class="col-12"><p class="text-muted">No identity images submitted.</p></div>';
+            }
+
+            // 4. Show the modal
+            const detailsModal = new bootstrap.Modal(document.getElementById('vendorDetailsModal'));
+            detailsModal.show();
         }
     </script>
 }

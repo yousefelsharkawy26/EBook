@@ -15,14 +15,17 @@ namespace Digital_Library.AdminPanel.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<User> _userManager;
         private readonly IVendorService _vendorService;
+        private readonly IConfiguration _config;
 
         public HomeController(ILogger<HomeController> logger,
                               UserManager<User> userManager,
-                              IVendorService vendorService)
+                              IVendorService vendorService,
+                              IConfiguration config)
         {
             _logger = logger;
             _userManager = userManager;
             _vendorService = vendorService;
+            _config = config;
         }
 
         public IActionResult Index()
@@ -45,9 +48,31 @@ namespace Digital_Library.AdminPanel.Controllers
 
         public async Task<IActionResult> NewVendors()
         {
-            var vendors = await _vendorService.GetVendorsAsync(); 
+            var vendors = await _vendorService.GetVendorsAsync();
 
-            return View(vendors.OrderBy(o => o.Status == Core.Enums.VendorStatus.Pending));
+            var vendorViewModels = vendors.Select(v => new VendorViewModel
+            {
+                Id = v.Id,
+                FullName = v.User?.FullName,
+                Email = v.User?.Email,
+                LibraryName = v.LibraryName,
+                City = v.City,
+                State = v.State,
+                ZipCode = v.ZipCode,
+                ContactNumber = v.ContactNumber,
+                WalletBalance = v.WalletBalance,
+                Status = v.Status.ToString(),
+                RejectionReason = v.RejectionReason,
+                SubmittedAt = v.SubmittedAt,
+                ReviewedAt = v.ReviewedAt,
+                ImageBaseUrl = _config["Digital-Library-Url"]!,
+                // ====> قم بتعبئة قائمة روابط الصور هنا <====
+                // نقوم بتحويل قائمة الكائنات إلى قائمة نصوص (URLs)
+                IdentityImageUrls = v.VendorIdentityImagesUrls?.Select(i => i.ImageUrl).ToList() ?? new List<string>()
+
+            }).ToList();
+
+            return View(vendorViewModels);
         }
 
         [HttpPost("api/Vendors/UpdateStatus")]
