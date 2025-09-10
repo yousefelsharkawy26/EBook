@@ -8,6 +8,7 @@ using Digital_Library.Infrastructure.UnitOfWork.Interface;
 using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -191,6 +192,11 @@ public class VendorService : IVendorService
 			}
 			else if (status == VendorStatus.Rejected)
 			{
+				var roles	= await userManager.GetRolesAsync(vendor.User!);
+				if (roles.Contains(Roles.Vendor))
+				{
+					var roleResult = await userManager.RemoveFromRoleAsync(vendor.User!, Roles.Vendor);
+				}
 				string htmlMessage = $"<p>Hello {vendor.User?.FullName},</p>" +
 																									$"<p>Your vendor request for '<strong>{vendor.LibraryName}</strong>' has been <strong>rejected</strong>.</p>" +
 																									$"<p>Reason: {reason ?? "Not specified"}</p>" +
