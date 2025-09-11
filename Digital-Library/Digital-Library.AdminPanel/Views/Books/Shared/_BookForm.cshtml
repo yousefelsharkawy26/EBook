@@ -52,11 +52,15 @@
       <label asp-for="PricePhysical"></label>
       <span asp-validation-for="PricePhysical" class="text-danger"></span>
      </div>
-     <div class="form-floating mb-3">
-      <input asp-for="PricePdf" class="form-control" />
-      <label asp-for="PricePdf"></label>
-      <span asp-validation-for="PricePdf" class="text-danger"></span>
-     </div>
+     @if (Model.PricePdf!=0)
+      {
+      <div class="form-floating mb-3">
+       <input asp-for="PricePdf" class="form-control" />
+       <label asp-for="PricePdf"></label>
+       <span asp-validation-for="PricePdf" class="text-danger"></span>
+      </div>
+      }
+
      <div class="form-floating mb-3">
       <select asp-for="CategoryId" class="form-select" asp-items="Model.Categories">
        <option value="">Select a Category</option>

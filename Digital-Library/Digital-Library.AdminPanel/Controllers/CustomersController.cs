@@ -49,7 +49,7 @@ public class CustomersController : Controller
 
         await _userService.ToggleUserStatusAsync(id);
 
-        // أعد المستخدم إلى صفحة القائمة
+       
         return RedirectToAction(nameof(Index));
     }
 }

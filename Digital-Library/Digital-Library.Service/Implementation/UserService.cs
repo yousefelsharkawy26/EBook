@@ -136,21 +136,25 @@ public class UserService : IUserService
         };
     }
 
-    public async Task<bool> ToggleUserStatusAsync(string customerId)
-    {
-        var user = await _userManager.FindByIdAsync(customerId);
-        if (user == null) return false;
+	public async Task<bool> ToggleUserStatusAsync(string customerId)
+	{
+		var user = await _userManager.FindByIdAsync(customerId);
+		if (user == null) return false;
 
-        if (user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTimeOffset.UtcNow)
-        {
-            // The user is currently locked out, so unlock them
-            await _userManager.SetLockoutEndDateAsync(user, null);
-        }
-        else
-        {
-            // Lock the user out indefinitely (or for a very long time)
-            await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
-        }
-        return true;
-    }
+		if (user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTimeOffset.UtcNow)
+		{
+			await _userManager.SetLockoutEndDateAsync(user, null);
+
+			await _userManager.UpdateSecurityStampAsync(user);
+		}
+		else
+		{
+			await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+
+			await _userManager.UpdateSecurityStampAsync(user);
+		}
+
+		return true;
+	}
+
 }
