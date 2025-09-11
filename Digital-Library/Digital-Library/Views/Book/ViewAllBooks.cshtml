@@ -2,567 +2,584 @@
 @model IEnumerable<Digital_Library.Core.Models.Book>
 
 @{
- ViewData["Title"] = "Shop - All Books";
- var bannerUrl = Url.Content("~/images/banner-image-bg-1.jpg");
+	ViewData["Title"] = "Shop - All Books";
+	var bannerUrl = Url.Content("~/images/banner-image-bg-1.jpg");
 
- var currentQuery = Context.Request.Query["query"].ToString();
- var currentSort = Context.Request.Query["sort"].ToString();
- var currentCategory = Context.Request.Query["category"].ToString();
- var currentAuthor = Context.Request.Query["author"].ToString();
- var currentPrice = Context.Request.Query["priceRange"].ToString();
-
-
- var currentPage = ViewBag.CurrentPage as int? ?? 1;
- var totalPages = ViewBag.TotalPages as int? ?? 1;
- var pageSize = ViewBag.PageSize as int? ?? 8;
- var totalItems = ViewBag.TotalItems as int? ?? 0;
- var startItem = totalItems > 0 ? ((currentPage - 1) * pageSize) + 1 : 0;
- var endItem = Math.Min(currentPage * pageSize, totalItems);
-
-    int windowSize = 5; // number of pages to display at once
-    int startPage = Math.Max(1, currentPage - windowSize / 2);
-    int endPage = Math.Min(totalPages, startPage + windowSize - 1);
-
-    // adjust if we are near the end
-    if (endPage - startPage + 1 < windowSize && startPage > 1)
-    {
-        startPage = Math.Max(1, endPage - windowSize + 1);
-    }
+	var currentQuery = Context.Request.Query["query"].ToString();
+	var currentSort = Context.Request.Query["sort"].ToString();
+	var currentCategory = Context.Request.Query["category"].ToString();
+	var currentAuthor = Context.Request.Query["author"].ToString();
+	var currentPrice = Context.Request.Query["priceRange"].ToString();
 
 
- var sortOptions = new List<(string Value, string Text)>
-    {
-        ("NameAsc", "Name (A - Z)"),
-        ("NameDesc", "Name (Z - A)"),
-        ("PriceLowHigh", "Price (Low-High)"),
-        ("PriceHighLow", "Price (High-Low)"),
-        ("RatingHigh", "Rating (Highest)"),
-        ("RatingLow", "Rating (Lowest)")
-    };
+	var currentPage = ViewBag.CurrentPage as int? ?? 1;
+	var totalPages = ViewBag.TotalPages as int? ?? 1;
+	var pageSize = ViewBag.PageSize as int? ?? 8;
+	var totalItems = ViewBag.TotalItems as int? ?? 0;
+	var startItem = totalItems > 0 ? ((currentPage - 1) * pageSize) + 1 : 0;
+	var endItem = Math.Min(currentPage * pageSize, totalItems);
 
- var priceRanges = new List<(string Value, string Text)>
-    {
-        ("0-10", "Less than $10"),
-        ("10-20", "$10 - $20"),
-        ("20-30", "$20 - $30"),
-        ("30-40", "$30 - $40"),
-        ("40-50", "$40 - $50")
-    };
+	int windowSize = 5; // number of pages to display at once
+	int startPage = Math.Max(1, currentPage - windowSize / 2);
+	int endPage = Math.Min(totalPages, startPage + windowSize - 1);
+
+	// adjust if we are near the end
+	if (endPage - startPage + 1 < windowSize && startPage > 1)
+	{
+		startPage = Math.Max(1, endPage - windowSize + 1);
+	}
+
+
+	var sortOptions = new List<(string Value, string Text)>
+				{
+								("NameAsc", "Name (A - Z)"),
+								("NameDesc", "Name (Z - A)"),
+								("PriceLowHigh", "Price (Low-High)"),
+								("PriceHighLow", "Price (High-Low)"),
+								("RatingHigh", "Rating (Highest)"),
+								("RatingLow", "Rating (Lowest)")
+				};
+
+	var priceRanges = new List<(string Value, string Text)>
+				{
+								("0-10", "Less than $10"),
+								("10-20", "$10 - $20"),
+								("20-30", "$20 - $30"),
+								("30-40", "$30 - $40"),
+								("40-50", "$40 - $50")
+				};
 }
 
 <style>
- /* --- Book Card Style Updates --- */
- .book-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background: #fff;
-  border: 1px solid #f0f0f0;
- }
+	/* --- Book Card Style Updates --- */
+	.book-card {
+		transition: transform 0.3s ease, box-shadow 0.3s ease;
+		background: #fff;
+		border: 1px solid #f0f0f0;
+	}
 
-  .book-card:hover {
-   transform: translateY(-5px);
-   box-shadow: 0 10px 20px rgba(0,0,0,0.12) !important;
-   border-color: transparent;
-  }
+		.book-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 10px 20px rgba(0,0,0,0.12) !important;
+			border-color: transparent;
+		}
 
- .book-cover-wrapper {
-  height: 250px;
-  overflow: hidden;
-  background: #f8f9fa;
-  display: flex;
-  align-items: center;
-  justify-content: center;
- }
+	.book-cover-wrapper {
+		height: 250px;
+		overflow: hidden;
+		background: #f8f9fa;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
 
-  .book-cover-wrapper img {
-   max-height: 100%;
-   width: auto;
-   transition: transform 0.3s ease;
-  }
+		.book-cover-wrapper img {
+			max-height: 100%;
+			width: auto;
+			transition: transform 0.3s ease;
+		}
 
- .book-card:hover .book-cover-wrapper img {
-  transform: scale(1.05);
- }
+	.book-card:hover .book-cover-wrapper img {
+		transform: scale(1.05);
+	}
 
- .pricing-section {
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 12px;
-  margin-top: 1rem;
-  border-top: 1px solid #e9ecef;
- }
+	.pricing-section {
+		background-color: #f8f9fa;
+		border-radius: 8px;
+		padding: 12px;
+		margin-top: 1rem;
+		border-top: 1px solid #e9ecef;
+	}
 
- /* --- Book Card NEW Color Scheme --- */
- .book-card .card-title a {
-  color: #343a40; /* Dark charcoal for title */
- }
+	/* --- Book Card NEW Color Scheme --- */
+	.book-card .card-title a {
+		color: #343a40; /* Dark charcoal for title */
+	}
 
-  .book-card .card-title a:hover {
-   color: #0d6efd !important; /* Keep blue for hover interaction */
-  }
+		.book-card .card-title a:hover {
+			color: #0d6efd !important; /* Keep blue for hover interaction */
+		}
 
- .book-card .book-author {
-  color: #6c757d; /* Consistent soft gray for author */
- }
+	.book-card .book-author {
+		color: #6c757d; /* Consistent soft gray for author */
+	}
 
- .pricing-section .price-label {
-  color: #6c757d; /* Consistent soft gray for labels */
- }
+	.pricing-section .price-label {
+		color: #6c757d; /* Consistent soft gray for labels */
+	}
 
- .pricing-section .price-value {
-  color: #198754; /* Rich green for prices to stand out */
-  font-weight: 600;
- }
+	.pricing-section .price-value {
+		color: #198754; /* Rich green for prices to stand out */
+		font-weight: 600;
+	}
 
- /* --- Sidebar Card & Form Style Updates --- */
- .sidebar .card {
-  border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  border: 1px solid #e9ecef;
- }
+	/* --- Sidebar Card & Form Style Updates --- */
+	.sidebar .card {
+		border-radius: 15px;
+		box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+		border: 1px solid #e9ecef;
+	}
 
- .sidebar .form-label {
-  font-weight: 600;
-  color: #495057;
-  margin-bottom: 0.5rem;
- }
+	.sidebar .form-label {
+		font-weight: 600;
+		color: #495057;
+		margin-bottom: 0.5rem;
+	}
 
- /* --- Custom Styling for ALL Dropdowns --- */
- .form-select {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border: 1px solid #ced4da;
-  border-radius: 8px;
-  padding: 0.5rem 2.5rem 0.5rem 1rem;
-  font-size: 0.95rem;
-  background-color: #fff;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 16px 12px;
- }
+	/* --- Custom Styling for ALL Dropdowns --- */
+	.form-select {
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+		border: 1px solid #ced4da;
+		border-radius: 8px;
+		padding: 0.5rem 2.5rem 0.5rem 1rem;
+		font-size: 0.95rem;
+		background-color: #fff;
+		transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+		background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+		background-repeat: no-repeat;
+		background-position: right 0.75rem center;
+		background-size: 16px 12px;
+	}
 
-  .form-select:focus {
-   border-color: #86b7fe;
-   outline: 0;
-   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-  }
+		.form-select:focus {
+			border-color: #86b7fe;
+			outline: 0;
+			box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+		}
 
- /* --- Pagination Styling --- */
- .pagination {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  flex-wrap: wrap;
- }
+	/* --- Pagination Styling --- */
+	.pagination {
+		display: flex;
+		justify-content: center;
+		gap: 6px;
+		flex-wrap: wrap;
+	}
 
-  .pagination .page-link {
-   border: none;
-   border-radius: 8px;
-   padding: 8px 14px;
-   font-size: 0.95rem;
-   font-weight: 500;
-   color: #0d6efd;
-   background-color: #f8f9fa;
-   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-   transition: all 0.25s ease;
-  }
+		.pagination .page-link {
+			border: none;
+			border-radius: 8px;
+			padding: 8px 14px;
+			font-size: 0.95rem;
+			font-weight: 500;
+			color: #0d6efd;
+			background-color: #f8f9fa;
+			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+			transition: all 0.25s ease;
+		}
 
-   .pagination .page-link:hover {
-    background-color: #0d6efd;
-    color: #fff;
-   }
+			.pagination .page-link:hover {
+				background-color: #0d6efd;
+				color: #fff;
+			}
 
-  .pagination .page-item.active .page-link {
-   background-color: #0d6efd;
-   color: #fff;
-   font-weight: 600;
-   box-shadow: 0 3px 8px rgba(13, 110, 253, 0.3);
-  }
+		.pagination .page-item.active .page-link {
+			background-color: #0d6efd;
+			color: #fff;
+			font-weight: 600;
+			box-shadow: 0 3px 8px rgba(13, 110, 253, 0.3);
+		}
 </style>
 
 <section class="hero-section position-relative padding-large" style="background-image: url(@bannerUrl); background-size: cover; background-repeat: no-repeat; background-position: center; height: 400px;">
- <div class="hero-content">
-  <div class="container">
-   <div class="row">
-    <div class="text-center">
-     <h1>Shop</h1>
-     <div class="breadcrumbs">
-      <span class="item">
-       <a asp-controller="Home" asp-action="Index">Home > </a>
-      </span>
-      <span class="item text-decoration-underline">Shop</span>
-     </div>
-    </div>
-   </div>
-  </div>
- </div>
+	<div class="hero-content">
+		<div class="container">
+			<div class="row">
+				<div class="text-center">
+					<h1>Shop</h1>
+					<div class="breadcrumbs">
+						<span class="item">
+							<a asp-controller="Home" asp-action="Index">Home > </a>
+						</span>
+						<span class="item text-decoration-underline">Shop</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </section>
 
 <div class="shopify-grid padding-large">
- <div class="container">
-  <div class="row flex-row-reverse g-md-5">
-   <main class="col-md-9">
-    <div class="filter-shop d-flex flex-wrap justify-content-between align-items-center mb-5">
-     <div class="showing-product">
-      <p class="mb-0 text-muted" style="color: #272727 !important;">Showing @startItem–@endItem of @totalItems results</p>
-     </div>
-     <div class="sort-by">
-      <form method="get" id="sortForm">
-       <input type="hidden" name="query" value="@currentQuery" />
-       <input type="hidden" name="category" value="@currentCategory" />
-       <input type="hidden" name="author" value="@currentAuthor" />
-       <input type="hidden" name="priceRange" value="@currentPrice" />
-       <div class="sort-by-container">
-        <i class="bi bi-sort-down sort-icon"></i>
-        <select id="sorting" name="sort" class="form-select sorting-select" onchange="this.form.submit();">
-         <option value="">Default sorting</option>
-         @foreach (var option in sortOptions)
-         {
-          <option value="@option.Value" selected="@(option.Value == currentSort ? "selected" : null)">@option.Text</option>
-         }
-        </select>
-       </div>
-      </form>
-     </div>
-    </div>
+	<div class="container">
+		<div class="row flex-row-reverse g-md-5">
+			<main class="col-md-9">
+				<div class="filter-shop d-flex flex-wrap justify-content-between align-items-center mb-5">
+					<div class="showing-product">
+						<p class="mb-0 text-muted" style="color: #272727 !important;">Showing @startItem–@endItem of @totalItems results</p>
+					</div>
+					<div class="sort-by">
+						<form method="get" id="sortForm">
+							<input type="hidden" name="query" value="@currentQuery" />
+							<input type="hidden" name="category" value="@currentCategory" />
+							<input type="hidden" name="author" value="@currentAuthor" />
+							<input type="hidden" name="priceRange" value="@currentPrice" />
+							<div class="sort-by-container">
+								<i class="bi bi-sort-down sort-icon"></i>
+								<select id="sorting" name="sort" class="form-select sorting-select" onchange="this.form.submit();">
+									<option value="">Default sorting</option>
+									@foreach (var option in sortOptions)
+									{
+										<option value="@option.Value" selected="@(option.Value == currentSort ? "selected" : null)">@option.Text</option>
+									}
+								</select>
+							</div>
+						</form>
+					</div>
+				</div>
 
-    <div class="row product-content product-store g-4">
-     @if (!Model.Any())
-     {
-      <div class="col-12 text-center py-5">
-       <i class="bi bi-journal-x fs-1 text-primary"></i>
-       <h3 class="mt-3">No Books Found</h3>
-       <p class="text-muted">We couldn't find any books matching your criteria. Please try adjusting your filters.</p>
-       <a asp-action="ViewAllBooks" class="btn btn-primary mt-3">
-        <i class="bi bi-arrow-counterclockwise"></i> Clear All Filters
-       </a>
-      </div>
-     }
-     else
-     {
-      @foreach (var book in Model)
-      {
-       <div class="col-lg-4 col-md-6 col-sm-6 d-flex">
-        <div class="card border-0 w-100 position-relative rounded-4 overflow-hidden book-card">
-         <div class="book-cover-wrapper">
-          <img src="~/@book.ImageBookCoverPath" class="img-fluid" alt="@book.Title">
-         </div>
+				<div class="row product-content product-store g-4">
+					@if (!Model.Any())
+					{
+						<div class="col-12 text-center py-5">
+							<i class="bi bi-journal-x fs-1 text-primary"></i>
+							<h3 class="mt-3">No Books Found</h3>
+							<p class="text-muted">We couldn't find any books matching your criteria. Please try adjusting your filters.</p>
+							<a asp-action="ViewAllBooks" class="btn btn-primary mt-3">
+								<i class="bi bi-arrow-counterclockwise"></i> Clear All Filters
+							</a>
+						</div>
+					}
+					else
+					{
+						@foreach (var book in Model)
+						{
+							<div class="col-lg-4 col-md-6 col-sm-6 d-flex">
+								<div class="card border-0 w-100 position-relative rounded-4 overflow-hidden book-card">
+									<div class="book-cover-wrapper">
+										<img src="~/@book.ImageBookCoverPath" class="img-fluid" alt="@book.Title">
+									</div>
 
-         <div class="card-body d-flex flex-column p-4">
-          <h6 class="card-title fw-bold text-truncate mb-1">
-           <a asp-action="Details" asp-route-id="@book.Id" class="stretched-link text-decoration-none">
-            @book.Title
-           </a>
-          </h6>
-          <p class="book-author mb-2 small">@book.Author</p>
+									<div class="card-body d-flex flex-column p-4">
+										<h6 class="card-title fw-bold text-truncate mb-1">
+											<a asp-action="Details" asp-route-id="@book.Id" class="stretched-link text-decoration-none">
+												@book.Title
+											</a>
+										</h6>
+										<p class="book-author mb-2 small">@book.Author</p>
 
-          <div class="d-flex align-items-center mb-3">
-           <div class="rating text-warning me-2" style="font-size: 0.8rem;">
-            <i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-half"></i>
-            <i class="bi bi-star"></i>
-           </div>
-           <small class="text-muted" style="color: #272727 !important;">(3.5)</small>
-          </div>
+										<div class="d-flex align-items-center mb-3">
+											<div class="rating text-warning me-2" style="font-size: 0.8rem;">
+												<i class="bi bi-star-fill"></i>
+												<i class="bi bi-star-fill"></i>
+												<i class="bi bi-star-fill"></i>
+												<i class="bi bi-star-half"></i>
+												<i class="bi bi-star"></i>
+											</div>
+											<small class="text-muted" style="color: #272727 !important;">(3.5)</small>
+										</div>
 
-          <div class="pricing-section">
-           <div class="price-item d-flex justify-content-between align-items-center small">
-            <span class="price-label">Physical:</span>
-            <span class="price-value">$@book.PricePhysical</span>
-           </div>
-           <div class="price-item d-flex justify-content-between align-items-center small">
-            <span class="price-label">PDF:</span>
-            <span class="price-value">$@(book.PricePdf ?? 0)</span>
-           </div>
-           <div class="price-item d-flex justify-content-between align-items-center small">
-            <span class="price-label">Per Day:</span>
-            <span class="price-value">$@(book.PricePDFPerDay ?? 0)</span>
-           </div>
-          </div>
-         </div>
-        </div>
-       </div>
-      }
-     }
-    </div>
+										<div class="pricing-section">
+											<div class="price-item d-flex justify-content-between align-items-center small">
+												<span class="price-label">Physical:</span>
+												<span class="price-value">$@book.PricePhysical</span>
+											</div>
+											<div class="price-item d-flex justify-content-between align-items-center small">
+												<span class="price-label">PDF:</span>
+												@if (book.HasPDF)
+												{
+													<span class="price-value">$@(book.PricePdf)</span>
 
-    @if (totalPages > 1)
-    {
-        <nav class="py-5" aria-label="Page navigation">
-            <ul class="pagination">
-                <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
-                    <a class="page-link" href="@Url.Action("ViewAllBooks", new { page = currentPage - 1, query = currentQuery, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">Prev</a>
-                </li>
+												}
+												else
+												{
+													<span class="price-value">Na</span>
+												}
+											</div>
 
-                @if (startPage > 1)
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="@Url.Action("ViewAllBooks", new { page = 1, query = currentQuery, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">1</a>
-                    </li>
-                    <li class="page-item disabled"><span class="page-link">...</span></li>
-                }
+											<div class="price-item d-flex justify-content-between align-items-center small">
+												<span class="price-label">Per Day:</span>
+												@if (book.IsBorrowable)
+												{
+													<span class="price-value">$@(book.PricePDFPerDay ?? 0)</span>
+												}
+												else
+												{
+													<span class="price-value">Na</span>
 
-                @for (int i = startPage; i <= endPage; i++)
-                {
-                    <li class="page-item @(i == currentPage ? "active" : "")">
-                        <a class="page-link" href="@Url.Action("ViewAllBooks", new { page = i, query = currentQuery, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">@i</a>
-                    </li>
-                }
+												}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						}
+					}
+				</div>
 
-                @if (endPage < totalPages)
-                {
-                    <li class="page-item disabled"><span class="page-link">...</span></li>
-                    <li class="page-item">
-                        <a class="page-link" href="@Url.Action("ViewAllBooks", new { page = totalPages, query = currentQuery, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">@totalPages</a>
-                    </li>
-                }
+				@if (totalPages > 1)
+				{
+					<nav class="py-5" aria-label="Page navigation">
+						<ul class="pagination">
+							<li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+								<a class="page-link" href="@Url.Action("ViewAllBooks", new { page = currentPage - 1, query = currentQuery, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">Prev</a>
+							</li>
 
-                <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
-                    <a class="page-link" href="@Url.Action("ViewAllBooks", new { page = currentPage + 1, query = currentQuery, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">Next</a>
-                </li>
-            </ul>
-        </nav>
-    }
-   </main>
+							@if (startPage > 1)
+							{
+								<li class="page-item">
+									<a class="page-link" href="@Url.Action("ViewAllBooks", new { page = 1, query = currentQuery, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">1</a>
+								</li>
+								<li class="page-item disabled"><span class="page-link">...</span></li>
+							}
 
-   <aside class="col-md-3">
-    <div class="sidebar">
-     <div class="card">
-      <div class="card-body p-4">
-       <h4 class="card-title mb-4 border-bottom pb-2">Filters</h4>
-       <form asp-action="ViewAllBooks" method="get" id="filterForm">
-        <!-- Form content remains the same -->
-        <div class="mb-4">
-         <label for="searchQuery" class="form-label">Search Book</label>
-         <div class="input-group">
-          <input class="form-control" type="search" placeholder="Enter title or author..." name="query" id="searchQuery" value="@currentQuery" />
-          <button class="btn btn-outline-primary" type="submit">
-           <i class="bi bi-search"></i>
-          </button>
-         </div>
-        </div>
-        <div class="mb-4">
-         <label for="categoryFilter" class="form-label">Category</label>
-         <select name="category" id="categoryFilter" class="form-select" onchange="this.form.submit()">
-          <option value="">All Categories</option>
-          @foreach (var category in ViewBag.Categories as IEnumerable<Digital_Library.Core.Models.Category>)
-          {
-           <option value="@category.Id" selected="@(category.Id.ToString() == currentCategory ? "selected" : null)">
-            @category.CategoryName
-           </option>
-          }
-         </select>
-        </div>
-        <div class="mb-4">
-         <label for="authorFilter" class="form-label">Author</label>
-         <select name="author" id="authorFilter" class="form-select" onchange="this.form.submit()">
-          <option value="">All Authors</option>
-          @foreach (var author in ViewBag.Authors as IEnumerable<string>)
-          {
-           <option value="@author" selected="@(author == currentAuthor ? "selected" : null)">@author</option>
-          }
-         </select>
-        </div>
-        <div class="mb-4">
-         <label for="priceFilter" class="form-label">Price Range</label>
-         <select name="priceRange" id="priceFilter" class="form-select" onchange="this.form.submit()">
-          <option value="">Any Price</option>
-          @foreach (var range in priceRanges)
-          {
-           <option value="@range.Value" selected="@(range.Value == currentPrice ? "selected" : null)">@range.Text</option>
-          }
-         </select>
-        </div>
-        <div class="d-grid gap-2">
-         <button type="submit" class="btn btn-primary"><i class="bi bi-funnel-fill"></i> Apply Filters</button>
-         <a asp-action="ViewAllBooks" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i> Clear Filters</a>
-        </div>
-       </form>
-      </div>
-     </div>
-    </div>
-   </aside>
-  </div>
- </div>
+							@for (int i = startPage; i <= endPage; i++)
+							{
+								<li class="page-item @(i == currentPage ? "active" : "")">
+									<a class="page-link" href="@Url.Action("ViewAllBooks", new { page = i, query = currentQuery, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">@i</a>
+								</li>
+							}
+
+							@if (endPage < totalPages)
+							{
+								<li class="page-item disabled"><span class="page-link">...</span></li>
+								<li class="page-item">
+									<a class="page-link" href="@Url.Action("ViewAllBooks", new { page = totalPages, query = currentQuery, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">@totalPages</a>
+								</li>
+							}
+
+							<li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+								<a class="page-link" href="@Url.Action("ViewAllBooks", new { page = currentPage + 1, query = currentQuery, sort = currentSort, category = currentCategory, author = currentAuthor, priceRange = currentPrice })">Next</a>
+							</li>
+						</ul>
+					</nav>
+				}
+			</main>
+
+			<aside class="col-md-3">
+				<div class="sidebar">
+					<div class="card">
+						<div class="card-body p-4">
+							<h4 class="card-title mb-4 border-bottom pb-2">Filters</h4>
+							<form asp-action="ViewAllBooks" method="get" id="filterForm">
+								<!-- Form content remains the same -->
+								<div class="mb-4">
+									<label for="searchQuery" class="form-label">Search Book</label>
+									<div class="input-group">
+										<input class="form-control" type="search" placeholder="Enter title or author..." name="query" id="searchQuery" value="@currentQuery" />
+										<button class="btn btn-outline-primary" type="submit">
+											<i class="bi bi-search"></i>
+										</button>
+									</div>
+								</div>
+								<div class="mb-4">
+									<label for="categoryFilter" class="form-label">Category</label>
+									<select name="category" id="categoryFilter" class="form-select" onchange="this.form.submit()">
+										<option value="">All Categories</option>
+										@foreach (var category in ViewBag.Categories as IEnumerable<Digital_Library.Core.Models.Category>)
+										{
+											<option value="@category.Id" selected="@(category.Id.ToString() == currentCategory ? "selected" : null)">
+												@category.CategoryName
+											</option>
+										}
+									</select>
+								</div>
+								<div class="mb-4">
+									<label for="authorFilter" class="form-label">Author</label>
+									<select name="author" id="authorFilter" class="form-select" onchange="this.form.submit()">
+										<option value="">All Authors</option>
+										@foreach (var author in ViewBag.Authors as IEnumerable<string>)
+										{
+											<option value="@author" selected="@(author == currentAuthor ? "selected" : null)">@author</option>
+										}
+									</select>
+								</div>
+								<div class="mb-4">
+									<label for="priceFilter" class="form-label">Price Range</label>
+									<select name="priceRange" id="priceFilter" class="form-select" onchange="this.form.submit()">
+										<option value="">Any Price</option>
+										@foreach (var range in priceRanges)
+										{
+											<option value="@range.Value" selected="@(range.Value == currentPrice ? "selected" : null)">@range.Text</option>
+										}
+									</select>
+								</div>
+								<div class="d-grid gap-2">
+									<button type="submit" class="btn btn-primary"><i class="bi bi-funnel-fill"></i> Apply Filters</button>
+									<a asp-action="ViewAllBooks" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i> Clear Filters</a>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</aside>
+		</div>
+	</div>
 </div>
 
 <section id="customers-reviews" class="position-relative padding-large" style="background-image: url(@Url.Content("~/images/banner-image-bg.jpg")); background-size: cover; background-repeat: no-repeat; background-position: center; height: 600px;">
- <div class="container offset-md-3 col-md-6 ">
-  <div class="position-absolute top-50 end-0 pe-0 pe-xxl-5 me-0 me-xxl-5 swiper-next testimonial-button-next">
-   <svg class="chevron-forward-circle d-flex justify-content-center align-items-center p-2" width="80" height="80">
-    <use xlink:href="#alt-arrow-right-outline"></use>
-   </svg>
-  </div>
-  <div class="position-absolute top-50 start-0 ps-0 ps-xxl-5 ms-0 ms-xxl-5 swiper-prev testimonial-button-prev">
-   <svg class="chevron-back-circle d-flex justify-content-center align-items-center p-2" width="80" height="80">
-    <use xlink:href="#alt-arrow-left-outline"></use>
-   </svg>
-  </div>
-  <div class="section-title mb-4 text-center">
-   <h3 class="mb-4">Customers reviews</h3>
-  </div>
-  <div class="swiper testimonial-swiper ">
-   <div class="swiper-wrapper">
-    <div class="swiper-slide">
-     <div class="card position-relative text-left p-5 border rounded-3">
-      <blockquote>"I stumbled upon this bookstore while visiting the city, and it instantly became my favorite spot. The cozy atmosphere, friendly staff, and wide selection of books make every visit a delight!"</blockquote>
-      <div class="rating text-warning d-flex align-items-center">
-       <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-      </div>
-      <h5 class="mt-1 fw-normal">Emma Chamberlin</h5>
-     </div>
-    </div>
-    <div class="swiper-slide">
-     <div class="card position-relative text-left p-5 border rounded-3">
-      <blockquote>"As an avid reader, I'm always on the lookout for new releases, and this bookstore never disappoints. They always have the latest titles, and their recommendations have introduced me to some incredible reads!"</blockquote>
-      <div class="rating text-warning d-flex align-items-center">
-       <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-      </div>
-      <h5 class="mt-1 fw-normal">Thomas John</h5>
-     </div>
-    </div>
-   </div>
-  </div>
- </div>
+	<div class="container offset-md-3 col-md-6 ">
+		<div class="position-absolute top-50 end-0 pe-0 pe-xxl-5 me-0 me-xxl-5 swiper-next testimonial-button-next">
+			<svg class="chevron-forward-circle d-flex justify-content-center align-items-center p-2" width="80" height="80">
+				<use xlink:href="#alt-arrow-right-outline"></use>
+			</svg>
+		</div>
+		<div class="position-absolute top-50 start-0 ps-0 ps-xxl-5 ms-0 ms-xxl-5 swiper-prev testimonial-button-prev">
+			<svg class="chevron-back-circle d-flex justify-content-center align-items-center p-2" width="80" height="80">
+				<use xlink:href="#alt-arrow-left-outline"></use>
+			</svg>
+		</div>
+		<div class="section-title mb-4 text-center">
+			<h3 class="mb-4">Customers reviews</h3>
+		</div>
+		<div class="swiper testimonial-swiper ">
+			<div class="swiper-wrapper">
+				<div class="swiper-slide">
+					<div class="card position-relative text-left p-5 border rounded-3">
+						<blockquote>"I stumbled upon this bookstore while visiting the city, and it instantly became my favorite spot. The cozy atmosphere, friendly staff, and wide selection of books make every visit a delight!"</blockquote>
+						<div class="rating text-warning d-flex align-items-center">
+							<i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+						</div>
+						<h5 class="mt-1 fw-normal">Emma Chamberlin</h5>
+					</div>
+				</div>
+				<div class="swiper-slide">
+					<div class="card position-relative text-left p-5 border rounded-3">
+						<blockquote>"As an avid reader, I'm always on the lookout for new releases, and this bookstore never disappoints. They always have the latest titles, and their recommendations have introduced me to some incredible reads!"</blockquote>
+						<div class="rating text-warning d-flex align-items-center">
+							<i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+						</div>
+						<h5 class="mt-1 fw-normal">Thomas John</h5>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </section>
 
 <section id="instagram" class="py-5">
- <div class="container">
-  <div class="text-center mb-4">
-   <h3>Follow us on Instagram</h3>
-  </div>
-  <div class="row g-3">
-   <div class="col-md-2 col-4">
-    <figure class="instagram-item position-relative rounded-3 overflow-hidden">
-     <a href="#" class="image-link position-relative">
-      <div class="icon-overlay position-absolute d-flex justify-content-center align-items-center">
-       <i class="bi bi-instagram fs-2 text-white"></i>
-      </div>
-      <img src="~/images/insta-item1.jpg" alt="instagram" class="img-fluid insta-image">
-     </a>
-    </figure>
-   </div>
-   <div class="col-md-2 col-4">
-    <figure class="instagram-item position-relative rounded-3 overflow-hidden">
-     <a href="#" class="image-link position-relative">
-      <div class="icon-overlay position-absolute d-flex justify-content-center align-items-center">
-       <i class="bi bi-instagram fs-2 text-white"></i>
-      </div>
-      <img src="~/images/insta-item2.jpg" alt="instagram" class="img-fluid insta-image">
-     </a>
-    </figure>
-   </div>
-   <div class="col-md-2 col-4">
-    <figure class="instagram-item position-relative rounded-3 overflow-hidden">
-     <a href="#" class="image-link position-relative">
-      <div class="icon-overlay position-absolute d-flex justify-content-center align-items-center">
-       <i class="bi bi-instagram fs-2 text-white"></i>
-      </div>
-      <img src="~/images/insta-item3.jpg" alt="instagram" class="img-fluid insta-image">
-     </a>
-    </figure>
-   </div>
-   <div class="col-md-2 col-4">
-    <figure class="instagram-item position-relative rounded-3 overflow-hidden">
-     <a href="#" class="image-link position-relative">
-      <div class="icon-overlay position-absolute d-flex justify-content-center align-items-center">
-       <i class="bi bi-instagram fs-2 text-white"></i>
-      </div>
-      <img src="~/images/insta-item4.jpg" alt="instagram" class="img-fluid insta-image">
-     </a>
-    </figure>
-   </div>
-   <div class="col-md-2 col-4">
-    <figure class="instagram-item position-relative rounded-3 overflow-hidden">
-     <a href="#" class="image-link position-relative">
-      <div class="icon-overlay position-absolute d-flex justify-content-center align-items-center">
-       <i class="bi bi-instagram fs-2 text-white"></i>
-      </div>
-      <img src="~/images/insta-item5.jpg" alt="instagram" class="img-fluid insta-image">
-     </a>
-    </figure>
-   </div>
-   <div class="col-md-2 col-4">
-    <figure class="instagram-item position-relative rounded-3 overflow-hidden">
-     <a href="#" class="image-link position-relative">
-      <div class="icon-overlay position-absolute d-flex justify-content-center align-items-center">
-       <i class="bi bi-instagram fs-2 text-white"></i>
-      </div>
-      <img src="~/images/insta-item6.jpg" alt="instagram" class="img-fluid insta-image">
-     </a>
-    </figure>
-   </div>
-  </div>
- </div>
+	<div class="container">
+		<div class="text-center mb-4">
+			<h3>Follow us on Instagram</h3>
+		</div>
+		<div class="row g-3">
+			<div class="col-md-2 col-4">
+				<figure class="instagram-item position-relative rounded-3 overflow-hidden">
+					<a href="#" class="image-link position-relative">
+						<div class="icon-overlay position-absolute d-flex justify-content-center align-items-center">
+							<i class="bi bi-instagram fs-2 text-white"></i>
+						</div>
+						<img src="~/images/insta-item1.jpg" alt="instagram" class="img-fluid insta-image">
+					</a>
+				</figure>
+			</div>
+			<div class="col-md-2 col-4">
+				<figure class="instagram-item position-relative rounded-3 overflow-hidden">
+					<a href="#" class="image-link position-relative">
+						<div class="icon-overlay position-absolute d-flex justify-content-center align-items-center">
+							<i class="bi bi-instagram fs-2 text-white"></i>
+						</div>
+						<img src="~/images/insta-item2.jpg" alt="instagram" class="img-fluid insta-image">
+					</a>
+				</figure>
+			</div>
+			<div class="col-md-2 col-4">
+				<figure class="instagram-item position-relative rounded-3 overflow-hidden">
+					<a href="#" class="image-link position-relative">
+						<div class="icon-overlay position-absolute d-flex justify-content-center align-items-center">
+							<i class="bi bi-instagram fs-2 text-white"></i>
+						</div>
+						<img src="~/images/insta-item3.jpg" alt="instagram" class="img-fluid insta-image">
+					</a>
+				</figure>
+			</div>
+			<div class="col-md-2 col-4">
+				<figure class="instagram-item position-relative rounded-3 overflow-hidden">
+					<a href="#" class="image-link position-relative">
+						<div class="icon-overlay position-absolute d-flex justify-content-center align-items-center">
+							<i class="bi bi-instagram fs-2 text-white"></i>
+						</div>
+						<img src="~/images/insta-item4.jpg" alt="instagram" class="img-fluid insta-image">
+					</a>
+				</figure>
+			</div>
+			<div class="col-md-2 col-4">
+				<figure class="instagram-item position-relative rounded-3 overflow-hidden">
+					<a href="#" class="image-link position-relative">
+						<div class="icon-overlay position-absolute d-flex justify-content-center align-items-center">
+							<i class="bi bi-instagram fs-2 text-white"></i>
+						</div>
+						<img src="~/images/insta-item5.jpg" alt="instagram" class="img-fluid insta-image">
+					</a>
+				</figure>
+			</div>
+			<div class="col-md-2 col-4">
+				<figure class="instagram-item position-relative rounded-3 overflow-hidden">
+					<a href="#" class="image-link position-relative">
+						<div class="icon-overlay position-absolute d-flex justify-content-center align-items-center">
+							<i class="bi bi-instagram fs-2 text-white"></i>
+						</div>
+						<img src="~/images/insta-item6.jpg" alt="instagram" class="img-fluid insta-image">
+					</a>
+				</figure>
+			</div>
+		</div>
+	</div>
 </section>
 @* <-- (ضع هذا الجزء في نهاية الملف، بعد كل الـ HTML الموجود عندك) --> *@
 
 @section Scripts {
- <script>
-  document.addEventListener("DOMContentLoaded", function () {
-      const filterForm = document.getElementById("filterForm");
-      if (!filterForm) return;
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+						const filterForm = document.getElementById("filterForm");
+						if (!filterForm) return;
 
-      // زر Apply Filters داخل الفورم
-      const applyBtn = filterForm.querySelector('button[type="submit"]');
+						// زر Apply Filters داخل الفورم
+						const applyBtn = filterForm.querySelector('button[type="submit"]');
 
-      // كل الحقول ذات الاسم داخل الفورم (inputs & selects)
-      const inputs = Array.from(filterForm.querySelectorAll('input[name], select[name], textarea[name]'))
-          .filter(el => !!el.name);
+						// كل الحقول ذات الاسم داخل الفورم (inputs & selects)
+						const inputs = Array.from(filterForm.querySelectorAll('input[name], select[name], textarea[name]'))
+										.filter(el => !!el.name);
 
-      // خزن القيم الابتدائية
-      const initialValues = {};
-      inputs.forEach(el => initialValues[el.name] = el.value ?? "");
+						// خزن القيم الابتدائية
+						const initialValues = {};
+						inputs.forEach(el => initialValues[el.name] = el.value ?? "");
 
-      // إزالة أي onchange inline داخل الـ filterForm (عشان نمنع auto-submit الموجود في attributes)
-      filterForm.querySelectorAll('[onchange]').forEach(el => {
-          // نزل الـ attribute بس علشان ما نغيرش الـ HTML في الملف
-          el.removeAttribute('onchange');
-      });
+						// إزالة أي onchange inline داخل الـ filterForm (عشان نمنع auto-submit الموجود في attributes)
+						filterForm.querySelectorAll('[onchange]').forEach(el => {
+										// نزل الـ attribute بس علشان ما نغيرش الـ HTML في الملف
+										el.removeAttribute('onchange');
+						});
 
-      // دالة تتحقق هل أي قيمة اختلفت عن القيمة الابتدائية
-      function isAnyChanged() {
-          return inputs.some(el => {
-              const cur = (el.value ?? "");
-              const init = (initialValues[el.name] ?? "");
-              return cur !== init;
-          });
-      }
+						// دالة تتحقق هل أي قيمة اختلفت عن القيمة الابتدائية
+						function isAnyChanged() {
+										return inputs.some(el => {
+														const cur = (el.value ?? "");
+														const init = (initialValues[el.name] ?? "");
+														return cur !== init;
+										});
+						}
 
-      // تحديث حالة زر Apply
-      function updateApplyState() {
-          if (!applyBtn) return;
-          const changed = isAnyChanged();
-          applyBtn.disabled = !changed;
-      }
+						// تحديث حالة زر Apply
+						function updateApplyState() {
+										if (!applyBtn) return;
+										const changed = isAnyChanged();
+										applyBtn.disabled = !changed;
+						}
 
-      // ربط الأحداث
-      inputs.forEach(el => {
-          el.addEventListener("change", updateApplyState);
-          el.addEventListener("input", updateApplyState);
-      });
+						// ربط الأحداث
+						inputs.forEach(el => {
+										el.addEventListener("change", updateApplyState);
+										el.addEventListener("input", updateApplyState);
+						});
 
-      // الحالة الابتدائية (لو مافيش أي تغيير نخلي الزر معطّل)
-      updateApplyState();
+						// الحالة الابتدائية (لو مافيش أي تغيير نخلي الزر معطّل)
+						updateApplyState();
 
-      // عند إرسال الفورم: عطل الزر واظهر مؤشر تحميل بسيط
-      filterForm.addEventListener("submit", function (e) {
-          if (!applyBtn) return;
-          applyBtn.disabled = true;
+						// عند إرسال الفورم: عطل الزر واظهر مؤشر تحميل بسيط
+						filterForm.addEventListener("submit", function (e) {
+										if (!applyBtn) return;
+										applyBtn.disabled = true;
 
-          // حفظ النص الأصلي لعرضه بعد إرسال الصفحة (لو لازمت)
-          applyBtn.dataset.origHtml = applyBtn.innerHTML;
+										// حفظ النص الأصلي لعرضه بعد إرسال الصفحة (لو لازمت)
+										applyBtn.dataset.origHtml = applyBtn.innerHTML;
 
-          // وضع spinner ونص اختياري (يتحكم فيه الـ Bootstrap إذا موجود)
-          applyBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Applying...';
-      });
+										// وضع spinner ونص اختياري (يتحكم فيه الـ Bootstrap إذا موجود)
+										applyBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Applying...';
+						});
 
-      // إذا المستخدم نقر "Clear Filters" (رابط يعيد الصفحة)، لازم الزر يرجع لحالته بعد التحميل
-      // هذا الجزء سيعمل بعد إعادة التحميل التلقائي (ولا يغيّر سلوك Clear link نفسه).
-  });
- </script>
+						// إذا المستخدم نقر "Clear Filters" (رابط يعيد الصفحة)، لازم الزر يرجع لحالته بعد التحميل
+						// هذا الجزء سيعمل بعد إعادة التحميل التلقائي (ولا يغيّر سلوك Clear link نفسه).
+		});
+	</script>
 }
