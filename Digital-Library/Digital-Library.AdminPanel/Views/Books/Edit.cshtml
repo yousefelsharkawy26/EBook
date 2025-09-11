@@ -1,16 +1,14 @@
 ﻿@using Digital_Library.Core.ViewModels
 @model BookFormViewModel
 @{
-    ViewData["Title"] = "Edit Book";
+	ViewData["Title"] = "Edit Book";
 }
 
 <div class="container-fluid pt-4 px-4">
-    <div class="bg-light rounded h-100 p-4">
-        <h6 class="mb-4">@ViewData["Title"]</h6>
-        <form asp-action="Edit" method="post" enctype="multipart/form-data">
-            <partial name="Shared/_BookForm" model="Model" />
-            <button type="submit" class="btn btn-primary">Update</button>
-            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-        </form>
-    </div>
+	<div class="bg-light rounded h-100 p-4">
+		<h6 class="mb-4">@ViewData["Title"]</h6>
+
+		<partial name="Shared/_BookForm" model="Model" />
+
+	</div>
 </div>

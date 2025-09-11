@@ -356,11 +356,11 @@ public class BookService : IBookService
 			Description = book.Description,
 			PricePhysical = book.PricePhysical,
 			PricePdf = book.PricePdf ?? 0,
-			CoverImage = (await _fileService.GetFormFile(book.ImageBookCoverPath, "bytes")),
 			CategoryId = book.CategoryID,
 			VendorId = book.VendorId,
 			Categories = await GetCategoriesSelectList(),
-			Vendors = await GetVendorsSelectList()
+			Vendors = await GetVendorsSelectList(),
+			ExistingCoverImage=book.ImageBookCoverPath
 		};
 		return viewModel;
 	}
@@ -408,14 +408,13 @@ public class BookService : IBookService
 				BookID = book.Id,
 				HasPDF = book.HasPDF,
 				IsBorrowable = book.IsBorrowable,
-				PDFFile = book.PDFFilePath != null ? await _fileService.GetFormFile(book.PDFFilePath, "bytes") : null,
 				Stock = book.Stock,
 			};
 			await UpdateBook(book.Id, data);
 		}
 	}
 
-	// دوال مساعدة لإنشاء قوائم الـ Dropdown
+
 	private async Task<IEnumerable<SelectListItem>> GetCategoriesSelectList()
 	{
 		return await _unitOfWork.Categories

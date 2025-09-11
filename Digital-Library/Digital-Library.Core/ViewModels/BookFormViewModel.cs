@@ -6,36 +6,24 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Digital_Library.Core.ViewModels;
 
-// في Core/ViewModels/BookFormViewModel.cs
 public class BookFormViewModel
 {
-    public string Id { get; set; }
+	public string Id { get; set; }
 
-    [Required, StringLength(200)]
-    public string Title { get; set; }
+	public string Title { get; set; }
+	public string Author { get; set; }
+	public string Description { get; set; }
 
-    [Required, StringLength(100)]
-    public string Author { get; set; }
+	public decimal PricePhysical { get; set; }
+	public decimal PricePdf { get; set; }
 
-    [Required]
-    public string Description { get; set; }
+	// صورة قديمة (لو موجودة)
+	public string? ExistingCoverImage { get; set; }
+	public IFormFile? CoverImage { get; set; }
 
-    [Display(Name = "Price (Physical)")]
-    public decimal PricePhysical { get; set; }
+	public string CategoryId { get; set; }
+	public string VendorId { get; set; }
 
-    [Display(Name = "Price (PDF)")]
-    public decimal PricePdf { get; set; }
-
-    [ValidateNever]
-    public IFormFile? CoverImage { get; set; }
-
-    [Required, Display(Name = "Category")]
-    public string CategoryId { get; set; }
-
-    [Required, Display(Name = "Vendor")]
-    public string VendorId { get; set; }
-
-    // هذه القوائم ستُستخدم لملء الـ Dropdowns في النموذج
-    public IEnumerable<SelectListItem>? Categories { get; set; }
-    public IEnumerable<SelectListItem>? Vendors { get; set; }
+	public IEnumerable<SelectListItem>? Categories { get; set; }
+	public IEnumerable<SelectListItem>? Vendors { get; set; }
 }

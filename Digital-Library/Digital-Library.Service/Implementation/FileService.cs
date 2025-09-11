@@ -52,7 +52,7 @@ namespace Digital_Library.Service.Implementation
 
 		public async Task<bool> DeleteFile(string fileName)
 		{
-			string filePath =  Path.Combine(_webHostEnvironment.WebRootPath, fileName);
+			string filePath = Path.Combine(_webHostEnvironment.WebRootPath, fileName);
 
 			if (File.Exists(filePath))
 			{
@@ -94,7 +94,7 @@ namespace Digital_Library.Service.Implementation
 				return Enumerable.Empty<string>();
 
 			var files = Directory.GetFiles(folderPath)
-								 .Select(f => Path.Combine(folderName, Path.GetFileName(f)).Replace("\\", "/"));
+									.Select(f => Path.Combine(folderName, Path.GetFileName(f)).Replace("\\", "/"));
 
 			await Task.CompletedTask;
 
@@ -107,8 +107,9 @@ namespace Digital_Library.Service.Implementation
 
 			return await AddFile(file, folderName);
 		}
-        public async Task<IFormFile?> GetFormFile(string fileName, string contentType)
-        {
+
+		public async Task<IFormFile?> GetFormFile(string fileName, string contentType)
+		{
 			var fileBytes = await GetFile(fileName);
 			if (fileBytes != null)
 			{
@@ -120,7 +121,7 @@ namespace Digital_Library.Service.Implementation
 				};
 			}
 			return null;
-        }
-    }
+		}
+	}
 
 }
