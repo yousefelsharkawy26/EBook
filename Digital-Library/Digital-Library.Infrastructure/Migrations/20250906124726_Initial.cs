@@ -602,7 +602,8 @@ namespace Digital_Library.Infrastructure.Migrations
                 name: "Vendors");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "AspNetUsers");//**//
+            //
          
         }
     }
