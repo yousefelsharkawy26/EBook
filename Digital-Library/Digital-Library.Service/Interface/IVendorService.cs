@@ -23,7 +23,7 @@ public interface IVendorService
 
 	Task<Response> ReturnVendorIdFromUserId(string userId);
 
-    Task<IEnumerable<VendorViewModel>> GetVendorsDetailsAsync();
+	Task<IEnumerable<VendorViewModel>> GetVendorsDetailsAsync();
 }
 
 

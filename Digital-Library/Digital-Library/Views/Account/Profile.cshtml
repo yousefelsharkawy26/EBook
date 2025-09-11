@@ -59,7 +59,7 @@
                         <img id="profilePreview"
                              src="~/@image"
                              data-default-src="~/images/avatar.png"
-                             alt="Profile picture of John Doe"
+                             alt="Profile picture of @Model.FullName"
                              width="120" height="120"
                              style="object-fit: cover; border-radius: 50%; border: 4px solid var(--primary-color);" />
                     </div>
@@ -114,9 +114,9 @@
                             <button id="submitBtn" type="submit" class="btn btn-primary btn-lg">
                                 Update Profile
                             </button>
-                            <button type="reset" class="btn btn-outline-secondary btn-lg" asp-action="Index" asp-controller="Book">
+                            <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary btn-lg">
                                 Cancel
-                            </button>
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -137,7 +137,7 @@
       // Update avatar alt text as the name changes
       const updateAlt = () => {
         const name = nameInput.value.trim() || 'your profile';
-        img.alt = Profile picture of ${name};
+        img.alt = `Profile picture of ${name}`;
       };
       nameInput.addEventListener('input', updateAlt);
       updateAlt();
