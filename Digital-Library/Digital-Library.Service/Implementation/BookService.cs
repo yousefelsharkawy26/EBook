@@ -125,7 +125,7 @@ public class BookService : IBookService
 		return Response.Ok("Book retrieved successfully", book);
 	}
 
-	public async Task<Response> UpdateBook(string bookId, UpdateBookRequest request)
+	public async Task<Response> UpdateBook(string bookId, UpdateBookRequest request,string newPathCover=null)
 	{
 		try
 		{
@@ -158,6 +158,10 @@ public class BookService : IBookService
 					await _fileService.DeleteFile(book.ImageBookCoverPath);
 
 				book.ImageBookCoverPath = await _fileService.AddFile(request.ImageBookCover, FileFoldersName.BooksImageCover);
+			}
+			else if (!string.IsNullOrEmpty(newPathCover))
+			{
+				book.ImageBookCoverPath = newPathCover;
 			}
 
 			_unitOfWork.Books.Update(book);
@@ -403,14 +407,14 @@ public class BookService : IBookService
 				PricePhysical = model.PricePhysical,
 				PricePDF = model.PricePdf,
 				PricePDFPerDay = book.PricePDFPerDay,
-				ImageBookCover = model.CoverImage,
 				CategoryID = model.CategoryId,
 				BookID = book.Id,
 				HasPDF = book.HasPDF,
 				IsBorrowable = book.IsBorrowable,
 				Stock = book.Stock,
 			};
-			await UpdateBook(book.Id, data);
+			
+			await UpdateBook(book.Id, data,model.ExistingCoverImage);
 		}
 	}
 

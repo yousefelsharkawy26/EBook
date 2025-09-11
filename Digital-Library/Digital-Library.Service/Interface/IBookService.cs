@@ -11,7 +11,7 @@ namespace Digital_Library.Service.Interface
 	{
 		Task<Response> AddBook(BookRequest request, string vendorId);
 
-		Task<Response> UpdateBook(string bookId, UpdateBookRequest request);
+		Task<Response> UpdateBook(string bookId, UpdateBookRequest request, string newPathCover = null);
 
 		Task<Response> DeleteBook(string bookId);
 
