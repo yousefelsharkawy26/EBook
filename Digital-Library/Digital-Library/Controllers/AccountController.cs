@@ -8,84 +8,95 @@ using System.Threading.Tasks;
 
 namespace Digital_Library.Controllers
 {
-    public class AccountController : Controller
-    {
-        private readonly UserManager<User> _userManager;
-        private readonly IFileService _fileService;
-        private readonly IAuthService _authService;
+	public class AccountController : Controller
+	{
+		private readonly UserManager<User> _userManager;
+		private readonly IFileService _fileService;
+		private readonly IAuthService _authService;
 
-        public AccountController(UserManager<User> userManager, 
-                                IFileService fileService, 
-                                IAuthService authService)
-        {
-            _userManager = userManager;
-            _fileService = fileService;
-            _authService = authService;
-        }
+		public AccountController(UserManager<User> userManager,
+																										IFileService fileService,
+																										IAuthService authService)
+		{
+			_userManager = userManager;
+			_fileService = fileService;
+			_authService = authService;
+		}
 
-        public async Task<IActionResult> Profile()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) 
-                return NotFound();
+		[HttpGet]
+		public IActionResult Login(string? returnUrl = null)
+		{
+			return RedirectToAction("Login", "Auth", new { returnUrl });
+		}
 
-            var model = new UserProfileViewModel()
-            {
-                Id = user.Id,
-                Email = user.Email,
-                FullName = user.FullName,
-                ImageUrl = user.ImageUrl,
-            };
+		[HttpGet]
+		public IActionResult AccessDenied()
+		{
+			return View();
+		}
+		public async Task<IActionResult> Profile()
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null)
+				return NotFound();
 
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Profile(UserProfileViewModel model, IFormFile file)
-        {
-            var user = await _userManager.FindByIdAsync(model.Id);
-            user.FullName = model.FullName;
-            var isEmailUpdate = false;
-            if (user.Email != model.Email)
-            {
-                user.Email = model.Email;
-                isEmailUpdate = true;
-            }
-
-            var imageUrl = await _fileService.UpdateFile(file, user.ImageUrl ?? "", FileFoldersName.UserProfileImage);
-
-            user.ImageUrl = imageUrl;
-            model.ImageUrl = imageUrl;
-
-            var res = await _userManager.UpdateAsync(user);
-
-            if (res.Succeeded)
-            {
-                if (isEmailUpdate) 
-                    await _authService.VerifyEmailAsync(user.Id, await _userManager.GenerateEmailConfirmationTokenAsync(user));
-
-                ViewBag.IsSucess = true;
-                ViewBag.IsFaild = false;
-
-                return View(model);
-            }
-
-            ViewBag.IsFaild = true;
-            ViewBag.IsSucess = false;
-
-            return View(model);
-        }
+			var model = new UserProfileViewModel()
+			{
+				Id = user.Id,
+				Email = user.Email,
+				FullName = user.FullName,
+				ImageUrl = user.ImageUrl,
+			};
 
 
-        public async Task<IActionResult> Edit()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return NotFound();
+			return View(model);
+		}
 
-            return View(user);
-        }
+		[HttpPost]
+		public async Task<IActionResult> Profile(UserProfileViewModel model, IFormFile file)
+		{
+			var user = await _userManager.FindByIdAsync(model.Id);
+			user.FullName = model.FullName;
+			var isEmailUpdate = false;
+			if (user.Email != model.Email)
+			{
+				user.Email = model.Email;
+				isEmailUpdate = true;
+			}
 
-    }
+			var imageUrl = await _fileService.UpdateFile(file, user.ImageUrl ?? "", FileFoldersName.UserProfileImage);
+
+			user.ImageUrl = imageUrl;
+			model.ImageUrl = imageUrl;
+
+			var res = await _userManager.UpdateAsync(user);
+
+			if (res.Succeeded)
+			{
+				if (isEmailUpdate)
+					await _authService.VerifyEmailAsync(user.Id, await _userManager.GenerateEmailConfirmationTokenAsync(user));
+
+				ViewBag.IsSucess = true;
+				ViewBag.IsFaild = false;
+
+				return View(model);
+			}
+
+			ViewBag.IsFaild = true;
+			ViewBag.IsSucess = false;
+
+			return View(model);
+		}
+
+
+		public async Task<IActionResult> Edit()
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null)
+				return NotFound();
+
+			return View(user);
+		}
+
+	}
 }

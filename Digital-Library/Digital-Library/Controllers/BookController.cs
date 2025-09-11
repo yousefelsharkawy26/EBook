@@ -411,7 +411,5 @@ namespace Digital_Library.Controllers
 			return PhysicalFile(filePath, "application/pdf", fileName);
 		}
 
-
-
 	}
 }

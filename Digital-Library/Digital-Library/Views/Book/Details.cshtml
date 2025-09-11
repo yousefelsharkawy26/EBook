@@ -295,7 +295,8 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify(request)
         })
         .then(async res => {
-            const data = await res.json().catch(() => ({ success: false, message: 'Unexpected response' }));
+              const data = await res.json().catch(() => {window.location.href = "/Auth/Login";
+  });
             return { ok: res.ok, data };
         })
         .then(({ ok, data }) => {
@@ -312,7 +313,8 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .catch(err => {
             console.error("Error:", err);
-            messageBox.innerHTML = `<div class="alert alert-danger">⚠️ Unexpected error</div>`;
+              window.location.href = "/Auth/Login";
+
         })
         .finally(() => {
             confirmBtn.disabled = false;

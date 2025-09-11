@@ -34,20 +34,7 @@ namespace Digital_Library.Controllers
 			}
 			return View(cartItems.Data as Cart);
 		}
-
-		//[HttpPost("AddItem")]
-		//public async Task<IActionResult> AddItem([FromBody] CartDetailRequest request)
-		//{
-		//	var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-		//	if (userId == null) return Unauthorized();
-
-		//	var result = await cartService.AddItemAsync(userId, request);
-		//	return Json(result);
-		//}
-		//new one when add in book details
-
 		[HttpPost("AddItem")]
-		[Authorize]
 		public async Task<IActionResult> AddItem([FromBody] CartDetailRequest request)
 		{
 			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

@@ -499,4 +499,70 @@
   </div>
  </div>
 </section>
-```
+@* <-- (ضع هذا الجزء في نهاية الملف، بعد كل الـ HTML الموجود عندك) --> *@
+
+@section Scripts {
+ <script>
+  document.addEventListener("DOMContentLoaded", function () {
+      const filterForm = document.getElementById("filterForm");
+      if (!filterForm) return;
+
+      // زر Apply Filters داخل الفورم
+      const applyBtn = filterForm.querySelector('button[type="submit"]');
+
+      // كل الحقول ذات الاسم داخل الفورم (inputs & selects)
+      const inputs = Array.from(filterForm.querySelectorAll('input[name], select[name], textarea[name]'))
+          .filter(el => !!el.name);
+
+      // خزن القيم الابتدائية
+      const initialValues = {};
+      inputs.forEach(el => initialValues[el.name] = el.value ?? "");
+
+      // إزالة أي onchange inline داخل الـ filterForm (عشان نمنع auto-submit الموجود في attributes)
+      filterForm.querySelectorAll('[onchange]').forEach(el => {
+          // نزل الـ attribute بس علشان ما نغيرش الـ HTML في الملف
+          el.removeAttribute('onchange');
+      });
+
+      // دالة تتحقق هل أي قيمة اختلفت عن القيمة الابتدائية
+      function isAnyChanged() {
+          return inputs.some(el => {
+              const cur = (el.value ?? "");
+              const init = (initialValues[el.name] ?? "");
+              return cur !== init;
+          });
+      }
+
+      // تحديث حالة زر Apply
+      function updateApplyState() {
+          if (!applyBtn) return;
+          const changed = isAnyChanged();
+          applyBtn.disabled = !changed;
+      }
+
+      // ربط الأحداث
+      inputs.forEach(el => {
+          el.addEventListener("change", updateApplyState);
+          el.addEventListener("input", updateApplyState);
+      });
+
+      // الحالة الابتدائية (لو مافيش أي تغيير نخلي الزر معطّل)
+      updateApplyState();
+
+      // عند إرسال الفورم: عطل الزر واظهر مؤشر تحميل بسيط
+      filterForm.addEventListener("submit", function (e) {
+          if (!applyBtn) return;
+          applyBtn.disabled = true;
+
+          // حفظ النص الأصلي لعرضه بعد إرسال الصفحة (لو لازمت)
+          applyBtn.dataset.origHtml = applyBtn.innerHTML;
+
+          // وضع spinner ونص اختياري (يتحكم فيه الـ Bootstrap إذا موجود)
+          applyBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Applying...';
+      });
+
+      // إذا المستخدم نقر "Clear Filters" (رابط يعيد الصفحة)، لازم الزر يرجع لحالته بعد التحميل
+      // هذا الجزء سيعمل بعد إعادة التحميل التلقائي (ولا يغيّر سلوك Clear link نفسه).
+  });
+ </script>
+}

@@ -22,27 +22,26 @@ namespace Digital_Library
 			{
 				option.UseSqlServer(builder.Configuration.GetConnectionString("DevConn"));
 			});
-            #endregion
+			#endregion
 
-            //add on detail cart
-            builder.Services.AddControllersWithViews()
-                    .AddJsonOptions(options =>
-                    {
-                        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-                        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                    });
+			builder.Services.AddControllersWithViews()
+											.AddJsonOptions(options =>
+											{
+												options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+												options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+											});
 
-            builder.Services.Configure<SecurityStampValidatorOptions>(options =>
-            {
-                options.ValidationInterval = TimeSpan.Zero;
-            });
+			builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+			{
+				options.ValidationInterval = TimeSpan.Zero;
+			});
 
 
-            #region Dependency injections
+			#region Dependency injections
 
-            builder.Services.Add_Module_Infrastructure_Dependencies()
-							.Add_Module_Service_Dependencies()
-							.Add_Module_Configuration_Services(builder.Configuration);
+			builder.Services.Add_Module_Infrastructure_Dependencies()
+.Add_Module_Service_Dependencies()
+.Add_Module_Configuration_Services(builder.Configuration);
 
 			#endregion
 
