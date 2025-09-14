@@ -53,11 +53,9 @@ namespace Digital_Library.Controllers
 			}
 			catch (Exception ex)
 			{
-				// log ex
 				return StatusCode(500, new { success = false, message = "Server error: " + ex.Message });
 			}
 		}
-
 
 		[HttpGet("Remove")]
 		public async Task<IActionResult> Remove(string cartDetailId)

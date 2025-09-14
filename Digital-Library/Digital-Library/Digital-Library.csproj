@@ -27,10 +27,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\BooksImage\" />
-    <Folder Include="wwwroot\BooksPdf\" />
+    <Folder Include="Files\" />
     <Folder Include="wwwroot\UserProfileImage\" />
-    <Folder Include="wwwroot\VendorIdentification\" />
   </ItemGroup>
 
   <ItemGroup>

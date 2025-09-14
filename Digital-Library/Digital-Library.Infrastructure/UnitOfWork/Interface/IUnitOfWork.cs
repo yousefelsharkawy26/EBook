@@ -6,7 +6,6 @@ public interface IUnitOfWork : IDisposable
 {
 	IBaseRepository<User> Users {  get; }
 	IBaseRepository<Book> Books {  get; }
-	IBaseRepository<Borrowing> Borrowings {  get; }
 	IBaseRepository<Cart> Carts {  get; }
 	IBaseRepository<CartDetail> CartDetails {  get; }
 	IBaseRepository<Category> Categories {  get; }
@@ -15,7 +14,7 @@ public interface IUnitOfWork : IDisposable
 	IBaseRepository<OrderHeader> OrderHeaders {  get; }
 	IBaseRepository<Transaction> Transactions {  get; }
 	IBaseRepository<Vendor> Vendors {  get; }
-	IBaseRepository<UserPdfBook> UserPdfBooks {  get; }
+	IBaseRepository<UserBookAccess> UserBookAccesses {  get; }
 	IBaseRepository<VendorIdentityImagesUrl> VendorIdentityImagesUrls { get; }
 
 

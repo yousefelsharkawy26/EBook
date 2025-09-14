@@ -4,18 +4,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Digital_Library.Core.Models;
 
-public class User: IdentityUser
+public class User : IdentityUser
 {
-    [Required]
-    public string FullName { get; set; }
-    public string? ImageUrl { get; set; }
-    public DateTime CreationDate { get; set; } = DateTime.UtcNow;
-    public Cart? Cart { get; set; }
-    public Vendor? Vendor { get; set; }
-
-    public ICollection<Borrowing>? borrowings { get; set; }
-    public ICollection<Order>? Orders { get; set; }
-    public ICollection<UserPdfBook>? userPdfBooks { get; set; }
+	[Required]
+	public string FullName { get; set; }
+	public string? ImageUrl { get; set; }
+	public DateTime CreationDate { get; set; } = DateTime.UtcNow;
+	public Cart? Cart { get; set; }
+	public Vendor? Vendor { get; set; }
+	public byte[]? PublicKey { get; set; }
+	public ICollection<Order>? Orders { get; set; }
+	public ICollection<UserBookAccess>? UserBookAccesses { get; set; }
 
 }
 

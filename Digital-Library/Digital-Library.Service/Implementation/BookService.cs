@@ -2,6 +2,7 @@
 using Digital_Library.Core.Enums;
 using Digital_Library.Core.Filters;
 using Digital_Library.Core.Models;
+using Digital_Library.Core.Services;
 using Digital_Library.Core.ViewModels;
 using Digital_Library.Core.ViewModels.Requests;
 using Digital_Library.Core.ViewModels.Responses;
@@ -18,14 +19,19 @@ public class BookService : IBookService
 	private readonly IUnitOfWork _unitOfWork;
 	private readonly IFileService _fileService;
 	private readonly ILogger<BookService> _logger;
+	private readonly VendorPdfEncryption _pdfEncryptionService;
+
 
 	public BookService(IUnitOfWork unitOfWork,
-					   IFileService fileService,
-					   ILogger<BookService> logger)
+								IFileService fileService,
+								ILogger<BookService> logger,
+									VendorPdfEncryption pdfEncryptionService)
 	{
 		_unitOfWork = unitOfWork;
 		_fileService = fileService;
 		_logger = logger;
+		_pdfEncryptionService = pdfEncryptionService;
+
 	}
 
 	public async Task<Response> AddBook(BookRequest request, string vendorId)
@@ -34,18 +40,30 @@ public class BookService : IBookService
 		{
 			var category = await _unitOfWork.Categories.GetByIdAsync(request.CategoryID);
 			if (category == null)
-				return Response.Fail("Invalid Category ID.");
-
-			string? pdfPath = null;
-			if (request.PDFFile != null)
-			{
-				pdfPath = await _fileService.AddFile(request.PDFFile, FileFoldersName.BooksPdf);
-			}
+				return Response.Fail("Invalid Category");
 
 			string? coverPath = null;
 			if (request.ImageBookCover != null)
 			{
 				coverPath = await _fileService.AddFile(request.ImageBookCover, FileFoldersName.BooksImageCover);
+			}
+
+			string? pdfPath = null;
+			byte[]? iv = null;
+			byte[]? tag = null;
+
+			if (request.PDFFile != null)
+			{
+
+				var encryptedFileName = Path.GetFileNameWithoutExtension(request.PDFFile.FileName) + ".enc";
+
+				var outputPath = Path.Combine(await _fileService.GetFolderPath(FileFoldersName.BooksPdf), encryptedFileName);
+
+				var encryptionResult = await _pdfEncryptionService.EncryptFileAsync(request.PDFFile, outputPath);
+
+				pdfPath = outputPath; 
+				iv = encryptionResult.IV;
+				tag = encryptionResult.Tag;
 			}
 
 			var book = new Book
@@ -61,8 +79,10 @@ public class BookService : IBookService
 				IsBorrowable = request.IsBorrowable,
 				CategoryID = request.CategoryID,
 				VendorId = vendorId,
+				ImageBookCoverPath = coverPath,
 				PDFFilePath = pdfPath,
-				ImageBookCoverPath = coverPath
+				PDFIV = iv,
+				PDFTag = tag
 			};
 
 			await _unitOfWork.Books.AddAsync(book);
@@ -78,6 +98,8 @@ public class BookService : IBookService
 		}
 	}
 
+
+
 	public async Task<Response> DeleteBook(string bookId)
 	{
 		try
@@ -87,7 +109,7 @@ public class BookService : IBookService
 				return Response.Fail("Book not found.");
 
 			if (!string.IsNullOrEmpty(book.PDFFilePath))
-				await _fileService.DeleteFile(book.PDFFilePath);
+				await _fileService.DeleteFile(book.PDFFilePath, StorageType.Private);
 
 			if (!string.IsNullOrEmpty(book.ImageBookCoverPath))
 				await _fileService.DeleteFile(book.ImageBookCoverPath);
@@ -101,7 +123,7 @@ public class BookService : IBookService
 		catch (Exception ex)
 		{
 			_logger.LogError(ex, "Error while deleting book {BookId}", bookId);
-			return Response.Fail("An error occurred while deleting the book.");
+			return Response.Fail("Can Not Delete Book");
 		}
 	}
 
@@ -125,7 +147,7 @@ public class BookService : IBookService
 		return Response.Ok("Book retrieved successfully", book);
 	}
 
-	public async Task<Response> UpdateBook(string bookId, UpdateBookRequest request,string newPathCover=null)
+	public async Task<Response> UpdateBook(string bookId, UpdateBookRequest request, string newPathCover = null)
 	{
 		try
 		{
@@ -146,11 +168,21 @@ public class BookService : IBookService
 
 			if (request.PDFFile != null)
 			{
-				if (!string.IsNullOrEmpty(book.PDFFilePath))
-					await _fileService.DeleteFile(book.PDFFilePath);
 
-				book.PDFFilePath = await _fileService.AddFile(request.PDFFile, FileFoldersName.BooksPdf);
+				if (!string.IsNullOrEmpty(book.PDFFilePath))
+					await _fileService.DeleteFile(book.PDFFilePath, StorageType.Private);
+
+				var encryptedFileName = Path.GetFileNameWithoutExtension(request.PDFFile.FileName) + ".enc";
+
+				var outputPath = Path.Combine(await _fileService.GetFolderPath(FileFoldersName.BooksPdf), encryptedFileName);
+
+				var encryptionResult = await _pdfEncryptionService.EncryptFileAsync(request.PDFFile, outputPath);
+				book.PDFIV = encryptionResult.IV;
+				book.PDFTag = encryptionResult.Tag;
+				book.PDFFilePath = outputPath;
+
 			}
+
 
 			if (request.ImageBookCover != null)
 			{
@@ -199,7 +231,7 @@ public class BookService : IBookService
 	}
 
 	public async Task<(IEnumerable<Book> Books, int TotalCount)> GetPagedBooksAsync(
-	   string vendorId, int page, int pageSize, BookFilter? filter = null)
+				string vendorId, int page, int pageSize, BookFilter? filter = null)
 	{
 		_logger.LogInformation(
 			"Start GetPagedBooks with vendorId={VendorId}, page={Page}, pageSize={PageSize}, filter={@Filter}",
@@ -278,35 +310,21 @@ public class BookService : IBookService
 
 	public async Task<PagedResult<UserBookDto>> GetUserBooksAsync(string userId, int pageNumber, int pageSize)
 	{
-		var pdfBooks = _unitOfWork.UserPdfBooks
-						.GetManyQuery(upb => upb.UserId == userId)
-						.Select(upb => new UserBookDto
+		var userBookAccesses = _unitOfWork.UserBookAccesses
+						.GetManyQuery(uba => uba.UserId == userId, includes: new Expression<Func<UserBookAccess, object>>[] { uba => uba.Book })
+						.Select(uba => new UserBookDto
 						{
-							BookId = upb.Book.Id,
-							Title = upb.Book.Title,
-							Author = upb.Book.Author,
-							Type = FormatType.PDF,
-							ImageBookCoverPath = upb.Book.ImageBookCoverPath,
-							BorrowedUntil = null
+							BookId = uba.Book.Id,
+							Title = uba.Book.Title,
+							Author = uba.Book.Author,
+							Type = uba.DueDate.HasValue ? FormatType.Borrowing : FormatType.PDF,
+							ImageBookCoverPath = uba.Book.ImageBookCoverPath,
+							BorrowedUntil = uba.DueDate
 						});
 
-		var borrowedBooks = _unitOfWork.Borrowings
-						.GetManyQuery(b => b.UserId == userId)
-						.Select(b => new UserBookDto
-						{
-							BookId = b.Book.Id,
-							Title = b.Book.Title,
-							Author = b.Book.Author,
-							Type = FormatType.Borrowing,
-							ImageBookCoverPath = b.Book.ImageBookCoverPath,
-							BorrowedUntil = b.DueDate
-						});
+		var totalCount = await userBookAccesses.CountAsync();
 
-		var query = pdfBooks.Union(borrowedBooks);
-
-		var totalCount = await query.CountAsync();
-
-		var items = await query
+		var items = await userBookAccesses
 						.Skip((pageNumber - 1) * pageSize)
 						.Take(pageSize)
 						.ToListAsync();
@@ -318,17 +336,6 @@ public class BookService : IBookService
 			PageNumber = pageNumber,
 			PageSize = pageSize
 		};
-	}
-
-	public async Task<UserBookAccessType> GetUserBookAccessAsync(string userId, string bookId)
-	{
-		if (await _unitOfWork.Borrowings.GetManyQuery(b => b.UserId == userId && b.BookId == bookId).AnyAsync())
-			return UserBookAccessType.Borrowed;
-
-		if (await _unitOfWork.UserPdfBooks.GetManyQuery(upb => upb.UserId == userId && upb.BookId == bookId).AnyAsync())
-			return UserBookAccessType.Purchased;
-
-		return UserBookAccessType.None;
 	}
 
 	public async Task<IEnumerable<BookSummaryViewModel>> GetAllBooksAsync()
@@ -364,7 +371,7 @@ public class BookService : IBookService
 			VendorId = book.VendorId,
 			Categories = await GetCategoriesSelectList(),
 			Vendors = await GetVendorsSelectList(),
-			ExistingCoverImage=book.ImageBookCoverPath
+			ExistingCoverImage = book.ImageBookCoverPath
 		};
 		return viewModel;
 	}
@@ -413,8 +420,8 @@ public class BookService : IBookService
 				IsBorrowable = book.IsBorrowable,
 				Stock = book.Stock,
 			};
-			
-			await UpdateBook(book.Id, data,model.ExistingCoverImage);
+
+			await UpdateBook(book.Id, data, model.ExistingCoverImage);
 		}
 	}
 
@@ -436,5 +443,6 @@ public class BookService : IBookService
 			.Select(v => new SelectListItem { Value = v.Id, Text = $"{v.LibraryName} ({v.User.FullName})" })
 			.ToListAsync();
 	}
+
 }
 

@@ -968,11 +968,13 @@ select#input-sort {
   text-align: right;
   cursor: pointer;
 }
-
+.text-muted {
+ color: #413b3d !important;
+}
 /* 5.1 Single Product Page
 /*----------------------------------------------*/
-.thumb-swiper .swiper-slide{
-  height: auto;
+.thumb-swiper .swiper-slide {
+ height: auto;
 }
 .swiper-slide-thumb-active img{
   border: var(--bs-border-width) var(--bs-border-style) var(--primary-color) !important;

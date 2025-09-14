@@ -22,24 +22,24 @@ public class VendorService : IVendorService
 	private readonly ILogger<VendorService> _logger;
 	private readonly IEmailSender _emailSender;
 	private readonly UserManager<User> userManager;
-    private readonly IConfiguration _config;
+	private readonly IConfiguration _config;
 
-    public VendorService(IUnitOfWork unitOfWork,
-        IFileService fileService,
-        ILogger<VendorService> logger,
-        IEmailSender emailSender,
-        UserManager<User> userManager,
-        IConfiguration config)
-    {
-        _unitOfWork = unitOfWork;
-        _fileService = fileService;
-        _logger = logger;
-        _emailSender = emailSender;
-        this.userManager = userManager;
-        _config = config;
-    }
+	public VendorService(IUnitOfWork unitOfWork,
+					IFileService fileService,
+					ILogger<VendorService> logger,
+					IEmailSender emailSender,
+					UserManager<User> userManager,
+					IConfiguration config)
+	{
+		_unitOfWork = unitOfWork;
+		_fileService = fileService;
+		_logger = logger;
+		_emailSender = emailSender;
+		this.userManager = userManager;
+		_config = config;
+	}
 
-    public async Task<Response> SubmitVendorRequestAsync(VendorRequest request, string userId)
+	public async Task<Response> SubmitVendorRequestAsync(VendorRequest request, string userId)
 	{
 		try
 		{
@@ -61,7 +61,7 @@ public class VendorService : IVendorService
 			{
 				foreach (var img in request.IdentityImages)
 				{
-					var imgPath = await _fileService.AddFile(img, FileFoldersName.VendorIdentification);
+					var imgPath = await _fileService.AddFile(img, FileFoldersName.VendorIdentification, StorageType.Private);
 					identityImageUrls.Add(new VendorIdentityImagesUrl { ImageUrl = imgPath });
 				}
 			}
@@ -187,7 +187,7 @@ public class VendorService : IVendorService
 																									$"<p>Your vendor request for '<strong>{vendor.LibraryName}</strong>' has been <strong>approved</strong>.</p>" +
 																									"<p>Thank you.</p>";
 
-				 _emailSender.SendEmailAsync(vendor.User!.Email, "Vendor Request Approved", htmlMessage);
+				_emailSender.SendEmailAsync(vendor.User!.Email, "Vendor Request Approved", htmlMessage);
 				_unitOfWork.Vendors.Update(vendor);
 			}
 			else if (status == VendorStatus.Rejected)
@@ -198,7 +198,7 @@ public class VendorService : IVendorService
 					await _fileService.DeleteFile(img.ImageUrl);
 					_unitOfWork.VendorIdentityImagesUrls.Delete(img);
 				}
-				var roles	= await userManager.GetRolesAsync(vendor.User!);
+				var roles = await userManager.GetRolesAsync(vendor.User!);
 				if (roles.Contains(Roles.Vendor))
 				{
 					var roleResult = await userManager.RemoveFromRoleAsync(vendor.User!, Roles.Vendor);
@@ -227,38 +227,39 @@ public class VendorService : IVendorService
 
 	public async Task<Response> ReturnVendorIdFromUserId(string userId)
 	{
-		var vendor =  await _unitOfWork.Vendors.GetSingleAsync(v => v.UserId == userId);
+		var vendor = await _unitOfWork.Vendors.GetSingleAsync(v => v.UserId == userId);
 		if (vendor == null)
 			return Response.Fail("Vendor not found.");
 
 		return Response.Ok("Vendor found.", vendor.Id);
 	}
 
-    public async Task<IEnumerable<VendorViewModel>> GetVendorsDetailsAsync()
-    {
-        var vendors = await GetVendorsAsync(Core.Enums.VendorStatus.Pending);
+	public async Task<IEnumerable<VendorViewModel>> GetVendorsDetailsAsync()
+	{
+		var vendors = await GetVendorsAsync(Core.Enums.VendorStatus.Pending);
 
-        var vendorViewModels = vendors.Select(v => new VendorViewModel
-        {
-            Id = v.Id,
-            FullName = v.User?.FullName,
-            Email = v.User?.Email,
-            LibraryName = v.LibraryName,
-            City = v.City,
-            State = v.State,
-            ZipCode = v.ZipCode,
-            ContactNumber = v.ContactNumber,
-            WalletBalance = v.WalletBalance,
-            Status = v.Status.ToString(),
-            SubmittedAt = v.SubmittedAt,
-            ReviewedAt = v.ReviewedAt,
-            ImageBaseUrl = _config["Digital-Library-Url"]!,
-            // ====> قم بتعبئة قائمة روابط الصور هنا <====
-            // نقوم بتحويل قائمة الكائنات إلى قائمة نصوص (URLs)
-            IdentityImageUrls = v.VendorIdentityImagesUrls?.Select(i => i.ImageUrl).ToList() ?? new List<string>()
-
-        }).ToList();
+		var vendorViewModels = vendors.Select(v => new VendorViewModel
+		{
+			Id = v.Id,
+			FullName = v.User?.FullName ?? "N/A",
+			Email = v.User?.Email ?? "N/A",
+			LibraryName = v.LibraryName,
+			City = v.City,
+			State = v.State,
+			ZipCode = v.ZipCode,
+			ContactNumber = v.ContactNumber,
+			WalletBalance = v.WalletBalance,
+			Status = v.Status.ToString(),
+			SubmittedAt = v.SubmittedAt,
+			ReviewedAt = v.ReviewedAt,
+			ImageBaseUrl = _config["Digital-Library-Url"]!,
+			IdentityImageUrls = v.VendorIdentityImagesUrls?.Select(i =>
+							$"api/File/photo?fileName={i.ImageUrl}")
+										.ToList()
+										?? new List<string>()
+		});
 
 		return vendorViewModels;
-    }
+	}
+
 }

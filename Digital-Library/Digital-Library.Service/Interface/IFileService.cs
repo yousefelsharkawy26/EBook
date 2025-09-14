@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Digital_Library.Core.Constant;
+using Digital_Library.Core.Enums;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +11,10 @@ namespace Digital_Library.Service.Interface
 {
 	public interface IFileService
 	{
-		Task<string> AddFile(IFormFile file, string FolderName);
-		Task<bool> DeleteFile(string fileName);
-		Task<byte[]> GetFile(string fileName);
-		Task<bool> FileExists(string fileName);
-		Task<IEnumerable<string>> GetFilesInFolder(string folderName);
-		Task<string> UpdateFile(IFormFile file, string existingFileName, string folderName);
-		Task<IFormFile?> GetFormFile(string fileName, string contentType);
-    }
+		Task<string> AddFile(IFormFile file, string folderName, StorageType storageType = StorageType.Public);
+		Task<bool> DeleteFile(string fileName,StorageType storageType = StorageType.Public);
+		Task<string> UpdateFile(IFormFile file, string existingFileName, StorageType storageType = StorageType.Public);
+		Task<string> AddBytes(byte[] fileBytes, string fileName, string folderName, StorageType storageType = StorageType.Public);
+		Task<string> GetFolderPath(string folder);
+	}
 }

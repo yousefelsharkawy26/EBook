@@ -25,7 +25,14 @@ public class Book
 	public bool HasPDF { get; set; }
 	[Required]
 	public bool IsBorrowable { get; set; }
+
 	public string? PDFFilePath { get; set; }
+	[Column(TypeName = "varbinary(16)")]
+	public byte[]? PDFIV { get; set; }
+
+	[Column(TypeName = "varbinary(16)")]
+	public byte[]? PDFTag { get; set; }
+
 	public DateTime UploadDate { get; set; }= DateTime.UtcNow;
 
 	public Category? Category { get; set; }
@@ -33,7 +40,6 @@ public class Book
 	[Required]
 	public string CategoryID { get; set; }
 
-	public ICollection<Borrowing>? Borrowings { get; set; }
 	public ICollection<CartDetail>? CartDetails { get; set; }
 	public ICollection<OrderDetail>? OrderDetails { get; set; }
 
@@ -41,7 +47,8 @@ public class Book
 	[ForeignKey(nameof(Vendor))]
 	[Required]
 	public string VendorId { get; set; }
-	public ICollection<UserPdfBook>? userPdfBooks { get; set; }
+	public ICollection<UserBookAccess>? UserBookAccesses { get; set; }
+
 
 
 

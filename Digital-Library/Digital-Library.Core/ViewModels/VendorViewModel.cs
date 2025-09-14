@@ -14,9 +14,6 @@ public class VendorViewModel
     public string Status { get; set; }
     public DateTime SubmittedAt { get; set; }
     public DateTime? ReviewedAt { get; set; }
-
-    // ====> الخاصية الجديدة التي تمت إضافتها <====
-    // هذه قائمة بسيطة من النصوص، لا تسبب أي حلقات
     public List<string> IdentityImageUrls { get; set; } = new List<string>();
     public string ImageBaseUrl { get; set; }
 }

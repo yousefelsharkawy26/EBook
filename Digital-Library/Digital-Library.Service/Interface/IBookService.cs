@@ -23,14 +23,13 @@ namespace Digital_Library.Service.Interface
 
 		Task<(IEnumerable<Book> Books, int TotalCount)> GetPagedBooksAsync(string Vid, int page, int pageSize, BookFilter? filter = null);
 
-		Task<IEnumerable<Book>> GetRelatedBooksAsync( string excludeBookId, int count = 3);
+		Task<IEnumerable<Book>> GetRelatedBooksAsync(string excludeBookId, int count = 3);
 		Task<PagedResult<UserBookDto>> GetUserBooksAsync(string userId, int pageNumber, int pageSize);
-		Task<UserBookAccessType> GetUserBookAccessAsync(string userId, string bookId);
 
-        Task<IEnumerable<BookSummaryViewModel>> GetAllBooksAsync();
-        Task<BookFormViewModel?> GetBookForEditAsync(string bookId);
-        Task<BookFormViewModel> GetBookCreationDataAsync(); // للحصول على بيانات الـ Dropdowns
-        Task CreateBookAsync(BookFormViewModel model);
-        Task UpdateBookAsync(BookFormViewModel model);
-    }
+		Task<IEnumerable<BookSummaryViewModel>> GetAllBooksAsync();
+		Task<BookFormViewModel?> GetBookForEditAsync(string bookId);
+		Task<BookFormViewModel> GetBookCreationDataAsync(); 
+		Task CreateBookAsync(BookFormViewModel model);
+		Task UpdateBookAsync(BookFormViewModel model);
+	}
 }

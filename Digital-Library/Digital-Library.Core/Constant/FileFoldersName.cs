@@ -13,5 +13,7 @@ namespace Digital_Library.Core.Constant
 		public const string BooksImageCover = "BooksImageCover";
 		public const string BooksPdf = "BooksPdf";
 		public const string UserProfileImage = "UserProfileImage";
+		public const string UsersBooksPdf = "UsersBooksPdf";
+
 	}
 }

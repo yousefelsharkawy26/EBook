@@ -27,7 +27,7 @@ namespace Digital_Library.Service.Implementation
 				{
 					CategoryName = request.CategoryName,
 					Description = request.Description,
-					IsApproved = true 
+					IsApproved = true
 				};
 
 				await _unitOfWork.Categories.AddAsync(category);
@@ -50,9 +50,15 @@ namespace Digital_Library.Service.Implementation
 				var category = await _unitOfWork.Categories.GetByIdAsync(categoryId);
 				if (category == null)
 					return Response.Fail("Category not found.");
-
+				if (category.CategoryName!=request.CategoryName)
+				{
 				category.CategoryName = request.CategoryName;
-				category.Description = request.Description;
+
+				}
+				if (category.Description != request.Description)
+				{
+					category.Description = request.Description;
+				}
 
 				_unitOfWork.Categories.Update(category);
 				await _unitOfWork.SaveChangesAsync();
@@ -112,11 +118,10 @@ namespace Digital_Library.Service.Implementation
 
 		public async Task<IEnumerable<Category>> GetAllCategories()
 		{
-			var categories =  _unitOfWork.Categories.GetAllQuery();
+			var categories = _unitOfWork.Categories.GetAllQuery();
 			_logger.LogInformation("Retrieved {Count} categories", categories.Count());
 			return await categories.OrderBy(o => o.CategoryName).ToListAsync();
 		}
-
 	}
 }
 

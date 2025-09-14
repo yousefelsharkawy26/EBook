@@ -70,7 +70,7 @@ public class BooksController : Controller
 			content.Add(fileContent, "file", model.CoverImage.FileName);
 			content.Add(new StringContent(model.ExistingCoverImage ?? ""), "oldNameFile");
 
-			var response = await _httpClient.PostAsync("api/Upload/upload", content);
+			var response = await _httpClient.PostAsync("api/File/upload", content);
 
 			if (response.IsSuccessStatusCode)
 			{

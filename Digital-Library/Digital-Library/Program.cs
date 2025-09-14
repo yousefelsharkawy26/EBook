@@ -1,6 +1,8 @@
+using Digital_Library.Core.Services;
 using Digital_Library.Infrastructure;
 using Digital_Library.Infrastructure.Context;
 using Digital_Library.Service;
+using Digital_Library.Service.Helpers;
 using Digital_Library.Service.Implementation;
 using Digital_Library.Service.Interface;
 using Digital_Library.Service.Seed;
@@ -35,6 +37,11 @@ namespace Digital_Library
 			{
 				options.ValidationInterval = TimeSpan.Zero;
 			});
+
+			builder.Services.AddSingleton(new VendorPdfEncryption(
+				builder.Configuration["Encryption:PdfKey"]
+));
+			builder.Services.AddSingleton(new UserPdfEncryptionService());
 
 
 			#region Dependency injections

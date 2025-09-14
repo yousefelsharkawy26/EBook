@@ -11,7 +11,7 @@ namespace Digital_Library.Infrastructure.UnitOfWork.Implementation
 		public EBookContext _context { get; }
 		public IBaseRepository<User> Users { get; }
 		public IBaseRepository<Book> Books { get; }
-		public IBaseRepository<Borrowing> Borrowings { get; }
+		public IBaseRepository<UserBookAccess> UserBookAccesses { get; }
 		public IBaseRepository<Cart> Carts { get; }
 		public IBaseRepository<CartDetail> CartDetails { get; }
 		public IBaseRepository<Category> Categories { get; }
@@ -20,7 +20,6 @@ namespace Digital_Library.Infrastructure.UnitOfWork.Implementation
 		public IBaseRepository<OrderHeader> OrderHeaders { get; }
 		public IBaseRepository<Transaction> Transactions { get; }
 		public IBaseRepository<Vendor> Vendors { get; }
-		public IBaseRepository<UserPdfBook> UserPdfBooks { get; }
 		public IBaseRepository<VendorIdentityImagesUrl> VendorIdentityImagesUrls { get; }
 
 
@@ -29,7 +28,7 @@ namespace Digital_Library.Infrastructure.UnitOfWork.Implementation
 			_context = context;
 			Users = new BaseRepository<User>(_context);
 			Books = new BaseRepository<Book>(_context);
-			Borrowings = new BaseRepository<Borrowing>(_context);
+			UserBookAccesses = new BaseRepository<UserBookAccess>(_context);
 			Carts = new BaseRepository<Cart>(_context);
 			Categories = new BaseRepository<Category>(_context);
 			Orders = new BaseRepository<Order>(_context);
@@ -38,7 +37,6 @@ namespace Digital_Library.Infrastructure.UnitOfWork.Implementation
 			Vendors = new BaseRepository<Vendor>(_context);
 			CartDetails = new BaseRepository<CartDetail>(_context);
 			OrderHeaders = new BaseRepository<OrderHeader>(_context);
-			UserPdfBooks= new BaseRepository<UserPdfBook>(_context);
 			VendorIdentityImagesUrls = new BaseRepository<VendorIdentityImagesUrl>(_context);
 
 		}

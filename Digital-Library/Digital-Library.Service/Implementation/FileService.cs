@@ -9,8 +9,11 @@ using System.Threading.Tasks;
 
 namespace Digital_Library.Service.Implementation
 {
-	using Microsoft.AspNetCore.Http;
+	using Digital_Library.Core.Constant;
+	using Digital_Library.Core.Enums;
 	using Microsoft.AspNetCore.Hosting;
+	using Microsoft.AspNetCore.Http;
+	using Microsoft.Extensions.Hosting;
 	using System;
 	using System.Collections.Generic;
 	using System.IO;
@@ -19,40 +22,60 @@ namespace Digital_Library.Service.Implementation
 
 	public class FileService : IFileService
 	{
-		private readonly IWebHostEnvironment _webHostEnvironment;
+		private readonly IWebHostEnvironment _env;
 
-		public FileService(IWebHostEnvironment webHostEnvironment)
+		public FileService(IWebHostEnvironment env)
 		{
-			_webHostEnvironment = webHostEnvironment;
+			_env = env;
 		}
-
-		public async Task<string> AddFile(IFormFile file, string folderName)
+		public async Task<string> GetFolderPath(string folder)
 		{
-			if (file == null || file.Length == 0)
-				return null;
+			string folderPath = Path.Combine(_env.ContentRootPath, "Files", folder);
 
-			folderName = folderName.Trim().Replace("\\", "/");
-			string folderPath = Path.Combine(_webHostEnvironment.WebRootPath, folderName);
 
 			if (!Directory.Exists(folderPath))
 			{
 				Directory.CreateDirectory(folderPath);
 			}
 
+			return folderPath;
+		}
+
+
+		public async Task<string> AddFile(IFormFile file, string folderName, StorageType storageType = StorageType.Public)
+		{
+			if (file == null || file.Length == 0)
+				return null;
+
+			folderName = folderName.Trim().Replace("\\", "/");
+
+			string basePath = storageType == StorageType.Public
+							? Path.Combine(_env.WebRootPath, folderName)
+							: Path.Combine(_env.ContentRootPath, "Files", folderName);
+
+			if (!Directory.Exists(basePath))
+				Directory.CreateDirectory(basePath);
+
 			string uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-			string fullFilePath = Path.Combine(folderPath, uniqueFileName);
+			string fullFilePath = Path.Combine(basePath, uniqueFileName);
 
 			using (var stream = new FileStream(fullFilePath, FileMode.Create))
 			{
 				await file.CopyToAsync(stream);
 			}
-
 			return Path.Combine(folderName, uniqueFileName).Replace("\\", "/");
 		}
 
-		public async Task<bool> DeleteFile(string fileName)
+		public async Task<bool> DeleteFile(string relativePath, StorageType storageType = StorageType.Public)
 		{
-			string filePath = Path.Combine(_webHostEnvironment.WebRootPath, fileName);
+			if (string.IsNullOrEmpty(relativePath))
+				return false;
+
+			string basePath = storageType == StorageType.Public
+							? _env.WebRootPath
+							: Path.Combine(_env.ContentRootPath, "Files");
+
+			string filePath = Path.Combine(basePath, relativePath.Replace("/", Path.DirectorySeparatorChar.ToString()));
 
 			if (File.Exists(filePath))
 			{
@@ -61,66 +84,37 @@ namespace Digital_Library.Service.Implementation
 			}
 
 			await Task.CompletedTask;
-
 			return false;
 		}
 
-		public async Task<byte[]> GetFile(string fileName)
+		public async Task<string> UpdateFile(IFormFile file, string existingRelativePath, StorageType storageType = StorageType.Public)
 		{
-			string filePath = Path.Combine(_webHostEnvironment.WebRootPath, fileName);
+			if (!string.IsNullOrEmpty(existingRelativePath))
+				await DeleteFile(existingRelativePath, storageType);
 
-			if (File.Exists(filePath))
-			{
-				return await File.ReadAllBytesAsync(filePath);
-			}
-
-			return null;
+			string folderName = Path.GetDirectoryName(existingRelativePath)?.Replace("\\", "/") ?? "";
+			return await AddFile(file, folderName, storageType);
 		}
-
-		public async Task<bool> FileExists(string fileName)
+		public async Task<string> AddBytes(byte[] fileBytes, string fileName, string folderName, StorageType storageType = StorageType.Public)
 		{
-			string filePath = Path.Combine(_webHostEnvironment.WebRootPath, fileName);
+			if (fileBytes == null || fileBytes.Length == 0)
+				return null;
 
-			await Task.CompletedTask;
+			folderName = folderName.Trim().Replace("\\", "/");
 
-			return File.Exists(filePath);
-		}
+			string basePath = storageType == StorageType.Public
+																			? Path.Combine(_env.WebRootPath, folderName)
+																			: Path.Combine(_env.ContentRootPath, "Files", folderName);
 
-		public async Task<IEnumerable<string>> GetFilesInFolder(string folderName)
-		{
-			string folderPath = Path.Combine(_webHostEnvironment.WebRootPath, folderName);
+			if (!Directory.Exists(basePath))
+				Directory.CreateDirectory(basePath);
 
-			if (!Directory.Exists(folderPath))
-				return Enumerable.Empty<string>();
+			string uniqueFileName = $"{Guid.NewGuid()}_{fileName}";
+			string fullFilePath = Path.Combine(basePath, uniqueFileName);
 
-			var files = Directory.GetFiles(folderPath)
-									.Select(f => Path.Combine(folderName, Path.GetFileName(f)).Replace("\\", "/"));
+			await File.WriteAllBytesAsync(fullFilePath, fileBytes);
 
-			await Task.CompletedTask;
-
-			return files;
-		}
-
-		public async Task<string> UpdateFile(IFormFile file, string existingFileName, string folderName)
-		{
-			await DeleteFile(existingFileName);
-
-			return await AddFile(file, folderName);
-		}
-
-		public async Task<IFormFile?> GetFormFile(string fileName, string contentType)
-		{
-			var fileBytes = await GetFile(fileName);
-			if (fileBytes != null)
-			{
-				var stream = new MemoryStream(fileBytes);
-				return new FormFile(stream, 0, fileBytes.Length, "file", fileName)
-				{
-					Headers = new HeaderDictionary(),
-					ContentType = contentType
-				};
-			}
-			return null;
+			return Path.Combine(folderName, uniqueFileName).Replace("\\", "/");
 		}
 	}
 

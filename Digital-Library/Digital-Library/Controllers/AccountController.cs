@@ -64,7 +64,7 @@ namespace Digital_Library.Controllers
 				isEmailUpdate = true;
 			}
 
-			var imageUrl = await _fileService.UpdateFile(file, user.ImageUrl ?? "", FileFoldersName.UserProfileImage);
+			var imageUrl = await _fileService.UpdateFile(file, user.ImageUrl ?? "");
 
 			user.ImageUrl = imageUrl;
 			model.ImageUrl = imageUrl;
