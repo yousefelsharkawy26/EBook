@@ -9,37 +9,41 @@ namespace Digital_Library.Service.Helpers
 	public class UserPdfEncryptionService
 	{
 		public async Task<(string EncryptedFilePath, byte[] IV, byte[] Tag, byte[] EncryptedDEK)>
-						EncryptFileAsync(IFormFile file, RSA clientPublicKey, string outputFilePath)
+					EncryptFileAsync(IFormFile file, RSA clientPublicKey, string outputFilePath)
 		{
 			if (file == null || file.Length == 0)
 				throw new ArgumentException("File is null or empty", nameof(file));
 
+			// إنشاء DEK
 			using var dek = Aes.Create();
 			dek.KeySize = 256;
 			dek.GenerateKey();
 
-			byte[] iv = new byte[12]; // IV ثابت الحجم لـ AES-GCM
+			byte[] iv = new byte[12];
 			RandomNumberGenerator.Fill(iv);
 
-			byte[] tag = new byte[16];
-			byte[] buffer = new byte[4 * 1024 * 1024]; // 4MB buffer
-
-			using var aesGcm = new AesGcm(dek.Key);
-			using var inputStream = file.OpenReadStream();
-			using var outputStream = File.Create(outputFilePath);
-
-			int bytesRead;
-			while ((bytesRead = await inputStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+			byte[] fileBytes;
+			using (var ms = new MemoryStream())
 			{
-				byte[] cipherChunk = new byte[bytesRead];
-				aesGcm.Encrypt(iv, buffer.AsSpan(0, bytesRead), cipherChunk, tag);
-				await outputStream.WriteAsync(cipherChunk.AsMemory(0, bytesRead));
+				await file.CopyToAsync(ms);
+				fileBytes = ms.ToArray();
 			}
+
+			byte[] cipherText = new byte[fileBytes.Length];
+			byte[] tag = new byte[16];
+
+			using (var aesGcm = new AesGcm(dek.Key))
+			{
+				aesGcm.Encrypt(iv, fileBytes, cipherText, tag);
+			}
+
+			await File.WriteAllBytesAsync(outputFilePath, cipherText);
 
 			byte[] encryptedDEK = clientPublicKey.Encrypt(dek.Key, RSAEncryptionPadding.OaepSHA256);
 
 			return (outputFilePath, iv, tag, encryptedDEK);
 		}
+
 
 
 

@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <Folder Include="Files\" />
+    <Folder Include="Files\UsersBooksPdf\" />
     <Folder Include="wwwroot\UserProfileImage\" />
   </ItemGroup>
 

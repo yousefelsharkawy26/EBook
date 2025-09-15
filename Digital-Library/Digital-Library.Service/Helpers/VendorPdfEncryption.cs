@@ -6,7 +6,7 @@ namespace Digital_Library.Core.Services
 	public class VendorPdfEncryption
 	{
 		private readonly byte[] _encryptionKey;
-		private const int BufferSize = 4 * 1024 * 1024; // 4 ميجا لكل Chunk
+		private const int BufferSize = 4 * 1024 * 1024; 
 
 		public VendorPdfEncryption(string encryptionKey)
 		{
