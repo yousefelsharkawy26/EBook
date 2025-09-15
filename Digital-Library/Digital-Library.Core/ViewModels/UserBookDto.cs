@@ -7,6 +7,7 @@ public class UserBookDto
 	public string Title { get; set; }
 	public string Author { get; set; }
 	public FormatType Type { get; set; }
+	public string stringType => Type.ToString();
 	public string ImageBookCoverPath { get; set; }
 	public DateTime? BorrowedUntil { get; set; }
 }

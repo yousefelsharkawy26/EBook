@@ -7,7 +7,7 @@
         "Action": "Start"
       },
       {
-        "Path": "Digital-Library.AdminPanel\\Digital-Library.AdminPanel.csproj",
+        "Path": "Digital-Library.PdfViewer\\Digital-Library.PdfViewer.csproj",
         "Action": "Start"
       }
     ]

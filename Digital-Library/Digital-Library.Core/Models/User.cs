@@ -12,7 +12,7 @@ public class User : IdentityUser
 	public DateTime CreationDate { get; set; } = DateTime.UtcNow;
 	public Cart? Cart { get; set; }
 	public Vendor? Vendor { get; set; }
-	public byte[]? PublicKey { get; set; }
+	public string? PublicKey { get; set; }
 	public ICollection<Order>? Orders { get; set; }
 	public ICollection<UserBookAccess>? UserBookAccesses { get; set; }
 

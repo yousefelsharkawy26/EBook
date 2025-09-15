@@ -17,5 +17,5 @@ public interface IOrderService
 
 	Task<Response> UpdateOrderStatusAsync(string orderHeaderId, Status status);
 	Task<(string EncryptedFilePath, byte[] EncryptedDEK, byte[] IV, byte[] Tag)>
-				DecryptAndEncryptForUserAsync(string bookFilePath, byte[] bookIV, byte[] bookTag, byte[] userPublicKey, string outputFolder);
+				DecryptAndEncryptForUserAsync(string bookFilePath, byte[] bookIV, byte[] bookTag, string userPublicKey, string outputFolder);
 }

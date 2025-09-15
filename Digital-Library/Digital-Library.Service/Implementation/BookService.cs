@@ -20,18 +20,19 @@ public class BookService : IBookService
 	private readonly IFileService _fileService;
 	private readonly ILogger<BookService> _logger;
 	private readonly VendorPdfEncryption _pdfEncryptionService;
-
+	private readonly IOrderService orderService;
 
 	public BookService(IUnitOfWork unitOfWork,
 								IFileService fileService,
 								ILogger<BookService> logger,
-									VendorPdfEncryption pdfEncryptionService)
+									VendorPdfEncryption pdfEncryptionService,
+									IOrderService orderService)
 	{
 		_unitOfWork = unitOfWork;
 		_fileService = fileService;
 		_logger = logger;
 		_pdfEncryptionService = pdfEncryptionService;
-
+		this.orderService = orderService;
 	}
 
 	public async Task<Response> AddBook(BookRequest request, string vendorId)
@@ -97,8 +98,6 @@ public class BookService : IBookService
 			return Response.Fail("An error occurred while adding the book.");
 		}
 	}
-
-
 
 	public async Task<Response> DeleteBook(string bookId)
 	{
@@ -425,6 +424,53 @@ public class BookService : IBookService
 		}
 	}
 
+	public async Task<Response> ShowPdf(string bookId, string userId)
+	{
+
+		var book = await _unitOfWork.Books.GetByIdAsync(bookId);
+		if (book == null || string.IsNullOrEmpty(book.PDFFilePath))
+			return Response.Fail("Book or PDF not found.");
+
+		var access = await _unitOfWork.UserBookAccesses
+						.GetSingleAsync(
+										uba => uba.BookId == bookId && uba.UserId == userId,
+										includes: new Expression<Func<UserBookAccess, object>>[] { s => s.User }
+						);
+
+		if (access == null)
+			return Response.Fail("User does not have access to this book.");
+
+		if (string.IsNullOrEmpty(access.FilePath))
+		{
+			var booksPdfPath = Path.Combine(await _fileService.GetFolderPath(FileFoldersName.BooksPdf), book.PDFFilePath);
+			var usersBooksPdfFolder = await _fileService.GetFolderPath(FileFoldersName.UsersBooksPdf);
+
+			var res = await orderService.DecryptAndEncryptForUserAsync(
+							booksPdfPath,
+							book.PDFIV,
+							book.PDFTag,
+							access.User.PublicKey,
+							usersBooksPdfFolder
+			);
+
+			access.FilePath = res.EncryptedFilePath;
+			access.IV = res.IV;
+			access.Tag = res.Tag;
+			access.EncryptedDEK = res.EncryptedDEK;
+
+			_unitOfWork.UserBookAccesses.Update(access);
+			await _unitOfWork.SaveChangesAsync();
+		}
+		var fileEncDetails = new FileEncDetail
+		{
+			filePath = access.FilePath,
+			EncryptedDEK = access.EncryptedDEK,
+			IV = access.IV,
+			Tag = access.Tag
+		};
+
+		return Response.Ok("", fileEncDetails);
+	}
 
 	private async Task<IEnumerable<SelectListItem>> GetCategoriesSelectList()
 	{

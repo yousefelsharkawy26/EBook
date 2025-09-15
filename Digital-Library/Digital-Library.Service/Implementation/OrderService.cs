@@ -218,11 +218,10 @@ namespace Digital_Library.Service.Services
 
 		private async Task<bool> AddPdfOrBorrowedBookForUser(string userId, string bookId, int? days = null)
 		{
-			// 1. جلب المستخدم
+
 			var user = await _unitOfWork.Users.GetSingleAsync(u => u.Id == userId);
 			if (user == null) return false;
 
-			// 2. التحقق من وجود الكتاب مسبقًا للمستخدم
 			var existing = await _unitOfWork.UserBookAccesses
 							.GetSingleAsync(uba => uba.BookId == bookId && uba.UserId == userId && (uba.DueDate == null || uba.DueDate > DateTime.UtcNow));
 
@@ -236,8 +235,6 @@ namespace Digital_Library.Service.Services
 				}
 				return false;
 			}
-
-			// 3. جلب الكتاب
 			var book = await _unitOfWork.Books.GetSingleAsync(b => b.Id == bookId);
 			if (book == null) return false;
 
@@ -250,32 +247,16 @@ namespace Digital_Library.Service.Services
 				DueDate = days.HasValue ? DateTime.UtcNow.AddDays(days.Value) : null
 			};
 
-
-			if (!string.IsNullOrEmpty(book.PDFFilePath) && user.PublicKey != null && user.PublicKey.Length > 0)
-			{
-				var result = await DecryptAndEncryptForUserAsync(
-								book.PDFFilePath,
-								book.PDFIV!,
-								book.PDFTag!,
-								user.PublicKey,
-								await fileService.GetFolderPath(FileFoldersName.UsersBooksPdf)
-				);
-
-				userBookAccess.FilePath = result.EncryptedFilePath;
-				userBookAccess.EncryptedDEK = result.EncryptedDEK;
-				userBookAccess.IV = result.IV;
-				userBookAccess.Tag = result.Tag;
-
-			}
-
 			await _unitOfWork.UserBookAccesses.AddAsync(userBookAccess);
 			await _unitOfWork.SaveChangesAsync();
 
 			return true;
 		}
+
 		public async Task<(string EncryptedFilePath, byte[] EncryptedDEK, byte[] IV, byte[] Tag)>
-				DecryptAndEncryptForUserAsync(string bookFilePath, byte[] bookIV, byte[] bookTag, byte[] userPublicKey, string outputFolder)
+				DecryptAndEncryptForUserAsync(string bookFilePath, byte[] bookIV, byte[] bookTag, string userPublicKey, string outputFolder)
 		{
+			byte[] userPublicKeyBytes = Convert.FromBase64String(userPublicKey);
 
 			var tempDecryptedPath = Path.Combine(outputFolder, $"temp_{Guid.NewGuid()}.pdf");
 
@@ -287,7 +268,7 @@ namespace Digital_Library.Service.Services
 
 
 			using var rsa = RSA.Create();
-			rsa.ImportSubjectPublicKeyInfo(userPublicKey, out _);
+			rsa.ImportSubjectPublicKeyInfo(userPublicKeyBytes, out _);
 
 
 			var encryptionResult = await _userpdfEncryptionHelper.EncryptFileAsync(
@@ -296,7 +277,6 @@ namespace Digital_Library.Service.Services
 							userEncryptedPath
 			);
 
-			// 6. حذف الملف المؤقت
 			File.Delete(tempDecryptedPath);
 
 			return (userEncryptedPath, encryptionResult.EncryptedDEK, encryptionResult.IV, encryptionResult.Tag);

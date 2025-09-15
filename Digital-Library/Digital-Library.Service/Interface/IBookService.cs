@@ -31,5 +31,6 @@ namespace Digital_Library.Service.Interface
 		Task<BookFormViewModel> GetBookCreationDataAsync(); 
 		Task CreateBookAsync(BookFormViewModel model);
 		Task UpdateBookAsync(BookFormViewModel model);
+		Task<Response> ShowPdf(string bookId, string userId);
 	}
 }

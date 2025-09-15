@@ -12,6 +12,8 @@ namespace Digital_Library.Service.Interface
 		Task<Response> ChangePasswordAsync(string userId, string oldPassword, string newPassword);
 		Task<Response> VerifyEmailAsync(string userId, string token);
 		Task<Response> ChangeEmailAsync(string userId, string newEmail);
+		Task<Response> SignInWithJwtAsync(string email, string password);
+ Task<Response> SaveUserPublicKeyAsync(string userId, string publicKey);
 	}
 
 }

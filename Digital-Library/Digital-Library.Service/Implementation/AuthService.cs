@@ -1,5 +1,6 @@
 ﻿using Digital_Library.Core.Constant;
 using Digital_Library.Core.Models;
+using Digital_Library.Core.ViewModels;
 using Digital_Library.Core.ViewModels.Responses;
 using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Hosting;
@@ -8,8 +9,12 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -24,6 +29,7 @@ public class AuthService : IAuthService
 	private readonly IActionContextAccessor _actionContextAccessor;
 	private readonly ILogger<AuthService> _logger;
 	private readonly IWebHostEnvironment _webHostEnvironment;
+	private readonly IConfiguration _config;
 
 	public AuthService(UserManager<User> userManager,
 					   SignInManager<User> signInManager,
@@ -70,6 +76,71 @@ public class AuthService : IAuthService
 		}
 
 		return Response.Ok("Sign-in successful");
+	}
+	public async Task<Response> SignInWithJwtAsync(string email, string password)
+	{
+		var user = await _userManager.FindByEmailAsync(email);
+		if (user == null)
+			return Response.Fail("User not found");
+
+		var result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
+		if (!result.Succeeded)
+			return Response.Fail("Invalid credentials");
+
+		var roles = await _userManager.GetRolesAsync(user);
+
+		var claims = new List<Claim>
+				{
+								new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+								new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
+								new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+				};
+
+		claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
+
+		var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+		var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+		var expires = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:ExpireMinutes"]!));
+
+		var token = new JwtSecurityToken(
+						issuer: _config["Jwt:Issuer"],
+						audience: _config["Jwt:Audience"],
+						claims: claims,
+						expires: expires,
+						signingCredentials: creds
+		);
+
+		string jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+		var jwtResponse = new JwtResponse
+		{
+			Token = jwt,
+			Expiration = expires,
+			UserId = user.Id,
+			Email = user.Email!,
+			Roles = roles.ToList()
+		};
+
+		return Response.Ok("Login successful", jwtResponse);
+	}
+	public async Task<Response> SaveUserPublicKeyAsync(string userId, string publicKey)
+	{
+		var user = await _userManager.FindByIdAsync(userId);
+		if (user == null)
+			return Response.Fail("User not found");
+
+		if (!string.IsNullOrEmpty( user.PublicKey))
+		{
+			return Response.Ok("");
+		}
+		user.PublicKey = publicKey;
+		var result = await _userManager.UpdateAsync(user);
+
+		if (!result.Succeeded)
+			return Response.Fail(result.Errors.FirstOrDefault()?.Description ?? "Failed to save public key");
+
+		return Response.Ok("Public key saved successfully");
 	}
 
 
@@ -279,5 +350,24 @@ public class AuthService : IAuthService
 		await _emailSender.SendEmailAsync(user.Email, "Reset Your Password", html);
 	}
 
+	// Update the constructor to accept IConfiguration and initialize the field
+	public AuthService(UserManager<User> userManager,
+																				SignInManager<User> signInManager,
+																				IEmailSender emailSender,
+																				IUrlHelperFactory urlHelperFactory,
+																				IActionContextAccessor actionContextAccessor,
+																				ILogger<AuthService> logger,
+																				IWebHostEnvironment webHostEnvironment,
+																				IConfiguration config) // Add IConfiguration parameter
+	{
+		_userManager = userManager;
+		_signInManager = signInManager;
+		_emailSender = emailSender;
+		_urlHelperFactory = urlHelperFactory;
+		_actionContextAccessor = actionContextAccessor;
+		_logger = logger;
+		_webHostEnvironment = webHostEnvironment;
+		_config = config; // Initialize the _config field
+	}
 	#endregion
 }
