@@ -1,4 +1,5 @@
-﻿using Digital_Library.Core.ViewModels;
+﻿using Digital_Library.Core.Constant;
+using Digital_Library.Core.ViewModels;
 using Digital_Library.Service.Implementation;
 using Digital_Library.Service.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,10 +17,13 @@ namespace Digital_Library.Controllers
 	{
 		private readonly IAuthService _authService;
 		private readonly IBookService bookService;
-		public ClientController(IAuthService authService, IBookService bookService)
+		private readonly IFileService fileService;
+
+		public ClientController(IAuthService authService, IBookService bookService,IFileService fileService)
 		{
 			_authService = authService;
 			this.bookService = bookService;
+			this.fileService = fileService;
 		}
 
 		[HttpPost("login")]
@@ -84,6 +88,8 @@ namespace Digital_Library.Controllers
 				return BadRequest(result.Message);
 
 			var data = result.Data as FileEncDetail;
+			var folderPath = await fileService.GetFolderPath(FileFoldersName.UsersBooksPdf);
+			data.filePath = Path.Combine(folderPath,Path.GetFileName( data.filePath));
 			if (data == null || !System.IO.File.Exists(data.filePath))
 				return NotFound("Encrypted PDF not found.");
 

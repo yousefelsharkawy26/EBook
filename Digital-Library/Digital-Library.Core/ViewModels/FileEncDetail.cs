@@ -17,5 +17,9 @@ namespace Digital_Library.Core.ViewModels
 
 		public string? filePath { get; set; }
 
+		public string? type { get; set; }
+
+		public string? Email { get; set; }
+
 	}
 }

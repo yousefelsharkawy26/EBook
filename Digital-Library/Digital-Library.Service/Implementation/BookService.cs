@@ -439,6 +439,8 @@ public class BookService : IBookService
 
 		if (access == null)
 			return Response.Fail("User does not have access to this book.");
+		if(access.DueDate is not null && DateTime.UtcNow > access.DueDate)
+			return Response.Fail("Access to this book has expired.");
 
 		if (string.IsNullOrEmpty(access.FilePath))
 		{
@@ -453,7 +455,9 @@ public class BookService : IBookService
 							usersBooksPdfFolder
 			);
 
-			access.FilePath = res.EncryptedFilePath;
+			var fileName = Path.GetFileName(res.EncryptedFilePath); 
+			access.FilePath = Path.Combine(FileFoldersName.UsersBooksPdf, fileName); 
+
 			access.IV = res.IV;
 			access.Tag = res.Tag;
 			access.EncryptedDEK = res.EncryptedDEK;
@@ -466,7 +470,9 @@ public class BookService : IBookService
 			filePath = access.FilePath,
 			EncryptedDEK = access.EncryptedDEK,
 			IV = access.IV,
-			Tag = access.Tag
+			Tag = access.Tag,
+			Email	= access.User.Email,
+			type	= access.DueDate.HasValue ? FormatType.Borrowing.ToString() : FormatType.PDF.ToString()
 		};
 
 		return Response.Ok("", fileEncDetails);

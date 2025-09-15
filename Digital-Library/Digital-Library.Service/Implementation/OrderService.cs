@@ -254,33 +254,37 @@ namespace Digital_Library.Service.Services
 		}
 
 		public async Task<(string EncryptedFilePath, byte[] EncryptedDEK, byte[] IV, byte[] Tag)>
-				DecryptAndEncryptForUserAsync(string bookFilePath, byte[] bookIV, byte[] bookTag, string userPublicKey, string outputFolder)
+										DecryptAndEncryptForUserAsync(string bookFilePath, byte[] bookIV, byte[] bookTag, string userPublicKey, string outputFolder)
 		{
 			byte[] userPublicKeyBytes = Convert.FromBase64String(userPublicKey);
 
 			var tempDecryptedPath = Path.Combine(outputFolder, $"temp_{Guid.NewGuid()}.pdf");
 
-
-			await vendorPdfEncryption.DecryptFileToDiskAsync(bookFilePath, tempDecryptedPath, bookIV, bookTag);
-
+			await vendorPdfEncryption.DecryptFileAsync(bookFilePath, tempDecryptedPath, bookIV, bookTag);
 
 			var userEncryptedPath = Path.Combine(outputFolder, $"{Guid.NewGuid()}.enc");
 
+			(string EncryptedFilePath, byte[] IV, byte[] Tag, byte[] EncryptedDEK) encryptionResult;
 
-			using var rsa = RSA.Create();
-			rsa.ImportSubjectPublicKeyInfo(userPublicKeyBytes, out _);
+			using (var fs = File.OpenRead(tempDecryptedPath))
+			{
+				var formFile = new FormFile(fs, 0, fs.Length, "PDF", Path.GetFileName(tempDecryptedPath));
+				using var rsa = RSA.Create();
+				rsa.ImportSubjectPublicKeyInfo(userPublicKeyBytes, out _);
 
-
-			var encryptionResult = await _userpdfEncryptionHelper.EncryptFileAsync(
-							new FormFile(File.OpenRead(tempDecryptedPath), 0, new FileInfo(tempDecryptedPath).Length, "PDF", Path.GetFileName(tempDecryptedPath)),
-							rsa,
-							userEncryptedPath
-			);
+				encryptionResult = await _userpdfEncryptionHelper.EncryptFileAsync(
+								formFile,
+								rsa,
+								userEncryptedPath
+				);
+			}
 
 			File.Delete(tempDecryptedPath);
 
 			return (userEncryptedPath, encryptionResult.EncryptedDEK, encryptionResult.IV, encryptionResult.Tag);
 		}
+
+
 
 
 

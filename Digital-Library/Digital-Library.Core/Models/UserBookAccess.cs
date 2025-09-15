@@ -28,8 +28,9 @@ namespace Digital_Library.Core.Models
 		public string? FilePath { get; set; }
 
 		// Envelope Encryption fields
-		[Column(TypeName = "varbinary(32)")]
+		[Column(TypeName = "varbinary(256)")]
 		public byte[]? EncryptedDEK { get; set; }
+
 
 		[Column(TypeName = "varbinary(16)")]
 		public byte[]? IV { get; set; }
