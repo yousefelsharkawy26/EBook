@@ -57,6 +57,28 @@ namespace Digital_Library.AdminPanel.Controllers
 			return View("Update", request);
 		}
 
+		[HttpGet()]
+		public async Task<IActionResult> Add()
+		{
+			return View();
+		}
+		[HttpPost()]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Add(CategoryRequest request)
+		{
+			if (!ModelState.IsValid)
+			{
+				return View("Add", request);
+			}
+			var result = await categoryService.AddCategory(request);
+			if (result.Success)
+			{
+				TempData["SuccessMessage"] = result.Message;
+				return RedirectToAction("Index");
+			}
+			ModelState.AddModelError(string.Empty, result.Message);
+			return View("Add", request);
+		}
 
 
 	}
