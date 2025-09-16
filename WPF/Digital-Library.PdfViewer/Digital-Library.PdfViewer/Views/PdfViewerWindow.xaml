@@ -1,0 +1,80 @@
+﻿<Window x:Class="Digital_Library.PdfViewer.Views.PdfViewerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Digital_Library.PdfViewer.Controls" 
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="PdfViewerWindow" Height="700" Width="1000"
+        Loaded="Window_Loaded" PreviewKeyDown="Window_PreviewKeyDown">
+
+	<Grid x:Name="MainGrid">
+		<DockPanel>
+			<!-- Toolbar -->
+			<ToolBar x:Name="PdfToolBar" DockPanel.Dock="Top">
+				
+				<Separator/>
+				<Button Content="✏️ Pencil" Click="Pencil_Click"/>
+				<Button Content="🖍️ Highlight" Click="Highlight_Click"/>
+				<Button Content="🔤 Text" Click="Text_Click"/>
+				<Button Content="🧽 Erase" Click="Erase_Click"/>
+				<Button Content="❌ Clear Page" Click="Clear_Click"/>
+				<Button Content="🔲 Select" Click="Select_Click"/>
+				<Separator/>
+				<Button Content="➕ Zoom In" Click="ZoomIn_Click"/>
+				<Button Content="➖ Zoom Out" Click="ZoomOut_Click"/>
+				<Separator/>
+				<TextBox x:Name="SearchBox" Width="80" KeyDown="SearchBox_KeyDown"/>
+				<TextBlock x:Name="PageInfo" Margin="10,0,0,0" VerticalAlignment="Center"/>
+			</ToolBar>
+
+			<!-- PDF Viewer -->
+			<local:CustomPdfViewer x:Name="PdfRenderer"/>
+		</DockPanel>
+        <Button HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Width="40"
+                Height="40"
+                Margin="20"
+                Click="Prev_Click"/>
+        <Button HorizontalAlignment="Left"
+		        VerticalAlignment="Center"
+                Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
+                ToolTip="Go Next (Mini)"
+                Click="Prev_Click"
+                Margin="30"
+                Background="OrangeRed">
+            <materialDesign:PackIcon
+                        Kind="ChevronLeft" 
+                        Height="20"
+                        Width="20" />
+        </Button>
+
+        <Button HorizontalAlignment="Right"
+				VerticalAlignment="Center"
+                Width="40"
+                Height="40"
+                Margin="20"
+                Click="Next_Click"
+                >
+            <Button.Content>
+                <Border Width="40"
+						Height="40"
+						Padding="10">
+                    <materialDesign:PackIcon Kind="NavigateNext" 
+										 VerticalAlignment="Center"/>
+                </Border>
+            </Button.Content>
+        </Button>
+        <Button HorizontalAlignment="Right"
+				VerticalAlignment="Center"
+                Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
+                ToolTip="Go Next (Mini)"
+                Click="Next_Click"
+                Margin="30"
+                Background="OrangeRed">
+            <materialDesign:PackIcon Kind="ChevronRight" 
+                                     Height="20"
+                                     Width="20" />
+        </Button>
+    </Grid>
+</Window>
+	

@@ -7,13 +7,13 @@
     <Compile Update="Controls\CustomPdfViewer.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="LoginWindow.xaml.cs">
+    <Compile Update="Views\LoginWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="MyBooksWindow.xaml.cs">
+    <Compile Update="Views\MyBooksWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="PdfViewerWindow.xaml.cs">
+    <Compile Update="Views\PdfViewerWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

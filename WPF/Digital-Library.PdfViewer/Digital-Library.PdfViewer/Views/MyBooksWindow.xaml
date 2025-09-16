@@ -1,0 +1,135 @@
+﻿<Window x:Class="Digital_Library.PdfViewer.Views.MyBooksWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        xmlns:conv="clr-namespace:Digital_Library.PdfViewer.Helpers"
+        Title="My Books"
+        MinHeight="600"
+        MinWidth="900"
+        WindowStartupLocation="CenterScreen"
+        xmlns:viewModels="clr-namespace:Digital_Library.PdfViewer.ViewModels"
+        d:DataContext="{d:DesignInstance Type=viewModels:MyBooksViewModel}"
+        Background="#F4F6FB">
+
+	<Window.Resources>
+		<!-- Style for all buttons with hover effect -->
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <conv:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+
+        <Style x:Key="AppButtonStyle" TargetType="Button">
+			<Setter Property="Background" Value="#3182CE"/>
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="Padding" Value="6,2"/>
+			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="Cursor" Value="Hand"/>
+			<Setter Property="BorderBrush" Value="#3182CE"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="Width" Value="100"/>
+			<Setter Property="Margin" Value="5"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Button">
+						<Border x:Name="border" Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+							<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter TargetName="border" Property="Background" Value="#2B6CB0"/>
+								<Setter TargetName="border" Property="BorderBrush" Value="#2B6CB0"/>
+							</Trigger>
+							<Trigger Property="IsPressed" Value="True">
+								<Setter TargetName="border" Property="Background" Value="#225EA8"/>
+								<Setter TargetName="border" Property="BorderBrush" Value="#225EA8"/>
+							</Trigger>
+							<Trigger Property="IsEnabled" Value="False">
+								<Setter TargetName="border" Property="Background" Value="#A0AEC0"/>
+								<Setter TargetName="border" Property="BorderBrush" Value="#A0AEC0"/>
+								<Setter Property="Foreground" Value="#E2E8F0"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+	</Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <DockPanel Grid.Row="0" LastChildFill="False">
+            <TextBlock Text="My Books" FontSize="28" FontWeight="Bold" Foreground="#2D3748"
+                       HorizontalAlignment="Center" Margin="0,10,0,25" DockPanel.Dock="Left"/>
+            <!-- Changed Click to Command -->
+            <Button Content="Reload" Style="{StaticResource AppButtonStyle}" Command="{Binding LoadBooksCommand}" DockPanel.Dock="Right"/>
+        </DockPanel>
+
+        <!-- Book List -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <!-- Changed x:Name to Binding ItemsSource -->
+            <ItemsControl ItemsSource="{Binding Books}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel IsItemsHost="True" Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="White" CornerRadius="12" Margin="10" Padding="12"
+                                BorderBrush="#E2E8F0" BorderThickness="1">
+                            <Border.Effect>
+                                <DropShadowEffect Color="Gray" BlurRadius="8" ShadowDepth="2" Opacity="0.3"/>
+                            </Border.Effect>
+                            <StackPanel Width="180">
+                                <!-- Bindings are now to BookItemViewModel properties -->
+                                <Border Width="160" Height="220" CornerRadius="6" BorderBrush="#E2E8F0" BorderThickness="1">
+                                    <Image Source="{Binding FullImageBookCoverPath}" Stretch="Uniform"/>
+                                </Border>
+                                <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="#222" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                                <TextBlock Text="{Binding Author}" FontStyle="Italic" FontSize="14" Foreground="#4A5568" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                                <TextBlock Text="{Binding BorrowedStatusText}" FontSize="12" Foreground="#E53E3E" Margin="0,2,0,0"/>
+                                <!-- Changed Click to Command, Tag to CommandParameter -->
+                                <Button Content="Show PDF" 
+                                        Style="{StaticResource AppButtonStyle}" 
+                                        Padding="4" 
+                                        Command="{Binding DataContext.ShowPdfForBookCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Pagination -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,10">
+            <!-- Changed Click to Command, IsEnabled is now handled by the command -->
+            <Button Content="Previous" Style="{StaticResource AppButtonStyle}" Command="{Binding GoToPrevPageCommand}"/>
+            <!-- Changed x:Name to Binding -->
+            <TextBlock Text="{Binding PageInfoText}" VerticalAlignment="Center" FontWeight="Bold" FontSize="15" Margin="12,0"/>
+            <Button Content="Next" Style="{StaticResource AppButtonStyle}" Command="{Binding GoToNextPageCommand}"/>
+        </StackPanel>
+
+        <!-- Loading / Error Indicator -->
+        <Grid Grid.Row="1" Grid.RowSpan="2">
+            <!-- Error Message -->
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}"/>
+
+            <!-- Busy Indicator -->
+            <Border Background="#80FFFFFF" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <ProgressBar IsIndeterminate="True" Width="200" Height="20" VerticalAlignment="Center"/>
+            </Border>
+        </Grid>
+
+    </Grid>
+</Window>

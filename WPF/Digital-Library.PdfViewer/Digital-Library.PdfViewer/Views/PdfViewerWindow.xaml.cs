@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -10,7 +9,7 @@ using Microsoft.Win32;
 using System.Windows.Ink;
 using Digital_Library.PdfViewer.Enum;
 
-namespace Digital_Library.PdfViewer
+namespace Digital_Library.PdfViewer.Views
 {
 	public partial class PdfViewerWindow : Window
 	{
@@ -89,36 +88,6 @@ namespace Digital_Library.PdfViewer
 				UpdatePageInfo();
 			}
 		}
-
-
-
-
-		private void Print_Click(object sender, RoutedEventArgs e)
-		{
-			if (_currentType == FormatType.Borrowing.ToString()) return;
-
-			var dialog = new PrintDialog();
-			if (dialog.ShowDialog() == true)
-			{
-				dialog.PrintVisual(PdfRenderer, "Printing PDF Document");
-			}
-		}
-
-		private void Save_Click(object sender, RoutedEventArgs e)
-		{
-			if (_currentType == FormatType.Borrowing.ToString()) return;
-
-			var saveFileDialog = new SaveFileDialog
-			{
-				Filter = "PDF File (*.pdf)|*.pdf",
-				Title = "Save PDF File"
-			};
-			if (saveFileDialog.ShowDialog() == true)
-			{
-				File.WriteAllBytes(saveFileDialog.FileName, _originalPdfBytes);
-			}
-		}
-
 		private void Pencil_Click(object sender, RoutedEventArgs e)
 		{
 			var canvas = PdfRenderer.GetCurrentCanvas();
