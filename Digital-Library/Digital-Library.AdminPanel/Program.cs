@@ -1,6 +1,8 @@
+using Digital_Library.Core.Services;
 using Digital_Library.Infrastructure;
 using Digital_Library.Infrastructure.Context;
 using Digital_Library.Service;
+using Digital_Library.Service.Helpers;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -32,7 +34,10 @@ namespace Digital_Library.AdminPanel
 																				options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
 																				options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 																			});
-
+			builder.Services.AddSingleton(new VendorPdfEncryption(
+	builder.Configuration["Encryption:PdfKey"]
+));
+			builder.Services.AddSingleton(new UserPdfEncryptionService());
 			var app = builder.Build();
 
 			// Configure the HTTP request pipeline.
