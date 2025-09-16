@@ -9,7 +9,7 @@ namespace Digital_Library.PdfViewer.Services;
 public class AuthService : IAuthService
 {
     private readonly HttpClient _httpClient;
-
+    public string UserId { get; private set; }
     public AuthService(IHttpClientFactory httpClient)
     {
         _httpClient = httpClient.CreateClient("E-Book Client");
@@ -37,6 +37,8 @@ public class AuthService : IAuthService
         UserSession.Instance.TokenExpiration = result.Data.Expiration;
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", UserSession.Instance.JwtToken);
+
+        UserId = result.Data.UserId;
 
         return result.Data;
     }
