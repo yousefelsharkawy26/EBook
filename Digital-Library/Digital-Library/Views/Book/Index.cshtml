@@ -185,15 +185,6 @@
                                     <i class="bi bi-three-dots-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    @if (book.HasPDF)
-                                    {
-                                        <li>
-                                            <a class="dropdown-item" asp-action="ShowPdf" asp-route-id="@book.Id" target="_blank">
-                                                <i class="bi bi-file-earmark-pdf me-2 text-danger"></i> Show PDF
-                                            </a>
-                                        </li>
-                                    }
-
                                     <li>
                                         <a class="dropdown-item" asp-action="EditBook" asp-route-id="@book.Id">
                                             <i class="bi bi-pencil-square me-2 text-warning"></i> Edit
