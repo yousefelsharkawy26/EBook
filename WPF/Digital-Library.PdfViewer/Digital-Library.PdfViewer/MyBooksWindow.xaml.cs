@@ -60,7 +60,7 @@ namespace Digital_Library.PdfViewer
 			try
 			{
 				var response = await _httpClient.GetFromJsonAsync<EncryptedPdfViewModel>(
-								$"https://localhost:7254/api/Client/ShowPdf/{bookId}");
+								$"https://zzaki213-001-site1.stempurl.com/api/Client/ShowPdf/{bookId}");
 
 				if (response == null)
 				{
@@ -118,13 +118,13 @@ namespace Digital_Library.PdfViewer
 			try
 			{
 				var result = await _httpClient.GetFromJsonAsync<PagedResult<UserBookDto>>(
-								$"https://localhost:7254/api/Client/MyBooks?page={_currentPage}&pageSize={_pageSize}");
+								$"https://zzaki213-001-site1.stempurl.com/api/Client/MyBooks?page={_currentPage}&pageSize={_pageSize}");
 
 				if (result != null)
 				{
 					foreach (var book in result.Items)
 					{
-						book.ImageBookCoverPath = "https://localhost:7254/" + book.ImageBookCoverPath;
+						book.ImageBookCoverPath = "https://zzaki213-001-site1.stempurl.com/" + book.ImageBookCoverPath;
 
 						if (book.StringType == FormatType.Borrowing.ToString())
 						{

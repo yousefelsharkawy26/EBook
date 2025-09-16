@@ -29,7 +29,7 @@ namespace Digital_Library.PdfViewer
 
 			try
 			{
-				var response = await _httpClient.PostAsJsonAsync("https://localhost:7254/api/Client/login", loginRequest);
+				var response = await _httpClient.PostAsJsonAsync("https://zzaki213-001-site1.stempurl.com/api/Client/login", loginRequest);
 				if (response.IsSuccessStatusCode)
 				{
 					var result = await response.Content.ReadFromJsonAsync<ApiResponse<JwtResponse>>();
@@ -56,7 +56,7 @@ namespace Digital_Library.PdfViewer
 					
 							var publicKeyRequest = new { PublicKey = publicKeyBase64 };
 							var keyResponse = await _httpClient.PostAsJsonAsync(
-											"https://localhost:7254/api/Client/register-public-key",
+											"https://zzaki213-001-site1.stempurl.com/api/Client/register-public-key",
 											publicKeyRequest);
 
 							if (!keyResponse.IsSuccessStatusCode)
