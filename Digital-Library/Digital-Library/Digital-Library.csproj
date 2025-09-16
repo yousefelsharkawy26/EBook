@@ -29,7 +29,9 @@
 
   <ItemGroup>
     <Folder Include="Files\" />
+    <Folder Include="wwwroot\BooksImageCover\" />
     <Folder Include="wwwroot\UserProfileImage\" />
+    <Folder Include="wwwroot\VendorLibraryLogo\" />
   </ItemGroup>
 
   <ItemGroup>

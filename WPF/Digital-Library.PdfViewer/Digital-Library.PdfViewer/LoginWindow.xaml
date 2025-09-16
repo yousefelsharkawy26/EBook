@@ -17,7 +17,7 @@
 			<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
 				<Ellipse Width="113" Height="112" Margin="0,0,0,20">
 					<Ellipse.Fill>
-						<ImageBrush ImageSource="D:\ITI Project\EBook\WPF\Digital-Library.PdfViewer\Digital-Library.PdfViewer\images\logo.ico" Stretch="UniformToFill"/>
+						<ImageBrush ImageSource="https://images.icon-icons.com/1148/PNG/512/1486503746-book-learning-bookmark-ribbon-education-mark-school_81290.png" Stretch="UniformToFill"/>
 					</Ellipse.Fill>
 					<Ellipse.Effect>
 						<DropShadowEffect BlurRadius="10" ShadowDepth="2" Color="#FFB08B5C"/>
@@ -39,11 +39,11 @@
 				<TextBlock Text="Sign In" FontSize="28" FontWeight="Bold" Foreground="#FF6C4F3D" Margin="0,0,0,25" TextAlignment="Center"/>
 				<StackPanel Margin="0,0,0,10">
 					<TextBlock Text="Email" FontWeight="SemiBold" Foreground="#FF6C4F3D" Margin="0,0,0,5"/>
-					<TextBox x:Name="EmailBox" Height="36" Padding="10" Background="#FFF5E9D6" BorderBrush="#FFB08B5C" BorderThickness="1" />
+					<TextBox x:Name="EmailBox" Height="42" Padding="10" Background="#FFF5E9D6" BorderBrush="#FFB08B5C" BorderThickness="1" />
 				</StackPanel>
 				<StackPanel Margin="0,0,0,20">
 					<TextBlock Text="Password" FontWeight="SemiBold" Foreground="#FF6C4F3D" Margin="0,0,0,5"/>
-					<PasswordBox x:Name="PasswordBox" Height="36" Padding="10" Background="#FFF5E9D6" BorderBrush="#FFB08B5C" BorderThickness="1" />
+					<PasswordBox x:Name="PasswordBox" Height="42" Padding="10" Background="#FFF5E9D6" BorderBrush="#FFB08B5C" BorderThickness="1" />
 				</StackPanel>
 				<Button Content="Login" Height="40" Background="#FF6C4F3D" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Margin="0,0,0,15"  Click="LoginButton_Click" />
 			</StackPanel>
