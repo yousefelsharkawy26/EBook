@@ -27,7 +27,6 @@ namespace Digital_Library.Controllers
 		}
 
 		[HttpPost("login")]
-
 		public async Task<IActionResult> Login([FromBody] LoginRequest request)
 		{
 			if (!ModelState.IsValid)
@@ -102,6 +101,8 @@ namespace Digital_Library.Controllers
 				Tag = data.Tag,
 				EncryptedDEK = data.EncryptedDEK,
 				FileName = Path.GetFileName(data.filePath)
+				,Email=data.Email,
+				type=data.type
 			};
 
 			return Ok(viewModel);

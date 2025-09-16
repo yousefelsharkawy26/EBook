@@ -24,9 +24,6 @@ using System.Windows.Shapes;
 
 namespace Digital_Library.PdfViewer
 {
-	/// <summary>
-	/// Interaction logic for MyBooksWindow.xaml
-	/// </summary>
 	public partial class MyBooksWindow : Window
 	{
 		private readonly HttpClient _httpClient;
@@ -79,9 +76,8 @@ namespace Digital_Library.PdfViewer
 
 				using var ms = new MemoryStream(decryptedPdfBytes);
 				var pdfStreamCopy = new MemoryStream(ms.ToArray());
-				var pdfWindow = new PdfViewerWindow(pdfStreamCopy, response.Email);
+				var pdfWindow = new PdfViewerWindow(pdfStreamCopy, response.Email,response.type);
 				pdfWindow.ShowDialog();
-				this.Close();
 			}
 			catch (Exception ex)
 			{
