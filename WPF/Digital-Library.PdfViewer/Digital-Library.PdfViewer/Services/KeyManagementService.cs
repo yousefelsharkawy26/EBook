@@ -8,23 +8,26 @@ namespace Digital_Library.PdfViewer.Services
     public class KeyManagementService : IKeyManagementService
     {
         private readonly IAuthService _authService;
-        private readonly string _privateKeyPath;
 
         public KeyManagementService(IAuthService authService)
         {
             _authService = authService;
-            _privateKeyPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "private.key");
         }
 
         public async Task<(RSA rsa, string publicKeyBase64)> LoadOrCreateKeysAsync()
         {
+            string privateKeyFolder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), _authService.UserId);
+            if (!Directory.Exists(privateKeyFolder))
+                Directory.CreateDirectory(privateKeyFolder);
+
+            string privateKeyPath = Path.Combine(privateKeyFolder, "private.key");
+
             RSA rsa = RSA.Create();
             string publicKeyBase64;
             string privateKeyBase64;
 
-            if (!File.Exists(_privateKeyPath))
+            if (!File.Exists(privateKeyPath))
             {
                 (publicKeyBase64, privateKeyBase64) = KeyHelper.GenerateKeyPair();
 
@@ -36,11 +39,11 @@ namespace Digital_Library.PdfViewer.Services
                     Encoding.UTF8.GetBytes(privateKeyBase64),
                     null,
                     DataProtectionScope.CurrentUser);
-                await File.WriteAllBytesAsync(_privateKeyPath, encryptedKey);
+                await File.WriteAllBytesAsync(privateKeyPath, encryptedKey);
             }
             else
             {
-                var encryptedKey = await File.ReadAllBytesAsync(_privateKeyPath);
+                var encryptedKey = await File.ReadAllBytesAsync(privateKeyPath);
                 var privateKeyBytes = ProtectedData.Unprotect(encryptedKey, null, DataProtectionScope.CurrentUser);
                 privateKeyBase64 = Encoding.UTF8.GetString(privateKeyBytes);
             }

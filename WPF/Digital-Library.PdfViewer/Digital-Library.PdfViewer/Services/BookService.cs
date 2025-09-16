@@ -11,16 +11,18 @@ namespace Digital_Library.PdfViewer.Services
     public class BookService : IBookService
     {
         private readonly HttpClient _httpClient;
-
+        private readonly UserSession _userSession;
         public BookService(IHttpClientFactory httpClient)
         {
             _httpClient = httpClient.CreateClient("E-Book Client");
             // The token should be set on the HttpClient instance when the service is created
             // This is typically handled by a factory or dependency injection
-            if (UserSession.Instance.JwtToken != null)
+            _userSession = UserSession.Instance;
+
+            if (_userSession.JwtToken != null)
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", UserSession.Instance.JwtToken);
+                    new AuthenticationHeaderValue("Bearer", _userSession.JwtToken);
             }
         }
 
@@ -65,10 +67,10 @@ namespace Digital_Library.PdfViewer.Services
 
         private byte[] DecryptPdf(byte[] encryptedFile, byte[] encryptedDEK, byte[] iv, byte[] tag)
         {
-            if (UserSession.Instance.Rsa == null)
+            if (_userSession.Rsa == null)
                 throw new InvalidOperationException("User RSA keys are not loaded.");
 
-            byte[] dek = UserSession.Instance.Rsa.Decrypt(encryptedDEK, RSAEncryptionPadding.OaepSHA256);
+            byte[] dek = _userSession.Rsa.Decrypt(encryptedDEK, RSAEncryptionPadding.OaepSHA256);
 
             byte[] decrypted = new byte[encryptedFile.Length];
             using var aesGcm = new AesGcm(dek);

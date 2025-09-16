@@ -43,8 +43,8 @@ namespace Digital_Library.PdfViewer.ViewModels
                 var password = passwordBox.Password;
 
                 // 1. Authenticate and get JWT
-                await _authService.LoginAsync(Email, password);
-
+                var auth = await _authService.LoginAsync(Email, password);
+                
                 // 2. Load or create cryptographic keys
                 var (rsa, publicKey) = await _keyManagementService.LoadOrCreateKeysAsync();
 
