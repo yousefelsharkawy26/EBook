@@ -53,7 +53,7 @@ public class BooksController : Controller
 
 	[HttpPost]
 	[ValidateAntiForgeryToken]
-	public async Task<IActionResult> Edit(BookFormViewModel model)
+	public async Task<IActionResult> Edit(BookFormViewModel model, IFormFile CoverImage)
 	{
 		if (!ModelState.IsValid)
 		{
